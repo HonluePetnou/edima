@@ -1,0 +1,253 @@
+[
+  {
+    "id": "tpl_envoi_montant_nom",
+    "category": "transfert",
+    "fr": "Tu vas envoyer {montant} à {nom}.",
+    "variables": [
+      "montant",
+      "nom"
+    ],
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "tpl_solde_reste",
+    "category": "compte",
+    "fr": "Il te reste sur ton compte {montant}.",
+    "variables": [
+      "montant"
+    ],
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "tpl_solde_disponible",
+    "category": "compte",
+    "fr": "Ton solde disponible est de {montant}.",
+    "variables": [
+      "montant"
+    ],
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "tpl_frais_transfert",
+    "category": "transfert",
+    "fr": "Les frais de ce transfert sont de {montant}.",
+    "variables": [
+      "montant"
+    ],
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "tpl_total_sortant",
+    "category": "transfert",
+    "fr": "Le total qui sort de ton compte est {montant}.",
+    "variables": [
+      "montant"
+    ],
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "tpl_envoi_complet",
+    "category": "transfert",
+    "fr": "Tu envoies {montant} à {nom}, numéro {telephone}.",
+    "variables": [
+      "montant",
+      "nom",
+      "telephone"
+    ],
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "tpl_bouton_description",
+    "category": "navigation",
+    "fr": "« {bouton} » : {description}.",
+    "variables": [
+      "bouton",
+      "description"
+    ],
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "tpl_bouton_sert_a",
+    "category": "navigation",
+    "fr": "Le bouton « {bouton} » sert à {description}.",
+    "variables": [
+      "bouton",
+      "description"
+    ],
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "tpl_edima_lit_passage",
+    "category": "voix",
+    "fr": "Edima lit ce passage.",
+    "variables": [],
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "tpl_edima_explique_champs",
+    "category": "parcours",
+    "fr": "Edima explique chaque champ à voix haute.",
+    "variables": [],
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "tpl_remplis_toi_meme",
+    "category": "parcours",
+    "fr": "Remplis le formulaire toi-même sur le site, ou dis les valeurs à voix haute.",
+    "variables": [],
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "tpl_clique_toi_meme",
+    "category": "confirmation",
+    "fr": "Si tout est juste, clique toi-même sur « {bouton} ».",
+    "variables": [
+      "bouton"
+    ],
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "tpl_nouveau_message_lu",
+    "category": "securite",
+    "fr": "Un message est apparu sur la page. Edima le lit maintenant.",
+    "variables": [],
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "tpl_demande_code_sms",
+    "category": "securite",
+    "fr": "Un message te demande ton code secret par SMS.",
+    "variables": [],
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "tpl_jamais_demande",
+    "category": "securite",
+    "fr": "Ta banque et Edima ne te le demanderont jamais.",
+    "variables": [],
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "tpl_ny_reponds_pas",
+    "category": "securite",
+    "fr": "N'y réponds pas.",
+    "variables": [],
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "tpl_dis_jai_compris",
+    "category": "securite",
+    "fr": "Dis « j'ai compris », ou appuie sur le bouton ci-dessous.",
+    "variables": [],
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "tpl_dis_oui_continuer",
+    "category": "confirmation",
+    "fr": "Dis « oui » pour continuer, ou « répète » pour réécouter.",
+    "variables": [],
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "tpl_detecte_instant",
+    "category": "securite",
+    "fr": "Détecté à l'instant.",
+    "variables": [],
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "tpl_transfert_recu_de",
+    "category": "compte",
+    "fr": "Transfert reçu de {nom}, {montant}.",
+    "variables": [
+      "nom",
+      "montant"
+    ],
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "tpl_paiement_facture_fournisseur",
+    "category": "compte",
+    "fr": "Paiement de facture {fournisseur}, {montant}.",
+    "variables": [
+      "fournisseur",
+      "montant"
+    ],
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "tpl_retrait_guichet_montant",
+    "category": "compte",
+    "fr": "Retrait au guichet, {montant}.",
+    "variables": [
+      "montant"
+    ],
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "tpl_aujourdhui_date",
+    "category": "transfert",
+    "fr": "Aujourd'hui, {date}.",
+    "variables": [
+      "date"
+    ],
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "tpl_compte_numero",
+    "category": "compte",
+    "fr": "Compte numéro {numero_masque}.",
+    "variables": [
+      "numero_masque"
+    ],
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  }
+]

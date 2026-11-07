@@ -1,0 +1,578 @@
+[
+  {
+    "id": "solde_disponible",
+    "category": "compte",
+    "fr": "Solde disponible",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "numero_compte",
+    "category": "compte",
+    "fr": "Compte n°",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "compte_courant",
+    "category": "compte",
+    "fr": "Compte courant",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "dernieres_operations",
+    "category": "compte",
+    "fr": "Dernières opérations",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "transfert_recu",
+    "category": "compte",
+    "fr": "Transfert reçu",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "paiement_facture",
+    "category": "compte",
+    "fr": "Paiement facture",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "retrait_guichet",
+    "category": "compte",
+    "fr": "Retrait au guichet",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "solde_insuffisant",
+    "category": "compte",
+    "fr": "Solde insuffisant",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "beneficiaire",
+    "category": "transfert",
+    "fr": "Bénéficiaire",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "montant_envoye",
+    "category": "transfert",
+    "fr": "Montant envoyé",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "montant_a_envoyer",
+    "category": "transfert",
+    "fr": "Montant à envoyer",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "frais",
+    "category": "transfert",
+    "fr": "Frais",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "total_debite",
+    "category": "transfert",
+    "fr": "Total débité",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "date",
+    "category": "transfert",
+    "fr": "Date",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "message_optionnel",
+    "category": "transfert",
+    "fr": "Message (optionnel)",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "tu_envoies",
+    "category": "transfert",
+    "fr": "Tu envoies",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "a_destinataire",
+    "category": "transfert",
+    "fr": "À",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "franc_cfa",
+    "category": "transfert",
+    "fr": "FCFA",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "numero_telephone",
+    "category": "transfert",
+    "fr": "Numéro de téléphone",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "transfert_refuse",
+    "category": "transfert",
+    "fr": "Transfert refusé",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "envoyer_argent",
+    "category": "navigation",
+    "fr": "Envoyer de l'argent",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "retirer",
+    "category": "navigation",
+    "fr": "Retirer",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "payer_facture",
+    "category": "navigation",
+    "fr": "Payer une facture",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "accueil",
+    "category": "navigation",
+    "fr": "Accueil",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "comptes",
+    "category": "navigation",
+    "fr": "Comptes",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "virements",
+    "category": "navigation",
+    "fr": "Virements",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "aide",
+    "category": "navigation",
+    "fr": "Aide",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "bonjour",
+    "category": "navigation",
+    "fr": "Bonjour",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "confirmer",
+    "category": "confirmation",
+    "fr": "Confirmer",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "confirmer_transfert",
+    "category": "confirmation",
+    "fr": "Confirmer le transfert",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "annuler",
+    "category": "confirmation",
+    "fr": "Annuler",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "etape",
+    "category": "confirmation",
+    "fr": "Étape",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "sur",
+    "category": "confirmation",
+    "fr": "sur",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "recapitulatif",
+    "category": "confirmation",
+    "fr": "Récapitulatif",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "recapitulatif_transfert",
+    "category": "confirmation",
+    "fr": "Récapitulatif du transfert",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "operation_irreversible",
+    "category": "confirmation",
+    "fr": "Cette opération est irréversible",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "code_secret",
+    "category": "securite",
+    "fr": "Code secret",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "ne_jamais_partager_code_tel",
+    "category": "securite",
+    "fr": "Ne partage jamais ton code secret, même par téléphone",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "ne_jamais_communiquer_code_agence",
+    "category": "securite",
+    "fr": "Ne communiquez jamais votre code secret, même à un conseiller de la banque",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "alerte_securite",
+    "category": "securite",
+    "fr": "Alerte sécurité",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "arnaque_possible",
+    "category": "securite",
+    "fr": "Arnaque possible",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "ce_nest_pas_ta_banque",
+    "category": "securite",
+    "fr": "Ce n'est pas ta banque",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "message_detecte",
+    "category": "securite",
+    "fr": "Message détecté sur la page",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "action_requise",
+    "category": "securite",
+    "fr": "Action requise",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "detecte_a_linstant",
+    "category": "securite",
+    "fr": "Détecté à l'instant",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "erreur",
+    "category": "securite",
+    "fr": "Erreur",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "avertissement",
+    "category": "securite",
+    "fr": "Avertissement",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "lis_moi_cette_page",
+    "category": "voix",
+    "fr": "Lis-moi cette page",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "ecouter",
+    "category": "voix",
+    "fr": "Écouter",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "repeter",
+    "category": "voix",
+    "fr": "Répéter",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "pause",
+    "category": "voix",
+    "fr": "Pause",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "plus_lent",
+    "category": "voix",
+    "fr": "Plus lent",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "reecouter",
+    "category": "voix",
+    "fr": "Réécouter",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "jai_compris",
+    "category": "voix",
+    "fr": "J'ai compris",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "ce_que_dit_la_page",
+    "category": "voix",
+    "fr": "Ce que dit la page",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "valide",
+    "category": "transparence",
+    "fr": "Validé",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "valide_par_linguiste",
+    "category": "transparence",
+    "fr": "Validé par le linguiste",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "non_verifie",
+    "category": "transparence",
+    "fr": "Non vérifié",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "ia_non_verifie",
+    "category": "transparence",
+    "fr": "IA — non vérifié",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "voir_le_francais",
+    "category": "transparence",
+    "fr": "Voir le français",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "texte_original",
+    "category": "transparence",
+    "fr": "Texte original",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "la_page_dans_lordre",
+    "category": "parcours",
+    "fr": "La page, dans l'ordre",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "ce_quedima_texplique",
+    "category": "parcours",
+    "fr": "Ce qu'Edima t'explique",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "etape_1_sur_3_consulter_solde",
+    "category": "parcours",
+    "fr": "Étape 1 sur 3 — Consulter le solde",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "etape_2_sur_3_remplir",
+    "category": "parcours",
+    "fr": "Étape 2 sur 3 : remplir",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "etape_3_sur_3_verifier",
+    "category": "parcours",
+    "fr": "Étape 3 sur 3 : vérifier",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "montants_identiques_saisie",
+    "category": "coherence",
+    "fr": "Les montants sont les mêmes que ceux que tu as saisis",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "montant_verifie_saisie",
+    "category": "coherence",
+    "fr": "Montant vérifié — correspond à ta saisie",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "edima",
+    "category": "divers",
+    "fr": "Edima",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "slogan",
+    "category": "divers",
+    "fr": "Ta banque parle ta langue",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "en_attente_page",
+    "category": "divers",
+    "fr": "En attente d'une page à expliquer",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  },
+  {
+    "id": "nouveau_message_detecte",
+    "category": "divers",
+    "fr": "Nouveau message détecté",
+    "ewo": null,
+    "dua": null,
+    "status": "a_traduire"
+  }
+]

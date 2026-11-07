@@ -1,0 +1,21 @@
+{
+  "name": "edima-shared",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "compile": "tsc --noEmit"
+  },
+  "dependencies": {
+    "libphonenumber-js": "^1.11.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.0"
+  }
+}

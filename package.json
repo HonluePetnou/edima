@@ -1,0 +1,16 @@
+{
+  "name": "edima",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev:extension": "pnpm --filter edima-extension dev",
+    "build:extension": "pnpm --filter edima-extension build",
+    "dev:server": "pnpm --filter edima-server dev",
+    "test": "pnpm -r --if-present run test",
+    "compile": "pnpm -r --if-present run compile"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

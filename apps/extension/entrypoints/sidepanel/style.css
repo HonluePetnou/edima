@@ -1,0 +1,70 @@
+:root {
+  color-scheme: light;
+  font-family: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #ffffff;
+  color: #1c1917;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e4dfd6;
+}
+
+.wordmark {
+  font-size: 20px;
+  font-weight: 700;
+  color: #233072;
+  margin: 0;
+}
+
+.lang-pill {
+  border: none;
+  border-radius: 999px;
+  background: #e6e9f7;
+  color: #233072;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 8px 14px;
+}
+
+.content {
+  flex: 1;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.status {
+  font-size: 14px;
+  color: #574f45;
+}
+
+.primary-button {
+  border: none;
+  border-radius: 10px;
+  background: #233072;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 14px 20px;
+  cursor: pointer;
+}
+
+.primary-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
