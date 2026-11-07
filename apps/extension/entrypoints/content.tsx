@@ -3,8 +3,11 @@ import { speakAmount, translateText } from 'edima-shared';
 import { extractVisibleText, observeNewContent } from '../utils/dom-reader';
 import { describeElement, findInteractiveElements } from '../utils/buttons';
 import { findWarningLines } from '../utils/warnings';
+import { findFormFields } from '../utils/form-fields';
+import { extractRecap } from '../utils/recap';
+import { classifyStep } from '../utils/journey';
 import TalkingBubble, { type BubbleState } from '../components/TalkingBubble';
-import type { ExtensionMessage, PageTranslatedMessage, TranslatedLine } from '../utils/messages';
+import type { ExtensionMessage, FieldDescription, PageTranslatedMessage, TranslatedLine } from '../utils/messages';
 
 // The language picker in the side panel isn't wired to real state yet
 // (Phase 1 scaffold) — this is the single place that default will come
@@ -28,7 +31,7 @@ function translateVisiblePage(): TranslatedLine[] {
 }
 
 // Best-effort voice while no Ewondo/Duala synthesis exists yet (D2) — French
-// placeholder so every "lu à voix haute" requirement (F2/F3/F7) already
+// placeholder so every "lu à voix haute" requirement (F2/F3/F5/F7) already
 // holds end-to-end before real native-language audio is wired in.
 function speakFrench(text: string) {
   if (!('speechSynthesis' in window)) return;
@@ -114,27 +117,42 @@ export default defineContentScript({
       return warnings;
     }
 
-    // ---- F1: surimpression (reported to the side panel) ----
+    // ---- state reported to the side panel ----
     let currentLines: TranslatedLine[] = [];
     let currentButtonLabels: string[] = [];
     let currentWarnings: string[] = [];
+    let currentFormFields: FieldDescription[] = [];
+    let currentRecap: ReturnType<typeof extractRecap> = null;
+    let currentStep: ReturnType<typeof classifyStep> = null;
 
     const rescan = () => {
       currentLines = translateVisiblePage();
       currentButtonLabels = wireInteractiveElements();
       currentWarnings = announceNewWarnings(currentLines);
+
+      // ---- F5: parcours guidé ----
+      const fields = findFormFields();
+      currentFormFields = fields.map(({ label, description }) => ({ label, description }));
+      currentRecap = extractRecap(currentLines);
+      currentStep = classifyStep(currentLines, fields.length > 0, currentRecap !== null);
     };
     rescan();
 
-    const reportToSidePanel = () => {
-      const message: PageTranslatedMessage = {
+    function buildMessage(): PageTranslatedMessage {
+      return {
         type: 'edima:page-translated',
         url: location.href,
         lines: currentLines,
         buttonLabels: currentButtonLabels,
         warnings: currentWarnings,
+        step: currentStep,
+        formFields: currentFormFields,
+        recap: currentRecap,
       };
-      chrome.runtime.sendMessage(message).catch(() => {
+    }
+
+    const reportToSidePanel = () => {
+      chrome.runtime.sendMessage(buildMessage()).catch(() => {
         // No listener yet (side panel closed) — fine, it'll ask for state itself on open.
       });
     };
@@ -147,14 +165,7 @@ export default defineContentScript({
 
     chrome.runtime.onMessage.addListener((message: ExtensionMessage, _sender, sendResponse) => {
       if (message.type === 'edima:request-state') {
-        const response: PageTranslatedMessage = {
-          type: 'edima:page-translated',
-          url: location.href,
-          lines: currentLines,
-          buttonLabels: currentButtonLabels,
-          warnings: currentWarnings,
-        };
-        sendResponse(response);
+        sendResponse(buildMessage());
       }
       return true;
     });

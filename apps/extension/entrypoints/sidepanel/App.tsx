@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'preact/hooks';
 import { summarizePage } from '../../utils/summarize';
-import { extractRecap, formatRecapSummary } from '../../utils/recap';
-import type { PageTranslatedMessage, TranslatedLine } from '../../utils/messages';
+import { formatRecapSummary, type RecapInfo } from '../../utils/recap';
+import type { StepInfo } from '../../utils/journey';
+import type { FieldDescription, PageTranslatedMessage, TranslatedLine } from '../../utils/messages';
 
 function speak(text: string) {
-  if (!('speechSynthesis' in window)) return;
+  if (!text || !('speechSynthesis' in window)) return;
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = 'fr-FR';
   speechSynthesis.cancel();
@@ -21,6 +22,9 @@ export default function App() {
   const [lines, setLines] = useState<TranslatedLine[] | null>(null);
   const [buttonLabels, setButtonLabels] = useState<string[]>([]);
   const [warnings, setWarnings] = useState<string[]>([]);
+  const [step, setStep] = useState<StepInfo | null>(null);
+  const [formFields, setFormFields] = useState<FieldDescription[]>([]);
+  const [recap, setRecap] = useState<RecapInfo | null>(null);
   const [summary, setSummary] = useState<string | null>(null);
 
   useEffect(() => {
@@ -31,6 +35,9 @@ export default function App() {
       setLines(message.lines);
       setButtonLabels(message.buttonLabels);
       setWarnings(message.warnings);
+      setStep(message.step);
+      setFormFields(message.formFields);
+      setRecap(message.recap);
       setSummary(null); // a new page invalidates any summary read for the previous one
     };
 
@@ -64,10 +71,13 @@ export default function App() {
     speak(text);
   };
 
+  const readFormStep = () => {
+    const intro = `Étape ${step?.index} sur ${step?.total} : ${step?.label}.`;
+    const fields = formFields.map((f) => `${f.label} : ${f.description}`).join(' ');
+    speak(`${intro} ${fields}`);
+  };
+
   const validated = lines?.filter((l) => l.source === 'glossaire').length ?? 0;
-  // F6: recomputed from `lines` on every update — cheap, and keeps this card
-  // in sync as soon as F8 detects a change (e.g. a recap replacing a form).
-  const recap = lines ? extractRecap(lines) : null;
   const recapSummary = recap ? formatRecapSummary(recap) : '';
 
   return (
@@ -96,6 +106,11 @@ export default function App() {
                 </button>
               </section>
             )}
+            {step && (
+              <p class="step-eyebrow">
+                Étape {step.index} sur {step.total} — {step.label}
+              </p>
+            )}
             <p class="status">
               {lines.length} libellé(s) trouvé(s), {validated} validé(s) par le linguiste.
             </p>
@@ -103,6 +118,19 @@ export default function App() {
               Lis-moi cette page
             </button>
             {summary && <p class="summary">{summary}</p>}
+            {step?.id === 'formulaire' && formFields.length > 0 && (
+              <section class="form-card">
+                <p class="form-title">Ce qu'Edima t'explique</p>
+                {formFields.map((field, i) => (
+                  <p key={field.label} class="form-row">
+                    <span class="form-row-index">{i + 1}.</span> <strong>{field.label}</strong> — {field.description}
+                  </p>
+                ))}
+                <button class="secondary-button" type="button" onClick={readFormStep}>
+                  Lire cette étape
+                </button>
+              </section>
+            )}
             {recap && (
               <section class="recap-card">
                 <p class="recap-title">Récapitulatif avant confirmation</p>
