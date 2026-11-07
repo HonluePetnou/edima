@@ -1,31 +1,56 @@
 import { SERVER_URL } from '../utils/server-config';
-import type { ExtensionMessage, TranslateUnknownResponse } from '../utils/messages';
+import type {
+  ExtensionMessage,
+  GetEnteredAmountResponse,
+  TranslateUnknownResponse,
+} from '../utils/messages';
+
+const ENTERED_AMOUNT_KEY = 'edimaEnteredAmount';
 
 export default defineBackground(() => {
   // Clicking the toolbar icon opens the side panel directly, instead of a popup.
   chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(console.error);
 
-  // F9: relays the content script's fallback-translation request to
-  // apps/server. Runs here rather than in the content script so the
-  // request is never subject to the host page's own CSP.
   chrome.runtime.onMessage.addListener((message: ExtensionMessage, _sender, sendResponse) => {
-    if (message.type !== 'edima:translate-unknown') return undefined;
-
-    fetch(`${SERVER_URL}/translate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ masked: message.masked, language: message.language }),
-    })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data: { translated?: string } | null) => {
-        const response: TranslateUnknownResponse = { translated: data?.translated ?? null };
-        sendResponse(response);
+    // F9: relays the content script's fallback-translation request to
+    // apps/server. Runs here rather than in the content script so the
+    // request is never subject to the host page's own CSP.
+    if (message.type === 'edima:translate-unknown') {
+      fetch(`${SERVER_URL}/translate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ masked: message.masked, language: message.language }),
       })
-      .catch(() => {
-        const response: TranslateUnknownResponse = { translated: null };
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data: { translated?: string } | null) => {
+          const response: TranslateUnknownResponse = { translated: data?.translated ?? null };
+          sendResponse(response);
+        })
+        .catch(() => {
+          const response: TranslateUnknownResponse = { translated: null };
+          sendResponse(response);
+        });
+      return true; // keep the message channel open for the async response above
+    }
+
+    // D4: content scripts can't use chrome.storage.session directly without
+    // an extra access-level grant, so it's simplest to keep this one value
+    // in the trusted background context and relay through it. One value per
+    // browser session is a known Phase 1 limit — two tabs mid-transfer at
+    // once would share it.
+    if (message.type === 'edima:save-entered-amount') {
+      chrome.storage.session.set({ [ENTERED_AMOUNT_KEY]: message.amount }).then(() => sendResponse({}));
+      return true;
+    }
+    if (message.type === 'edima:get-entered-amount') {
+      chrome.storage.session.get(ENTERED_AMOUNT_KEY).then((result) => {
+        const stored = result[ENTERED_AMOUNT_KEY] as number | undefined;
+        const response: GetEnteredAmountResponse = { amount: stored ?? null };
         sendResponse(response);
       });
+      return true;
+    }
 
-    return true; // keep the message channel open for the async response above
+    return undefined;
   });
 });

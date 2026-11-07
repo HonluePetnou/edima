@@ -178,6 +178,24 @@ body {
   font-weight: 700;
 }
 
+.consistency-row {
+  margin: 4px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+
+.consistency-row--ok {
+  color: #158033;
+  background: #e6f6ec;
+}
+
+.consistency-row--alert {
+  color: #b91c1c;
+  background: #fde8e8;
+}
+
 .secondary-button {
   align-self: flex-start;
   border: 1px solid #233072;

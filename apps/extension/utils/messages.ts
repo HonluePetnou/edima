@@ -1,5 +1,6 @@
 import type { RecapInfo } from './recap';
 import type { StepInfo } from './journey';
+import type { ConsistencyInfo } from './consistency';
 
 export interface TranslatedLine {
   original: string;
@@ -30,6 +31,9 @@ export interface PageTranslatedMessage {
   formFields: FieldDescription[];
   /** F6: populated when step is "recapitulatif". */
   recap: RecapInfo | null;
+  /** D4: populated once the récap amount has been compared against what was
+   * captured on the formulaire step (asynchronous — see consistency.ts). */
+  consistency: ConsistencyInfo | null;
 }
 
 export interface RequestStateMessage {
@@ -52,4 +56,24 @@ export interface TranslateUnknownResponse {
   translated: string | null;
 }
 
-export type ExtensionMessage = PageTranslatedMessage | RequestStateMessage | TranslateUnknownMessage;
+/** D4: content script → background, sent whenever the formulaire step's
+ * montant field changes, so it survives the navigation to récapitulatif. */
+export interface SaveEnteredAmountMessage {
+  type: 'edima:save-entered-amount';
+  amount: number;
+}
+
+export interface GetEnteredAmountMessage {
+  type: 'edima:get-entered-amount';
+}
+
+export interface GetEnteredAmountResponse {
+  amount: number | null;
+}
+
+export type ExtensionMessage =
+  | PageTranslatedMessage
+  | RequestStateMessage
+  | TranslateUnknownMessage
+  | SaveEnteredAmountMessage
+  | GetEnteredAmountMessage;

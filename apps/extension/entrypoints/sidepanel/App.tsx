@@ -2,6 +2,7 @@ import { useEffect, useState } from 'preact/hooks';
 import { summarizePage } from '../../utils/summarize';
 import { formatRecapSummary, type RecapInfo } from '../../utils/recap';
 import type { StepInfo } from '../../utils/journey';
+import type { ConsistencyInfo } from '../../utils/consistency';
 import type { FieldDescription, PageTranslatedMessage, TranslatedLine } from '../../utils/messages';
 
 function speak(text: string) {
@@ -25,6 +26,7 @@ export default function App() {
   const [step, setStep] = useState<StepInfo | null>(null);
   const [formFields, setFormFields] = useState<FieldDescription[]>([]);
   const [recap, setRecap] = useState<RecapInfo | null>(null);
+  const [consistency, setConsistency] = useState<ConsistencyInfo | null>(null);
   const [summary, setSummary] = useState<string | null>(null);
 
   useEffect(() => {
@@ -38,6 +40,7 @@ export default function App() {
       setStep(message.step);
       setFormFields(message.formFields);
       setRecap(message.recap);
+      setConsistency(message.consistency);
       setSummary(null); // a new page invalidates any summary read for the previous one
     };
 
@@ -78,7 +81,7 @@ export default function App() {
   };
 
   const validated = lines?.filter((l) => l.source === 'glossaire').length ?? 0;
-  const recapSummary = recap ? formatRecapSummary(recap) : '';
+  const recapSummary = recap ? `${formatRecapSummary(recap)}${consistency ? ` ${consistency.message}` : ''}` : '';
 
   return (
     <>
@@ -138,6 +141,12 @@ export default function App() {
                 {recap.beneficiaire && <p class="recap-row">Bénéficiaire : {recap.beneficiaire}</p>}
                 {recap.frais && <p class="recap-row">Frais : {recap.frais}</p>}
                 {recap.total && <p class="recap-row recap-row--total">Total débité : {recap.total}</p>}
+                {consistency && (
+                  <p class={consistency.status === 'match' ? 'consistency-row consistency-row--ok' : 'consistency-row consistency-row--alert'}>
+                    {consistency.status === 'match' ? '✓ ' : '⚠ '}
+                    {consistency.message}
+                  </p>
+                )}
                 <button class="secondary-button" type="button" onClick={() => speak(recapSummary)}>
                   Lire le récapitulatif
                 </button>

@@ -6,10 +6,12 @@ import { findWarningLines } from '../utils/warnings';
 import { findFormFields } from '../utils/form-fields';
 import { extractRecap } from '../utils/recap';
 import { classifyStep } from '../utils/journey';
+import { checkConsistency } from '../utils/consistency';
 import TalkingBubble, { type BubbleState } from '../components/TalkingBubble';
 import type {
   ExtensionMessage,
   FieldDescription,
+  GetEnteredAmountResponse,
   PageTranslatedMessage,
   TranslateUnknownResponse,
   TranslatedLine,
@@ -169,6 +171,57 @@ export default defineContentScript({
       }
     }
 
+    // ---- D4: contrôle de cohérence ----
+    // Captures the amount typed on the formulaire step (relayed through the
+    // background, since content scripts can't use chrome.storage.session
+    // directly) and compares it against the récapitulatif's own amount.
+    const wiredMontantFields = new WeakSet<HTMLElement>();
+
+    function parseEnteredAmount(raw: string): number | null {
+      const n = Number(raw.replace(/[\s ]/g, ''));
+      return Number.isFinite(n) && n > 0 ? n : null;
+    }
+
+    function wireMontantCapture(fields: ReturnType<typeof findFormFields>) {
+      for (const { element, label } of fields) {
+        if (!/montant/i.test(label) || wiredMontantFields.has(element)) continue;
+        wiredMontantFields.add(element);
+        element.addEventListener('input', () => {
+          const amount = parseEnteredAmount((element as HTMLInputElement).value ?? '');
+          if (amount !== null) chrome.runtime.sendMessage({ type: 'edima:save-entered-amount', amount });
+        });
+      }
+    }
+
+    function requestEnteredAmount(): Promise<number | null> {
+      return new Promise((resolve) => {
+        chrome.runtime.sendMessage({ type: 'edima:get-entered-amount' }, (response: GetEnteredAmountResponse | undefined) =>
+          resolve(response?.amount ?? null),
+        );
+      });
+    }
+
+    async function checkRecapConsistency() {
+      if (currentStep?.id !== 'recapitulatif' || !currentRecap?.montant) {
+        currentConsistency = null;
+        return;
+      }
+      const enteredAmount = await requestEnteredAmount();
+      const result = checkConsistency(enteredAmount, currentRecap.montant);
+      currentConsistency = result;
+
+      // Same priority treatment as an F7 warning — a mismatched amount is
+      // exactly the kind of thing that must interrupt and be heard first.
+      if (result?.status === 'mismatch' && !spokenWarnings.has(result.message)) {
+        spokenWarnings.add(result.message);
+        speakFrench(result.message);
+        showBubble({ x: window.innerWidth / 2, y: 64, text: result.message, tone: 'danger' });
+        clearTimeout(warningBubbleTimer);
+        warningBubbleTimer = setTimeout(() => showBubble(null), 6000);
+      }
+      reportToSidePanel();
+    }
+
     // ---- state reported to the side panel ----
     let currentLines: TranslatedLine[] = [];
     let currentButtonLabels: string[] = [];
@@ -176,6 +229,7 @@ export default defineContentScript({
     let currentFormFields: FieldDescription[] = [];
     let currentRecap: ReturnType<typeof extractRecap> = null;
     let currentStep: ReturnType<typeof classifyStep> = null;
+    let currentConsistency: ReturnType<typeof checkConsistency> = null;
 
     const rescan = () => {
       currentLines = translateVisiblePage(aiCache);
@@ -187,6 +241,7 @@ export default defineContentScript({
       currentFormFields = fields.map(({ label, description }) => ({ label, description }));
       currentRecap = extractRecap(currentLines);
       currentStep = classifyStep(currentLines, fields.length > 0, currentRecap !== null);
+      wireMontantCapture(fields);
     };
     rescan();
 
@@ -200,6 +255,7 @@ export default defineContentScript({
         step: currentStep,
         formFields: currentFormFields,
         recap: currentRecap,
+        consistency: currentConsistency,
       };
     }
 
@@ -209,11 +265,13 @@ export default defineContentScript({
       });
     };
     reportToSidePanel();
+    checkRecapConsistency();
 
     observeNewContent((added) => {
       rescan();
       reportToSidePanel();
       tryAiFallback(added.map((a) => a.text));
+      checkRecapConsistency();
     });
 
     chrome.runtime.onMessage.addListener((message: ExtensionMessage, _sender, sendResponse) => {
