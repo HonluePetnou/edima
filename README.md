@@ -50,7 +50,7 @@ pnpm install
 - [x] **F6** (récapitulatif avant confirmation) : détecte bénéficiaire/montant/frais/total par les mêmes libellés que F2, carte dédiée dans le panneau avec lecture à la demande
 - [x] **F7** (avertissements prioritaires) : tout avertissement détecté (mots-clés FR/EN ou `role="alert"`) interrompt et passe en premier — lu dès son apparition, bannière rouge persistante dans le panneau
 - [x] **F5** (parcours guidé) : classe la page en 3 étapes (solde, formulaire, récapitulatif), explique chaque champ du formulaire avec son libellé, étiquette « Étape X sur 3 » dans le panneau
-- [ ] Traduction effective une fois des termes `valide` (glossaire → phrases-modèles → IA) — F9, Phase 2
+- [x] **F9** (contenu inédit) : nouveau texte détecté par F8 et absent du glossaire → masqué (F10) → envoyé à `apps/server` → réinséré et vérifié avant d'afficher « IA — non vérifié ». Le serveur répond `llm_not_configured` tant qu'aucune clé n'est posée, donc le français reste affiché par défaut — vérifié de bout en bout contre un serveur local réel. La chaîne phrases-modèles (étape du milieu) n'est pas branchée : il faut une vraie correspondance de structure de phrase, pas juste la recherche exacte du glossaire.
 - [ ] Traductions ewondo/duala validées par le linguiste — bloquant, voir PLAN.md
 - [ ] Panneau Edima complet (reprend une des 3 directions visuelles explorées sur Figma) — F1/F3 tournent pour l'instant dans le panneau de base du scaffold
 
