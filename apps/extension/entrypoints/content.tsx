@@ -50,12 +50,60 @@ export default defineContentScript({
       if (mountContainer) render(<TalkingBubble state={state} />, mountContainer);
     };
 
-    // ---- F1: surimpression (reported to the side panel; see F3 below for
-    // the in-page bubble, which covers buttons specifically) ----
-    let currentLines = translateVisiblePage();
+    // ---- F3: boutons parlants (also re-run on F8 mutations below, so a
+    // button inside a freshly-injected pop-up gets wired up too) ----
+    const wiredElements = new WeakSet<HTMLElement>();
+
+    function wireInteractiveElements(): string[] {
+      const labels: string[] = [];
+      for (const el of findInteractiveElements()) {
+        const described = describeElement(el);
+        if (!described) continue;
+        labels.push(described.label);
+        if (wiredElements.has(el)) continue;
+        wiredElements.add(el);
+
+        const speak = () => {
+          const rect = el.getBoundingClientRect();
+          showBubble({ x: rect.left + rect.width / 2, y: rect.top - 8, text: described.description });
+
+          // Best-effort voice while no Ewondo/Duala synthesis exists yet (D2) —
+          // reads the French description aloud so F3's "est décrit" requirement
+          // holds even before real native-language audio is wired in.
+          if ('speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(described.description);
+            utterance.lang = 'fr-FR';
+            speechSynthesis.cancel();
+            speechSynthesis.speak(utterance);
+          }
+        };
+        const hide = () => showBubble(null);
+
+        el.addEventListener('mouseenter', speak);
+        el.addEventListener('focus', speak);
+        el.addEventListener('mouseleave', hide);
+        el.addEventListener('blur', hide);
+      }
+      return labels;
+    }
+
+    // ---- F1: surimpression (reported to the side panel) ----
+    let currentLines: TranslatedLine[] = [];
+    let currentButtonLabels: string[] = [];
+
+    const rescan = () => {
+      currentLines = translateVisiblePage();
+      currentButtonLabels = wireInteractiveElements();
+    };
+    rescan();
 
     const reportToSidePanel = () => {
-      const message: PageTranslatedMessage = { type: 'edima:page-translated', url: location.href, lines: currentLines };
+      const message: PageTranslatedMessage = {
+        type: 'edima:page-translated',
+        url: location.href,
+        lines: currentLines,
+        buttonLabels: currentButtonLabels,
+      };
       chrome.runtime.sendMessage(message).catch(() => {
         // No listener yet (side panel closed) — fine, it'll ask for state itself on open.
       });
@@ -63,44 +111,21 @@ export default defineContentScript({
     reportToSidePanel();
 
     observeNewContent(() => {
-      currentLines = translateVisiblePage();
+      rescan();
       reportToSidePanel();
     });
 
     chrome.runtime.onMessage.addListener((message: ExtensionMessage, _sender, sendResponse) => {
       if (message.type === 'edima:request-state') {
-        const response: PageTranslatedMessage = { type: 'edima:page-translated', url: location.href, lines: currentLines };
+        const response: PageTranslatedMessage = {
+          type: 'edima:page-translated',
+          url: location.href,
+          lines: currentLines,
+          buttonLabels: currentButtonLabels,
+        };
         sendResponse(response);
       }
       return true;
     });
-
-    // ---- F3: boutons parlants ----
-    const described = findInteractiveElements()
-      .map((el) => describeElement(el))
-      .filter((d): d is NonNullable<typeof d> => d !== null);
-
-    for (const { element, description } of described) {
-      const speak = () => {
-        const rect = element.getBoundingClientRect();
-        showBubble({ x: rect.left + rect.width / 2, y: rect.top - 8, text: description });
-
-        // Best-effort voice while no Ewondo/Duala synthesis exists yet (D2) —
-        // reads the French description aloud so F3's "est décrit" requirement
-        // holds even before real native-language audio is wired in.
-        if ('speechSynthesis' in window) {
-          const utterance = new SpeechSynthesisUtterance(description);
-          utterance.lang = 'fr-FR';
-          speechSynthesis.cancel();
-          speechSynthesis.speak(utterance);
-        }
-      };
-      const hide = () => showBubble(null);
-
-      element.addEventListener('mouseenter', speak);
-      element.addEventListener('focus', speak);
-      element.addEventListener('mouseleave', hide);
-      element.addEventListener('blur', hide);
-    }
   },
 });

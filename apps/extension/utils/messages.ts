@@ -8,6 +8,7 @@ export interface PageTranslatedMessage {
   type: 'edima:page-translated';
   url: string;
   lines: TranslatedLine[];
+  buttonLabels: string[];
 }
 
 export interface RequestStateMessage {
