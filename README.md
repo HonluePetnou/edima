@@ -55,6 +55,7 @@ pnpm install
 - [x] **D9** (texte original en un geste) : clic sur une ligne traduite pour révéler le français d'origine (adapté de l'appui long, pas de geste équivalent dans un panneau de bureau)
 - [x] **D3** (partiel — panneau de transparence) : badge source par phrase déjà là (F1) ; coche « montants vérifiés » ajoutée sur les lignes IA
 - [x] **D5** (changement de langue en direct) : sélecteur Ewondo/Duala fonctionnel, re-scan immédiat de la même page sans rechargement — les deux langues affichent le même repli français tant qu'aucun terme n'est validé des deux côtés
+- [x] **D12** (numéros lus par groupes de deux) : le numéro du bénéficiaire dans le récapitulatif est lu comme on le dicte au Cameroun (un chiffre puis des paires), pas chiffre par chiffre
 - [ ] Traductions ewondo/duala validées par le linguiste — bloquant, voir PLAN.md
 - [ ] Panneau Edima complet (reprend une des 3 directions visuelles explorées sur Figma) — F1/F3 tournent pour l'instant dans le panneau de base du scaffold
 
