@@ -28,6 +28,9 @@ export default function App() {
   const [recap, setRecap] = useState<RecapInfo | null>(null);
   const [consistency, setConsistency] = useState<ConsistencyInfo | null>(null);
   const [summary, setSummary] = useState<string | null>(null);
+  // D9: "un appui long affiche le français d'origine" — adapted to a click,
+  // since a side panel has no long-press gesture of its own.
+  const [expandedLines, setExpandedLines] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     let cancelled = false;
@@ -72,6 +75,15 @@ export default function App() {
     const text = summarizePage(lines, buttonLabels);
     setSummary(text);
     speak(text);
+  };
+
+  const toggleOriginal = (key: string) => {
+    setExpandedLines((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
   };
 
   const readFormStep = () => {
@@ -153,17 +165,30 @@ export default function App() {
               </section>
             )}
             <ul class="line-list">
-              {lines.map((line) => (
-                <li key={line.original} class="line-item">
-                  <span class={`line-badge line-badge--${line.source}`}>
-                    {line.source === 'glossaire' ? 'Validé' : line.source === 'ia' ? 'IA — non vérifié' : 'Français'}
-                  </span>
-                  <span class="line-text-group">
-                    <span class="line-text">{line.text}</span>
-                    {line.spokenAmount && <span class="line-spoken">{line.spokenAmount}</span>}
-                  </span>
-                </li>
-              ))}
+              {lines.map((line) => {
+                const isExpanded = expandedLines.has(line.original);
+                const hasOriginalToShow = line.source !== 'original' && line.original !== line.text;
+                return (
+                  <li
+                    key={line.original}
+                    class={`line-item${hasOriginalToShow ? ' line-item--clickable' : ''}`}
+                    onClick={hasOriginalToShow ? () => toggleOriginal(line.original) : undefined}
+                  >
+                    <span class={`line-badge line-badge--${line.source}`}>
+                      {line.source === 'glossaire' ? 'Validé' : line.source === 'ia' ? 'IA — non vérifié' : 'Français'}
+                    </span>
+                    <span class="line-text-group">
+                      <span class="line-text">{line.text}</span>
+                      {line.spokenAmount && <span class="line-spoken">{line.spokenAmount}</span>}
+                      {/* D3: the numbers inside an IA line are always F10-verified
+                          before the line is ever cached — the translation quality
+                          badge above is separate from (and doesn't vouch for) that. */}
+                      {line.source === 'ia' && <span class="line-verified">✓ montants vérifiés</span>}
+                      {isExpanded && <span class="line-original">Texte original : {line.original}</span>}
+                    </span>
+                  </li>
+                );
+              })}
             </ul>
           </>
         )}
