@@ -37,6 +37,17 @@ export type TemplatePhrase = z.infer<typeof TemplatePhraseSchema>;
 export const TranslationSourceSchema = z.enum(['glossaire', 'phrase_modele', 'ia']);
 export type TranslationSource = z.infer<typeof TranslationSourceSchema>;
 
+/** D10 "Explique-moi ce mot": a plain-language gloss for a jargon term,
+ * independent of translation status — explaining what "frais" means helps
+ * someone who reads French fine but doesn't know banking vocabulary, so
+ * this applies even before any ewo/dua term is "valide". */
+export const ExplanationSchema = z.object({
+  termId: z.string(),
+  simple: z.string(),
+  example: z.string(),
+});
+export type Explanation = z.infer<typeof ExplanationSchema>;
+
 export const TranslationResultSchema = z.object({
   original: z.string(),
   translated: z.string(),

@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { fillTemplate, findTemplate, findTerm, glossaryTerms, templatePhrases, translateText } from './glossary';
+import {
+  explanations,
+  fillTemplate,
+  findExplanationForText,
+  findTemplate,
+  findTerm,
+  glossaryTerms,
+  templatePhrases,
+  translateText,
+} from './glossary';
 
 describe('glossary data', () => {
   it('loads and validates every term', () => {
@@ -26,6 +35,13 @@ describe('glossary data', () => {
   it('finds a known term and template by id', () => {
     expect(findTerm('solde_disponible')?.fr).toBe('Solde disponible');
     expect(findTemplate('tpl_envoi_montant_nom')?.fr).toBe('Tu vas envoyer {montant} à {nom}.');
+  });
+
+  it('every explanation references a real glossary term', () => {
+    expect(explanations.length).toBeGreaterThan(0);
+    for (const explanation of explanations) {
+      expect(findTerm(explanation.termId), `${explanation.termId} has no matching glossary term`).toBeDefined();
+    }
   });
 });
 
@@ -84,5 +100,25 @@ describe('translateText', () => {
       term.status = originalStatus;
       term.ewo = originalEwo;
     }
+  });
+});
+
+describe('findExplanationForText', () => {
+  it('finds a jargon explanation regardless of translation status', () => {
+    const result = findExplanationForText('Frais');
+    expect(result?.simple).toContain('garde');
+    expect(result?.example).toContain('FCFA');
+  });
+
+  it('matches regardless of whitespace or case, like translateText', () => {
+    expect(findExplanationForText('  frais  ')).not.toBeNull();
+  });
+
+  it('returns null for a term with no explanation written yet', () => {
+    expect(findExplanationForText('Accueil')).toBeNull();
+  });
+
+  it('returns null for text that matches no glossary term at all', () => {
+    expect(findExplanationForText('Un texte jamais vu')).toBeNull();
   });
 });

@@ -34,6 +34,9 @@ export default function App() {
   // D9: "un appui long affiche le français d'origine" — adapted to a click,
   // since a side panel has no long-press gesture of its own.
   const [expandedLines, setExpandedLines] = useState<Set<string>>(new Set());
+  // D10 "Explique-moi ce mot" — separate from D9's toggle: a line can have
+  // both an original-text reveal and a jargon explanation at once.
+  const [expandedExplanations, setExpandedExplanations] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     let cancelled = false;
@@ -92,6 +95,15 @@ export default function App() {
 
   const toggleOriginal = (key: string) => {
     setExpandedLines((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
+  const toggleExplanation = (key: string) => {
+    setExpandedExplanations((prev) => {
       const next = new Set(prev);
       if (next.has(key)) next.delete(key);
       else next.add(key);
@@ -193,6 +205,7 @@ export default function App() {
             <ul class="line-list">
               {lines.map((line) => {
                 const isExpanded = expandedLines.has(line.original);
+                const isExplained = expandedExplanations.has(line.original);
                 const hasOriginalToShow = line.source !== 'original' && line.original !== line.text;
                 return (
                   <li
@@ -204,13 +217,33 @@ export default function App() {
                       {line.source === 'glossaire' ? 'Validé' : line.source === 'ia' ? 'IA — non vérifié' : 'Français'}
                     </span>
                     <span class="line-text-group">
-                      <span class="line-text">{line.text}</span>
+                      <span class="line-text-row">
+                        <span class="line-text">{line.text}</span>
+                        {line.explanation && (
+                          <button
+                            type="button"
+                            class="explain-button"
+                            title="Explique-moi ce mot"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleExplanation(line.original);
+                            }}
+                          >
+                            ?
+                          </button>
+                        )}
+                      </span>
                       {line.spokenAmount && <span class="line-spoken">{line.spokenAmount}</span>}
                       {/* D3: the numbers inside an IA line are always F10-verified
                           before the line is ever cached — the translation quality
                           badge above is separate from (and doesn't vouch for) that. */}
                       {line.source === 'ia' && <span class="line-verified">✓ montants vérifiés</span>}
                       {isExpanded && <span class="line-original">Texte original : {line.original}</span>}
+                      {isExplained && line.explanation && (
+                        <span class="line-explanation">
+                          {line.explanation.simple} <em>{line.explanation.example}</em>
+                        </span>
+                      )}
                     </span>
                   </li>
                 );

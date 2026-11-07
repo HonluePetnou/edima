@@ -14,6 +14,9 @@ export interface TranslatedLine {
   source: 'glossaire' | 'ia' | 'original';
   /** F4: the amount in words, when this line is (or contains) an FCFA amount. */
   spokenAmount?: string;
+  /** D10: a plain-language gloss for this line, when it matches a jargon
+   * term that has one — independent of `source` (see findExplanationForText). */
+  explanation?: { simple: string; example: string };
 }
 
 export interface FieldDescription {

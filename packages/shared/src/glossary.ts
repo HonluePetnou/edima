@@ -1,9 +1,12 @@
 import { z } from 'zod';
 import termsData from '../data/glossary/terms.json';
 import templatesData from '../data/glossary/templates.json';
+import explanationsData from '../data/glossary/explanations.json';
 import {
+  ExplanationSchema,
   GlossaryTermSchema,
   TemplatePhraseSchema,
+  type Explanation,
   type GlossaryTerm,
   type LanguageCode,
   type TemplatePhrase,
@@ -13,6 +16,7 @@ import {
 // instead of reaching the user as a silent gap.
 export const glossaryTerms: GlossaryTerm[] = z.array(GlossaryTermSchema).parse(termsData);
 export const templatePhrases: TemplatePhrase[] = z.array(TemplatePhraseSchema).parse(templatesData);
+export const explanations: Explanation[] = z.array(ExplanationSchema).parse(explanationsData);
 
 export function findTerm(id: string): GlossaryTerm | undefined {
   return glossaryTerms.find((term) => term.id === id);
@@ -67,4 +71,18 @@ export function translateText(text: string, language: LanguageCode): TranslateRe
     return { original: text, text: translated, source: 'glossaire', status: term.status };
   }
   return { original: text, text, source: 'original', status: term?.status ?? null };
+}
+
+const explanationByTermId = new Map(explanations.map((e) => [e.termId, e]));
+
+/**
+ * D10 "Explique-moi ce mot" — looks up a plain-language gloss by matching
+ * `text` against the glossary's own `fr` field, same normalization as
+ * translateText(). Deliberately independent of translation status: knowing
+ * what "frais" means doesn't require ewondo/duala to be ready yet.
+ */
+export function findExplanationForText(text: string): Explanation | null {
+  const term = termsByNormalizedFr.get(normalize(text));
+  if (!term) return null;
+  return explanationByTermId.get(term.id) ?? null;
 }

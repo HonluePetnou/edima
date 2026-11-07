@@ -1,0 +1,47 @@
+[
+  {
+    "termId": "frais",
+    "simple": "C'est ce que la banque garde pour faire l'opération pour toi.",
+    "example": "Si tu envoies 5 000 FCFA avec 100 FCFA de frais, la banque garde 100 FCFA."
+  },
+  {
+    "termId": "beneficiaire",
+    "simple": "C'est la personne qui va recevoir l'argent que tu envoies.",
+    "example": "Si tu envoies de l'argent à ta mère, c'est elle le bénéficiaire."
+  },
+  {
+    "termId": "solde_disponible",
+    "simple": "C'est l'argent que tu as sur ton compte, que tu peux dépenser maintenant.",
+    "example": "Si ton solde disponible est 50 000 FCFA, tu peux envoyer jusqu'à 50 000 FCFA."
+  },
+  {
+    "termId": "montant_envoye",
+    "simple": "C'est la somme d'argent que tu as envoyée.",
+    "example": "Si tu as envoyé 5 000 FCFA à Paul, le montant envoyé est 5 000 FCFA."
+  },
+  {
+    "termId": "montant_a_envoyer",
+    "simple": "C'est la somme d'argent que tu veux envoyer.",
+    "example": "Si tu veux envoyer 5 000 FCFA à Paul, tu écris 5 000 dans ce champ."
+  },
+  {
+    "termId": "total_debite",
+    "simple": "C'est tout ce qui sort de ton compte : le montant plus les frais.",
+    "example": "Si tu envoies 5 000 FCFA avec 100 FCFA de frais, le total débité est 5 100 FCFA."
+  },
+  {
+    "termId": "code_secret",
+    "simple": "C'est le code personnel que toi seul connais pour confirmer tes opérations.",
+    "example": "Personne ne doit te demander ce code, même pas quelqu'un qui dit travailler à la banque."
+  },
+  {
+    "termId": "confirmer_transfert",
+    "simple": "C'est le bouton qui envoie vraiment l'argent. Une fois cliqué, l'opération ne peut plus être annulée.",
+    "example": "Vérifie toujours le montant et le bénéficiaire avant de cliquer sur ce bouton."
+  },
+  {
+    "termId": "operation_irreversible",
+    "simple": "Ça veut dire que l'opération ne peut pas être annulée une fois faite.",
+    "example": "Comme donner de l'argent en main propre : une fois donné, tu ne peux pas le reprendre."
+  }
+]

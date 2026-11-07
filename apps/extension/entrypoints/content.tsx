@@ -1,5 +1,12 @@
 import { render } from 'preact';
-import { extractProtectedValues, reinsertProtectedValues, speakAmount, translateText, verifyValuesIntact } from 'edima-shared';
+import {
+  extractProtectedValues,
+  findExplanationForText,
+  reinsertProtectedValues,
+  speakAmount,
+  translateText,
+  verifyValuesIntact,
+} from 'edima-shared';
 import { extractVisibleText, observeNewContent } from '../utils/dom-reader';
 import { describeElement, findInteractiveElements } from '../utils/buttons';
 import { findWarningLines } from '../utils/warnings';
@@ -37,15 +44,16 @@ function translateVisiblePage(aiCache: Map<string, string>, language: LanguageCo
     if (seen.has(text)) continue;
     seen.add(text);
     const spokenAmount = speakAmount(text, AMOUNT_SPEECH_LANGUAGE) ?? undefined;
+    const explanation = findExplanationForText(text) ?? undefined;
 
     const cached = aiCache.get(text);
     if (cached) {
-      lines.push({ original: text, text: cached, source: 'ia', spokenAmount });
+      lines.push({ original: text, text: cached, source: 'ia', spokenAmount, explanation });
       continue;
     }
 
     const result = translateText(text, language);
-    lines.push({ original: result.original, text: result.text, source: result.source, spokenAmount });
+    lines.push({ original: result.original, text: result.text, source: result.source, spokenAmount, explanation });
   }
   return lines;
 }
