@@ -27,10 +27,11 @@ Ajuster selon les compétences réelles (si l'un de vous est aussi locuteur nati
 
 - [ ] Lancer le recrutement linguiste / locuteurs natifs (bloquant, voir ci-dessus)
 - [ ] Trancher la langue MVP (ewondo ou duala)
-- [ ] Scaffold monorepo pnpm : `apps/extension`, `apps/server`, `packages/shared`
-- [ ] Extension : config WXT, Manifest V3, content script en Shadow DOM isolé, `MutationObserver` basique sur une page de test
-- [ ] Structure du glossaire JSON (150 termes + 50 phrases-modèles), rempli en français en attendant la traduction
-- [ ] Protection des montants (F10) : regex + `libphonenumber-js`, premiers tests Vitest — indépendant de la traduction, peut démarrer immédiatement
+- [x] Scaffold monorepo pnpm : `apps/extension`, `apps/server`, `packages/shared`
+- [x] Extension : config WXT, Manifest V3, `chrome.sidePanel`, content script en Shadow DOM isolé, `MutationObserver` + lecture générique du DOM
+- [x] Structure du glossaire JSON (72 termes + 24 phrases-modèles en français — à étendre vers 150/50 avec le linguiste)
+- [x] Protection des montants (F10) : regex + `libphonenumber-js`, testé avec Vitest (14 tests, tout passe)
+- [x] Serveur Hono de secours : route `/translate` validée par Zod, prête pour une clé LLM
 - [ ] Choisir une direction visuelle parmi les 3 maquettes Figma explorées (dark/dramatique, fond blanc, épurée) ou les fusionner — cible nécessaire pour Personne A
 - [ ] En parallèle (linguiste/locuteurs) : traduction du glossaire + grammaire des nombres
 
