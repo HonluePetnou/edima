@@ -52,6 +52,8 @@ pnpm install
 - [x] **F5** (parcours guidé) : classe la page en 3 étapes (solde, formulaire, récapitulatif), explique chaque champ du formulaire avec son libellé, étiquette « Étape X sur 3 » dans le panneau
 - [x] **F9** (contenu inédit) : nouveau texte détecté par F8 et absent du glossaire → masqué (F10) → envoyé à `apps/server` → réinséré et vérifié avant d'afficher « IA — non vérifié ». Le serveur répond `llm_not_configured` tant qu'aucune clé n'est posée, donc le français reste affiché par défaut — vérifié de bout en bout contre un serveur local réel. La chaîne phrases-modèles (étape du milieu) n'est pas branchée : il faut une vraie correspondance de structure de phrase, pas juste la recherche exacte du glossaire.
 - [x] **D4** (contrôle de cohérence) : le montant tapé sur le formulaire est comparé à celui du récapitulatif ; un écart interrompt et se fait lire en premier, comme un avertissement F7
+- [x] **D9** (texte original en un geste) : clic sur une ligne traduite pour révéler le français d'origine (adapté de l'appui long, pas de geste équivalent dans un panneau de bureau)
+- [x] **D3** (partiel — panneau de transparence) : badge source par phrase déjà là (F1) ; coche « montants vérifiés » ajoutée sur les lignes IA
 - [ ] Traductions ewondo/duala validées par le linguiste — bloquant, voir PLAN.md
 - [ ] Panneau Edima complet (reprend une des 3 directions visuelles explorées sur Figma) — F1/F3 tournent pour l'instant dans le panneau de base du scaffold
 
