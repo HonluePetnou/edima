@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { summarizePage } from '../../utils/summarize';
 import { formatRecapSummary, type RecapInfo } from '../../utils/recap';
 import type { StepInfo } from '../../utils/journey';
@@ -6,14 +6,10 @@ import type { ConsistencyInfo } from '../../utils/consistency';
 import type { FieldDescription, LanguageCode, PageTranslatedMessage, TranslatedLine } from '../../utils/messages';
 
 const LANGUAGE_LABELS: Record<LanguageCode, string> = { ewo: 'Ewondo', dua: 'Duala' };
-
-function speak(text: string) {
-  if (!text || !('speechSynthesis' in window)) return;
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = 'fr-FR';
-  speechSynthesis.cancel();
-  speechSynthesis.speak(utterance);
-}
+const SPEECH_RATES = [1, 0.85, 0.7];
+// Decorative only (no real-time audio analysis) — same static silhouette
+// used throughout the v2 Figma exploration.
+const WAVEFORM_HEIGHTS = [4, 7, 11, 15, 18, 20, 17, 13, 9, 6, 8, 12, 16, 19, 15, 10, 6, 4];
 
 /**
  * Phase 1 scaffold: shows whatever the content script found (F1) and reads
@@ -37,6 +33,30 @@ export default function App() {
   // D10 "Explique-moi ce mot" — separate from D9's toggle: a line can have
   // both an original-text reveal and a jargon explanation at once.
   const [expandedExplanations, setExpandedExplanations] = useState<Set<string>>(new Set());
+
+  // ---- command bar: speech state, shared by the hero orb and the bar itself ----
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const lastTextRef = useRef<string | null>(null);
+  const rateIndexRef = useRef(0);
+
+  const speak = (text: string) => {
+    if (!text || !('speechSynthesis' in window)) return;
+    lastTextRef.current = text;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'fr-FR';
+    utterance.rate = SPEECH_RATES[rateIndexRef.current] ?? 1;
+    utterance.onstart = () => {
+      setIsSpeaking(true);
+      setIsPaused(false);
+    };
+    utterance.onend = () => {
+      setIsSpeaking(false);
+      setIsPaused(false);
+    };
+    speechSynthesis.cancel();
+    speechSynthesis.speak(utterance);
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -117,13 +137,44 @@ export default function App() {
     speak(`${intro} ${fields}`);
   };
 
+  // ---- command bar actions ----
+  const handlePrimary = () => {
+    if (isSpeaking && !isPaused) {
+      speechSynthesis.pause();
+      setIsPaused(true);
+      return;
+    }
+    if (isPaused) {
+      speechSynthesis.resume();
+      setIsPaused(false);
+      return;
+    }
+    if (lines) readPage();
+  };
+
+  const handleRepeat = () => {
+    if (lastTextRef.current) speak(lastTextRef.current);
+  };
+
+  const handleSlower = () => {
+    rateIndexRef.current = (rateIndexRef.current + 1) % SPEECH_RATES.length;
+    if (lastTextRef.current) speak(lastTextRef.current);
+  };
+
+  const primaryLabel = isSpeaking && !isPaused ? 'Pause' : isPaused ? 'Reprendre' : 'Lire';
+  const primaryIcon = isSpeaking && !isPaused ? '❚❚' : '▶';
+
   const validated = lines?.filter((l) => l.source === 'glossaire').length ?? 0;
   const recapSummary = recap ? `${formatRecapSummary(recap)}${consistency ? ` ${consistency.message}` : ''}` : '';
+  const heroMessage = summary ?? (step ? `Étape ${step.index} sur ${step.total} — ${step.label}` : "Edima explique n'importe quelle page, à voix haute.");
 
   return (
     <>
       <header class="header">
-        <h1 class="wordmark">Edima</h1>
+        <div class="brand">
+          <span class="brand-dot" />
+          <h1 class="wordmark">Edima</h1>
+        </div>
         <select
           class="lang-pill"
           value={language}
@@ -136,7 +187,36 @@ export default function App() {
           ))}
         </select>
       </header>
+
       <main class="content">
+        <section class="hero">
+          <button
+            type="button"
+            class="orb-button"
+            onClick={handlePrimary}
+            aria-label={lines ? 'Lis-moi cette page' : 'En attente'}
+          >
+            <span class={`orb${isSpeaking && !isPaused ? ' orb--active' : ''}`} />
+            <span class="waveform" aria-hidden="true">
+              {WAVEFORM_HEIGHTS.map((h, i) => (
+                <span key={i} style={{ height: `${h}px` }} />
+              ))}
+            </span>
+          </button>
+          <p class="hero-message">{heroMessage}</p>
+          {lines && (
+            <button type="button" class="hero-link" onClick={readPage}>
+              Lis-moi cette page
+            </button>
+          )}
+          {lines && (
+            <div class="hero-pills">
+              <span class="pill pill--success">✓ {validated} validé(s)</span>
+              <span class="pill pill--outline">{lines.length} trouvé(s)</span>
+            </div>
+          )}
+        </section>
+
         {lines === null ? (
           <p class="status">En attente d'une page à expliquer.</p>
         ) : (
@@ -154,54 +234,71 @@ export default function App() {
                 </button>
               </section>
             )}
-            {step && (
-              <p class="step-eyebrow">
-                Étape {step.index} sur {step.total} — {step.label}
-              </p>
-            )}
-            <p class="status">
-              {lines.length} libellé(s) trouvé(s), {validated} validé(s) par le linguiste.
-            </p>
-            <button class="primary-button" type="button" onClick={readPage}>
-              Lis-moi cette page
-            </button>
-            {summary && <p class="summary">{summary}</p>}
+
             {step?.id === 'formulaire' && formFields.length > 0 && (
-              <section class="form-card">
-                <p class="form-title">Ce qu'Edima t'explique</p>
+              <section class="flat-card">
+                <p class="flat-card-title">Ce qu'Edima t'explique</p>
                 {formFields.map((field, i) => (
-                  <p key={field.label} class="form-row">
-                    <span class="form-row-index">{i + 1}.</span> <strong>{field.label}</strong> — {field.description}
+                  <p key={field.label} class="flat-row">
+                    <span class="flat-row-label">
+                      <span class="flat-row-index">{i + 1}.</span>
+                      {field.label}
+                    </span>
+                    <span class="flat-row-value">{field.description}</span>
                   </p>
                 ))}
-                <button class="secondary-button" type="button" onClick={readFormStep}>
-                  Lire cette étape
-                </button>
+                <div class="flat-card-footer">
+                  <button class="secondary-button" type="button" onClick={readFormStep}>
+                    Lire cette étape
+                  </button>
+                </div>
               </section>
             )}
+
             {recap && (
-              <section class="recap-card">
-                <p class="recap-title">Récapitulatif avant confirmation</p>
-                {recap.montant && <p class="recap-row">Montant envoyé : {recap.montant}</p>}
-                {recap.beneficiaire && (
-                  <p class="recap-row">
-                    Bénéficiaire : {recap.beneficiaire}
-                    {recap.beneficiairePhoneWords && <span class="line-spoken"> — {recap.beneficiairePhoneWords}</span>}
+              <section class="flat-card">
+                <p class="flat-card-title">Récapitulatif avant confirmation</p>
+                {recap.montant && (
+                  <p class="flat-row">
+                    <span class="flat-row-label">Montant envoyé</span>
+                    <span class="flat-row-value">{recap.montant}</span>
                   </p>
                 )}
-                {recap.frais && <p class="recap-row">Frais : {recap.frais}</p>}
-                {recap.total && <p class="recap-row recap-row--total">Total débité : {recap.total}</p>}
+                {recap.beneficiaire && (
+                  <p class="flat-row">
+                    <span class="flat-row-label">Bénéficiaire</span>
+                    <span class="flat-row-value">
+                      {recap.beneficiaire}
+                      {recap.beneficiairePhoneWords && <span class="line-spoken"><br />{recap.beneficiairePhoneWords}</span>}
+                    </span>
+                  </p>
+                )}
+                {recap.frais && (
+                  <p class="flat-row">
+                    <span class="flat-row-label">Frais</span>
+                    <span class="flat-row-value">{recap.frais}</span>
+                  </p>
+                )}
+                {recap.total && (
+                  <p class="flat-row">
+                    <span class="flat-row-label">Total débité</span>
+                    <span class="flat-row-value flat-row-value--total">{recap.total}</span>
+                  </p>
+                )}
                 {consistency && (
                   <p class={consistency.status === 'match' ? 'consistency-row consistency-row--ok' : 'consistency-row consistency-row--alert'}>
                     {consistency.status === 'match' ? '✓ ' : '⚠ '}
                     {consistency.message}
                   </p>
                 )}
-                <button class="secondary-button" type="button" onClick={() => speak(recapSummary)}>
-                  Lire le récapitulatif
-                </button>
+                <div class="flat-card-footer">
+                  <button class="secondary-button" type="button" onClick={() => speak(recapSummary)}>
+                    Lire le récapitulatif
+                  </button>
+                </div>
               </section>
             )}
+
             <ul class="line-list">
               {lines.map((line) => {
                 const isExpanded = expandedLines.has(line.original);
@@ -252,6 +349,21 @@ export default function App() {
           </>
         )}
       </main>
+
+      <nav class="command-bar">
+        <button type="button" class="command-button" onClick={handleRepeat} aria-label="Répéter">
+          <span class="command-button-icon">↻</span>
+          <span class="command-button-label">Répéter</span>
+        </button>
+        <button type="button" class="command-button command-button--primary" onClick={handlePrimary} aria-label={primaryLabel}>
+          <span class="command-button-icon">{primaryIcon}</span>
+          <span class="command-button-label">{primaryLabel}</span>
+        </button>
+        <button type="button" class="command-button" onClick={handleSlower} aria-label="Plus lent">
+          <span class="command-button-icon">🐌</span>
+          <span class="command-button-label">Plus lent</span>
+        </button>
+      </nav>
     </>
   );
 }
