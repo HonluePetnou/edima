@@ -48,6 +48,7 @@ pnpm install
 - [x] **F2** (Lis-moi cette page) : résumé court (solde, frais, avertissement, actions) lu au clic, construit à partir de ce que F1 a déjà extrait
 - [x] **F4** (lecture exacte des montants) : moteur montant → mots en français (0 à ~1 milliard, 48 tests), chiffre toujours affiché à côté du mot ; ewondo/duala renverront `null` tant que le linguiste n'a pas livré la grammaire des nombres
 - [x] **F6** (récapitulatif avant confirmation) : détecte bénéficiaire/montant/frais/total par les mêmes libellés que F2, carte dédiée dans le panneau avec lecture à la demande
+- [x] **F7** (avertissements prioritaires) : tout avertissement détecté (mots-clés FR/EN ou `role="alert"`) interrompt et passe en premier — lu dès son apparition, bannière rouge persistante dans le panneau
 - [ ] Traduction effective une fois des termes `valide` (glossaire → phrases-modèles → IA) — F9, Phase 2
 - [ ] Traductions ewondo/duala validées par le linguiste — bloquant, voir PLAN.md
 - [ ] Panneau Edima complet (reprend une des 3 directions visuelles explorées sur Figma) — F1/F3 tournent pour l'instant dans le panneau de base du scaffold
