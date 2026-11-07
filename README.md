@@ -45,6 +45,7 @@ pnpm install
 - [x] Serveur Hono : route `/translate` validée par Zod, en attente d'une clé LLM
 - [x] **F1** (surimpression) : chaque libellé visible de la page est passé par le glossaire et remonté au panneau latéral ; tant qu'aucun terme n'est `valide`, le français original s'affiche (comportement prévu par F10/D9, pas un trou)
 - [x] **F3** (boutons parlants) : au survol/focus, chaque bouton/lien affiche une bulle et se fait lire à voix haute (voix française de secours — l'audio natif ewondo/duala arrive avec D2)
+- [x] **F2** (Lis-moi cette page) : résumé court (solde, frais, avertissement, actions) lu au clic, construit à partir de ce que F1 a déjà extrait
 - [ ] Traduction effective une fois des termes `valide` (glossaire → phrases-modèles → IA) — F9, Phase 2
 - [ ] Traductions ewondo/duala validées par le linguiste — bloquant, voir PLAN.md
 - [ ] Panneau Edima complet (reprend une des 3 directions visuelles explorées sur Figma) — F1/F3 tournent pour l'instant dans le panneau de base du scaffold
