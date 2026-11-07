@@ -20,6 +20,7 @@ function speak(text: string) {
 export default function App() {
   const [lines, setLines] = useState<TranslatedLine[] | null>(null);
   const [buttonLabels, setButtonLabels] = useState<string[]>([]);
+  const [warnings, setWarnings] = useState<string[]>([]);
   const [summary, setSummary] = useState<string | null>(null);
 
   useEffect(() => {
@@ -29,6 +30,7 @@ export default function App() {
       if (cancelled) return;
       setLines(message.lines);
       setButtonLabels(message.buttonLabels);
+      setWarnings(message.warnings);
       setSummary(null); // a new page invalidates any summary read for the previous one
     };
 
@@ -81,6 +83,19 @@ export default function App() {
           <p class="status">En attente d'une page à expliquer.</p>
         ) : (
           <>
+            {warnings.length > 0 && (
+              <section class="warning-card" role="alert">
+                <p class="warning-title">⚠ Avertissement prioritaire</p>
+                {warnings.map((text) => (
+                  <p key={text} class="warning-row">
+                    {text}
+                  </p>
+                ))}
+                <button class="secondary-button secondary-button--danger" type="button" onClick={() => speak(warnings[0]!)}>
+                  Réécouter
+                </button>
+              </section>
+            )}
             <p class="status">
               {lines.length} libellé(s) trouvé(s), {validated} validé(s) par le linguiste.
             </p>

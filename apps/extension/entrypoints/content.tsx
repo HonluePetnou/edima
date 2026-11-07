@@ -2,6 +2,7 @@ import { render } from 'preact';
 import { speakAmount, translateText } from 'edima-shared';
 import { extractVisibleText, observeNewContent } from '../utils/dom-reader';
 import { describeElement, findInteractiveElements } from '../utils/buttons';
+import { findWarningLines } from '../utils/warnings';
 import TalkingBubble, { type BubbleState } from '../components/TalkingBubble';
 import type { ExtensionMessage, PageTranslatedMessage, TranslatedLine } from '../utils/messages';
 
@@ -24,6 +25,17 @@ function translateVisiblePage(): TranslatedLine[] {
     lines.push({ original: result.original, text: result.text, source: result.source, spokenAmount });
   }
   return lines;
+}
+
+// Best-effort voice while no Ewondo/Duala synthesis exists yet (D2) — French
+// placeholder so every "lu à voix haute" requirement (F2/F3/F7) already
+// holds end-to-end before real native-language audio is wired in.
+function speakFrench(text: string) {
+  if (!('speechSynthesis' in window)) return;
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'fr-FR';
+  speechSynthesis.cancel(); // F7: a new warning always interrupts whatever was playing
+  speechSynthesis.speak(utterance);
 }
 
 export default defineContentScript({
@@ -70,16 +82,7 @@ export default defineContentScript({
         const speak = () => {
           const rect = el.getBoundingClientRect();
           showBubble({ x: rect.left + rect.width / 2, y: rect.top - 8, text: described.description });
-
-          // Best-effort voice while no Ewondo/Duala synthesis exists yet (D2) —
-          // reads the French description aloud so F3's "est décrit" requirement
-          // holds even before real native-language audio is wired in.
-          if ('speechSynthesis' in window) {
-            const utterance = new SpeechSynthesisUtterance(described.description);
-            utterance.lang = 'fr-FR';
-            speechSynthesis.cancel();
-            speechSynthesis.speak(utterance);
-          }
+          speakFrench(described.description);
         };
         const hide = () => showBubble(null);
 
@@ -91,13 +94,35 @@ export default defineContentScript({
       return labels;
     }
 
+    // ---- F7: avertissements et erreurs prioritaires ----
+    const spokenWarnings = new Set<string>();
+    let warningBubbleTimer: ReturnType<typeof setTimeout> | undefined;
+
+    function announceNewWarnings(lines: TranslatedLine[]): string[] {
+      const warnings = findWarningLines(lines).map((l) => l.text);
+      const fresh = warnings.filter((text) => !spokenWarnings.has(text));
+      for (const text of fresh) spokenWarnings.add(text);
+
+      if (fresh.length > 0) {
+        // Only one can be spoken at a time — the first is the most urgent
+        // (DOM order usually puts the banner before the rest of the page).
+        speakFrench(fresh[0]!);
+        showBubble({ x: window.innerWidth / 2, y: 64, text: fresh[0]!, tone: 'danger' });
+        clearTimeout(warningBubbleTimer);
+        warningBubbleTimer = setTimeout(() => showBubble(null), 6000);
+      }
+      return warnings;
+    }
+
     // ---- F1: surimpression (reported to the side panel) ----
     let currentLines: TranslatedLine[] = [];
     let currentButtonLabels: string[] = [];
+    let currentWarnings: string[] = [];
 
     const rescan = () => {
       currentLines = translateVisiblePage();
       currentButtonLabels = wireInteractiveElements();
+      currentWarnings = announceNewWarnings(currentLines);
     };
     rescan();
 
@@ -107,6 +132,7 @@ export default defineContentScript({
         url: location.href,
         lines: currentLines,
         buttonLabels: currentButtonLabels,
+        warnings: currentWarnings,
       };
       chrome.runtime.sendMessage(message).catch(() => {
         // No listener yet (side panel closed) — fine, it'll ask for state itself on open.
@@ -126,6 +152,7 @@ export default defineContentScript({
           url: location.href,
           lines: currentLines,
           buttonLabels: currentButtonLabels,
+          warnings: currentWarnings,
         };
         sendResponse(response);
       }

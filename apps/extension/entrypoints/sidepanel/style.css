@@ -80,6 +80,37 @@ body {
   line-height: 1.5;
 }
 
+.warning-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #b91c1c;
+  background: #fde8e8;
+}
+
+.warning-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #991b1b;
+}
+
+.warning-row {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #7a1414;
+}
+
+.secondary-button--danger {
+  border-color: #b91c1c;
+  color: #b91c1c;
+}
+
 .recap-card {
   display: flex;
   flex-direction: column;

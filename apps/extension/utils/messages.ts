@@ -11,6 +11,8 @@ export interface PageTranslatedMessage {
   url: string;
   lines: TranslatedLine[];
   buttonLabels: string[];
+  /** F7: short, keyword-matched warning lines, most recent last. */
+  warnings: string[];
 }
 
 export interface RequestStateMessage {
