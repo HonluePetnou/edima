@@ -1,6 +1,15 @@
 import { useEffect, useState } from 'preact/hooks';
 import { summarizePage } from '../../utils/summarize';
+import { extractRecap, formatRecapSummary } from '../../utils/recap';
 import type { PageTranslatedMessage, TranslatedLine } from '../../utils/messages';
+
+function speak(text: string) {
+  if (!('speechSynthesis' in window)) return;
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'fr-FR';
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utterance);
+}
 
 /**
  * Phase 1 scaffold: shows whatever the content script found (F1) and reads
@@ -50,15 +59,14 @@ export default function App() {
     if (!lines) return;
     const text = summarizePage(lines, buttonLabels);
     setSummary(text);
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'fr-FR';
-      speechSynthesis.cancel();
-      speechSynthesis.speak(utterance);
-    }
+    speak(text);
   };
 
   const validated = lines?.filter((l) => l.source === 'glossaire').length ?? 0;
+  // F6: recomputed from `lines` on every update — cheap, and keeps this card
+  // in sync as soon as F8 detects a change (e.g. a recap replacing a form).
+  const recap = lines ? extractRecap(lines) : null;
+  const recapSummary = recap ? formatRecapSummary(recap) : '';
 
   return (
     <>
@@ -80,13 +88,28 @@ export default function App() {
               Lis-moi cette page
             </button>
             {summary && <p class="summary">{summary}</p>}
+            {recap && (
+              <section class="recap-card">
+                <p class="recap-title">Récapitulatif avant confirmation</p>
+                {recap.montant && <p class="recap-row">Montant envoyé : {recap.montant}</p>}
+                {recap.beneficiaire && <p class="recap-row">Bénéficiaire : {recap.beneficiaire}</p>}
+                {recap.frais && <p class="recap-row">Frais : {recap.frais}</p>}
+                {recap.total && <p class="recap-row recap-row--total">Total débité : {recap.total}</p>}
+                <button class="secondary-button" type="button" onClick={() => speak(recapSummary)}>
+                  Lire le récapitulatif
+                </button>
+              </section>
+            )}
             <ul class="line-list">
               {lines.map((line) => (
                 <li key={line.original} class="line-item">
                   <span class={`line-badge line-badge--${line.source}`}>
                     {line.source === 'glossaire' ? 'Validé' : 'Français'}
                   </span>
-                  <span class="line-text">{line.text}</span>
+                  <span class="line-text-group">
+                    <span class="line-text">{line.text}</span>
+                    {line.spokenAmount && <span class="line-spoken">{line.spokenAmount}</span>}
+                  </span>
                 </li>
               ))}
             </ul>

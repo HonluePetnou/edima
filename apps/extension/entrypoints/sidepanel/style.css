@@ -80,6 +80,47 @@ body {
   line-height: 1.5;
 }
 
+.recap-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #233072;
+  background: #e6e9f7;
+}
+
+.recap-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #233072;
+}
+
+.recap-row {
+  margin: 0;
+  font-size: 15px;
+  color: #1c1917;
+}
+
+.recap-row--total {
+  font-weight: 700;
+}
+
+.secondary-button {
+  align-self: flex-start;
+  border: 1px solid #233072;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #233072;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+
 .line-list {
   list-style: none;
   margin: 0;
@@ -98,9 +139,21 @@ body {
   border-radius: 10px;
 }
 
+.line-text-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .line-text {
   font-size: 14px;
   line-height: 1.4;
+}
+
+.line-spoken {
+  font-size: 12px;
+  font-style: italic;
+  color: #8a8378;
 }
 
 .line-badge {

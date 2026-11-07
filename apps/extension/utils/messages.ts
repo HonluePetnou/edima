@@ -2,6 +2,8 @@ export interface TranslatedLine {
   original: string;
   text: string;
   source: 'glossaire' | 'original';
+  /** F4: the amount in words, when this line is (or contains) an FCFA amount. */
+  spokenAmount?: string;
 }
 
 export interface PageTranslatedMessage {

@@ -1,5 +1,5 @@
 import { render } from 'preact';
-import { translateText } from 'edima-shared';
+import { speakAmount, translateText } from 'edima-shared';
 import { extractVisibleText, observeNewContent } from '../utils/dom-reader';
 import { describeElement, findInteractiveElements } from '../utils/buttons';
 import TalkingBubble, { type BubbleState } from '../components/TalkingBubble';
@@ -7,8 +7,11 @@ import type { ExtensionMessage, PageTranslatedMessage, TranslatedLine } from '..
 
 // The language picker in the side panel isn't wired to real state yet
 // (Phase 1 scaffold) — this is the single place that default will come
-// from once it is.
+// from once it is. amountToWords()/speakAmount() return null for 'ewo' until
+// the linguist delivers the number grammar, so French is used for F4's
+// spoken form in the meantime — never a guessed ewondo/duala reading.
 const ACTIVE_LANGUAGE = 'ewo' as const;
+const AMOUNT_SPEECH_LANGUAGE = 'fr' as const;
 
 function translateVisiblePage(): TranslatedLine[] {
   const seen = new Set<string>();
@@ -17,7 +20,8 @@ function translateVisiblePage(): TranslatedLine[] {
     if (seen.has(text)) continue;
     seen.add(text);
     const result = translateText(text, ACTIVE_LANGUAGE);
-    lines.push({ original: result.original, text: result.text, source: result.source });
+    const spokenAmount = speakAmount(text, AMOUNT_SPEECH_LANGUAGE) ?? undefined;
+    lines.push({ original: result.original, text: result.text, source: result.source, spokenAmount });
   }
   return lines;
 }
