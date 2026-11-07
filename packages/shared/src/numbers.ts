@@ -5,6 +5,7 @@
 // priorité"). The French implementation below is also the reference
 // `num2words`-style module the linguist's modules are meant to match.
 
+import { findPhoneNumbersInText } from 'libphonenumber-js';
 import type { LanguageCode } from './schemas';
 
 const ONES = ['zéro', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf'];
@@ -93,4 +94,40 @@ export function speakAmount(text: string, language: LanguageCode | 'fr'): string
   const amount = parseFcfaAmount(text);
   if (amount === null) return null;
   return amountToWords(amount, language);
+}
+
+/** D12: finds the first Cameroonian phone number inside free text (e.g. a
+ * "Bénéficiaire" line that also carries the name), returning the exact
+ * substring as written — never reformatted, so it still matches what F10
+ * protected in the first place. */
+export function extractPhoneNumber(text: string): string | null {
+  const [found] = findPhoneNumbersInText(text, 'CM');
+  return found ? text.slice(found.startsAt, found.endsAt) : null;
+}
+
+function groupToWords(group: string): string {
+  if (group.length === 2 && group[0] === '0') {
+    return `zéro ${numberToFrenchWords(Number(group[1]))}`;
+  }
+  return numberToFrenchWords(Number(group));
+}
+
+/** D12: "numéros lus par groupes de deux" — the way phone and account
+ * numbers are dictated in Cameroon, not digit by digit. A leading odd digit
+ * (the usual case: a 9-digit mobile number) is read on its own; everything
+ * else comes in pairs, "05"-style groups kept as "zéro cinq", never "cinq". */
+export function phoneToWords(raw: string): string {
+  const digits = raw.replace(/\D/g, '');
+  if (!digits) return '';
+
+  const groups: string[] = [];
+  let i = 0;
+  if (digits.length % 2 === 1) {
+    groups.push(digits[0]!);
+    i = 1;
+  }
+  for (; i < digits.length; i += 2) {
+    groups.push(digits.slice(i, i + 2));
+  }
+  return groups.map(groupToWords).join(', ');
 }

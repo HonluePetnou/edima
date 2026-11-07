@@ -171,7 +171,12 @@ export default function App() {
               <section class="recap-card">
                 <p class="recap-title">Récapitulatif avant confirmation</p>
                 {recap.montant && <p class="recap-row">Montant envoyé : {recap.montant}</p>}
-                {recap.beneficiaire && <p class="recap-row">Bénéficiaire : {recap.beneficiaire}</p>}
+                {recap.beneficiaire && (
+                  <p class="recap-row">
+                    Bénéficiaire : {recap.beneficiaire}
+                    {recap.beneficiairePhoneWords && <span class="line-spoken"> — {recap.beneficiairePhoneWords}</span>}
+                  </p>
+                )}
                 {recap.frais && <p class="recap-row">Frais : {recap.frais}</p>}
                 {recap.total && <p class="recap-row recap-row--total">Total débité : {recap.total}</p>}
                 {consistency && (

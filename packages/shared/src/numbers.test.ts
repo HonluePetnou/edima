@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { amountToWords, numberToFrenchWords, parseFcfaAmount, speakAmount } from './numbers';
+import { amountToWords, extractPhoneNumber, numberToFrenchWords, parseFcfaAmount, phoneToWords, speakAmount } from './numbers';
 
 describe('numberToFrenchWords', () => {
   const cases: [number, string][] = [
@@ -100,5 +100,38 @@ describe('speakAmount', () => {
 
   it('returns null when there is nothing to parse', () => {
     expect(speakAmount('Bénéficiaire', 'fr')).toBeNull();
+  });
+});
+
+describe('extractPhoneNumber', () => {
+  it('finds a Cameroonian number inside a longer line', () => {
+    expect(extractPhoneNumber('Paul Mballa — 6 99 12 34 56')).toBe('6 99 12 34 56');
+  });
+
+  it('returns null when there is no phone number', () => {
+    expect(extractPhoneNumber('Bénéficiaire')).toBeNull();
+  });
+});
+
+describe('phoneToWords', () => {
+  it('reads a 9-digit mobile number the Cameroonian way: one digit, then pairs', () => {
+    expect(phoneToWords('699123456')).toBe('six, quatre-vingt-dix-neuf, douze, trente-quatre, cinquante-six');
+  });
+
+  it('ignores any spacing or punctuation already in the input', () => {
+    expect(phoneToWords('6 99 12 34 56')).toBe('six, quatre-vingt-dix-neuf, douze, trente-quatre, cinquante-six');
+  });
+
+  it('reads a leading-zero group as "zéro X", not just X', () => {
+    expect(phoneToWords('05')).toBe('zéro cinq');
+    expect(phoneToWords('00')).toBe('zéro zéro');
+  });
+
+  it('groups a purely even-length number into pairs with no leading single digit', () => {
+    expect(phoneToWords('1234')).toBe('douze, trente-quatre');
+  });
+
+  it('returns an empty string for input with no digits', () => {
+    expect(phoneToWords('abc')).toBe('');
   });
 });

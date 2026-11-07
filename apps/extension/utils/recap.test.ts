@@ -7,7 +7,7 @@ function line(text: string): TranslatedLine {
 }
 
 describe('extractRecap', () => {
-  it('reads bénéficiaire, montant, frais and total from the BanqueDémo récap table', () => {
+  it('reads bénéficiaire, montant, frais, total and the spoken phone number', () => {
     const lines = [
       line('Étape 3 sur 3'),
       line('Récapitulatif du transfert'),
@@ -27,6 +27,7 @@ describe('extractRecap', () => {
       montant: '5 000 FCFA',
       frais: '100 FCFA',
       total: '5 100 FCFA',
+      beneficiairePhoneWords: 'six, quatre-vingt-dix-neuf, douze, trente-quatre, cinquante-six',
     });
   });
 
@@ -36,24 +37,40 @@ describe('extractRecap', () => {
 
   it('returns partial info rather than discarding what it did find', () => {
     const recap = extractRecap([line('Montant envoyé'), line('5 000 FCFA')]);
-    expect(recap).toEqual({ beneficiaire: null, montant: '5 000 FCFA', frais: null, total: null });
+    expect(recap).toEqual({
+      beneficiaire: null,
+      montant: '5 000 FCFA',
+      frais: null,
+      total: null,
+      beneficiairePhoneWords: null,
+    });
+  });
+
+  it('leaves beneficiairePhoneWords null when the name carries no phone number', () => {
+    const recap = extractRecap([line('Bénéficiaire'), line('Paul Mballa')]);
+    expect(recap?.beneficiairePhoneWords).toBeNull();
   });
 });
 
 describe('formatRecapSummary', () => {
-  it('reads montant, bénéficiaire and frais clearly, in that order', () => {
+  it('reads montant, bénéficiaire (with phone) and frais clearly, in that order', () => {
     const summary = formatRecapSummary({
-      beneficiaire: 'Paul Mballa',
+      beneficiaire: 'Paul Mballa — 6 99 12 34 56',
       montant: '5 000 FCFA',
       frais: '100 FCFA',
       total: '5 100 FCFA',
+      beneficiairePhoneWords: 'six, quatre-vingt-dix-neuf, douze, trente-quatre, cinquante-six',
     });
     expect(summary).toBe(
-      'Récapitulatif avant confirmation. Montant envoyé : 5 000 FCFA. Bénéficiaire : Paul Mballa. Frais : 100 FCFA. Total débité de ton compte : 5 100 FCFA.',
+      'Récapitulatif avant confirmation. Montant envoyé : 5 000 FCFA. ' +
+        'Bénéficiaire : Paul Mballa — 6 99 12 34 56. Numéro : six, quatre-vingt-dix-neuf, douze, trente-quatre, cinquante-six. ' +
+        'Frais : 100 FCFA. Total débité de ton compte : 5 100 FCFA.',
     );
   });
 
   it('returns an empty string when there is nothing to read', () => {
-    expect(formatRecapSummary({ beneficiaire: null, montant: null, frais: null, total: null })).toBe('');
+    expect(
+      formatRecapSummary({ beneficiaire: null, montant: null, frais: null, total: null, beneficiairePhoneWords: null }),
+    ).toBe('');
   });
 });
