@@ -147,7 +147,7 @@ export default function App() {
               {lines.map((line) => (
                 <li key={line.original} class="line-item">
                   <span class={`line-badge line-badge--${line.source}`}>
-                    {line.source === 'glossaire' ? 'Validé' : 'Français'}
+                    {line.source === 'glossaire' ? 'Validé' : line.source === 'ia' ? 'IA — non vérifié' : 'Français'}
                   </span>
                   <span class="line-text-group">
                     <span class="line-text">{line.text}</span>

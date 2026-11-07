@@ -31,8 +31,13 @@ app.post('/translate', async (c) => {
     return c.json({ error: 'llm_not_configured' }, 503);
   }
 
-  // TODO (Phase 2): call the LLM with `parsed.data.masked` only, and tag the
-  // result source as "ia" so the client shows the "non vérifié" badge.
+  // TODO (Phase 2): call the LLM with `parsed.data.masked` only, and
+  // respond `{ translated: string }` — still masked, same {{Vn}} tokens as
+  // the request, untouched. The extension (utils/messages.ts,
+  // TranslateUnknownResponse) reinserts the real values, runs F10's
+  // verifyValuesIntact() check, and only then tags the line source "ia" for
+  // the "non vérifié" badge (D1). Never resolve the tokens server-side —
+  // the server never sees the real amounts/names in the first place.
   return c.json({ error: 'not_implemented' }, 501);
 });
 

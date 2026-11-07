@@ -1,5 +1,5 @@
 import { render } from 'preact';
-import { speakAmount, translateText } from 'edima-shared';
+import { extractProtectedValues, reinsertProtectedValues, speakAmount, translateText, verifyValuesIntact } from 'edima-shared';
 import { extractVisibleText, observeNewContent } from '../utils/dom-reader';
 import { describeElement, findInteractiveElements } from '../utils/buttons';
 import { findWarningLines } from '../utils/warnings';
@@ -7,7 +7,13 @@ import { findFormFields } from '../utils/form-fields';
 import { extractRecap } from '../utils/recap';
 import { classifyStep } from '../utils/journey';
 import TalkingBubble, { type BubbleState } from '../components/TalkingBubble';
-import type { ExtensionMessage, FieldDescription, PageTranslatedMessage, TranslatedLine } from '../utils/messages';
+import type {
+  ExtensionMessage,
+  FieldDescription,
+  PageTranslatedMessage,
+  TranslateUnknownResponse,
+  TranslatedLine,
+} from '../utils/messages';
 
 // The language picker in the side panel isn't wired to real state yet
 // (Phase 1 scaffold) — this is the single place that default will come
@@ -17,14 +23,24 @@ import type { ExtensionMessage, FieldDescription, PageTranslatedMessage, Transla
 const ACTIVE_LANGUAGE = 'ewo' as const;
 const AMOUNT_SPEECH_LANGUAGE = 'fr' as const;
 
-function translateVisiblePage(): TranslatedLine[] {
+// F9: confirmed-good IA translations for this page (verified by F10 below),
+// keyed by the original French text so they survive every later rescan
+// instead of reverting to French the next time F8 notices a mutation.
+function translateVisiblePage(aiCache: Map<string, string>): TranslatedLine[] {
   const seen = new Set<string>();
   const lines: TranslatedLine[] = [];
   for (const { text } of extractVisibleText()) {
     if (seen.has(text)) continue;
     seen.add(text);
-    const result = translateText(text, ACTIVE_LANGUAGE);
     const spokenAmount = speakAmount(text, AMOUNT_SPEECH_LANGUAGE) ?? undefined;
+
+    const cached = aiCache.get(text);
+    if (cached) {
+      lines.push({ original: text, text: cached, source: 'ia', spokenAmount });
+      continue;
+    }
+
+    const result = translateText(text, ACTIVE_LANGUAGE);
     lines.push({ original: result.original, text: result.text, source: result.source, spokenAmount });
   }
   return lines;
@@ -117,6 +133,42 @@ export default defineContentScript({
       return warnings;
     }
 
+    // ---- F9: contenu inédit — chaîne glossaire → phrases-modèles → IA ----
+    // (phrases-modèles matching isn't wired yet: it needs real sentence
+    // structure matching, not just the exact-string lookup translateText()
+    // does today. Unmatched text here goes straight to the IA fallback.)
+    const aiCache = new Map<string, string>();
+
+    function requestAiTranslation(masked: string): Promise<string | null> {
+      return new Promise((resolve) => {
+        chrome.runtime.sendMessage(
+          { type: 'edima:translate-unknown', masked, language: ACTIVE_LANGUAGE },
+          (response: TranslateUnknownResponse | undefined) => resolve(response?.translated ?? null),
+        );
+      });
+    }
+
+    async function tryAiFallback(addedTexts: string[]) {
+      for (const text of addedTexts) {
+        if (aiCache.has(text)) continue;
+        // Only genuinely unseen content is F9's job — a known glossary term
+        // (any status) was already handled by translateText() above.
+        if (translateText(text, ACTIVE_LANGUAGE).status !== null) continue;
+        if (text.length < 8 || text.length > 200) continue; // not sentence-like enough to bother the LLM with
+
+        const { masked, values } = extractProtectedValues(text);
+        const translated = await requestAiTranslation(masked);
+        if (!translated) continue; // server unavailable — French original keeps showing, correctly
+
+        const final = reinsertProtectedValues(translated, values);
+        if (!verifyValuesIntact(final, values)) continue; // F10's safety net: never show a value mismatch
+
+        aiCache.set(text, final);
+        rescan();
+        reportToSidePanel();
+      }
+    }
+
     // ---- state reported to the side panel ----
     let currentLines: TranslatedLine[] = [];
     let currentButtonLabels: string[] = [];
@@ -126,7 +178,7 @@ export default defineContentScript({
     let currentStep: ReturnType<typeof classifyStep> = null;
 
     const rescan = () => {
-      currentLines = translateVisiblePage();
+      currentLines = translateVisiblePage(aiCache);
       currentButtonLabels = wireInteractiveElements();
       currentWarnings = announceNewWarnings(currentLines);
 
@@ -158,9 +210,10 @@ export default defineContentScript({
     };
     reportToSidePanel();
 
-    observeNewContent(() => {
+    observeNewContent((added) => {
       rescan();
       reportToSidePanel();
+      tryAiFallback(added.map((a) => a.text));
     });
 
     chrome.runtime.onMessage.addListener((message: ExtensionMessage, _sender, sendResponse) => {
