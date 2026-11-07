@@ -12,13 +12,16 @@
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
     "compile": "tsc --noEmit",
+    "test": "vitest run",
     "postinstall": "wxt prepare"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.6",
     "@types/chrome": "^0.3.7",
+    "jsdom": "^31.0.0",
     "typescript": "^5.9.3",
     "vite": "^8.1.5",
+    "vitest": "^2.1.0",
     "web-ext": "^10.5.0",
     "wxt": "^0.21.3"
   },

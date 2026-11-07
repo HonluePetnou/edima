@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { fillTemplate, findTemplate, findTerm, glossaryTerms, templatePhrases } from './glossary';
+import { fillTemplate, findTemplate, findTerm, glossaryTerms, templatePhrases, translateText } from './glossary';
 
 describe('glossary data', () => {
   it('loads and validates every term', () => {
@@ -40,5 +40,49 @@ describe('fillTemplate', () => {
     const template = findTemplate('tpl_envoi_montant_nom')!;
     const result = fillTemplate(template, { montant: '5 000 FCFA' });
     expect(result).toBe('Tu vas envoyer 5 000 FCFA à {nom}.');
+  });
+});
+
+describe('translateText', () => {
+  it('falls back to the French original for an unmatched string', () => {
+    const result = translateText('Un texte jamais vu sur aucune page', 'ewo');
+    expect(result).toEqual({
+      original: 'Un texte jamais vu sur aucune page',
+      text: 'Un texte jamais vu sur aucune page',
+      source: 'original',
+      status: null,
+    });
+  });
+
+  it('falls back to French for a known term that is not yet "valide"', () => {
+    const result = translateText('Solde disponible', 'ewo');
+    expect(result.source).toBe('original');
+    expect(result.text).toBe('Solde disponible');
+    expect(result.status).toBe('a_traduire');
+  });
+
+  it('matches regardless of surrounding whitespace or case', () => {
+    const result = translateText('  solde DISPONIBLE  ', 'ewo');
+    expect(result.status).toBe('a_traduire');
+  });
+
+  it('uses the glossary translation once a term is valide', () => {
+    const term = glossaryTerms.find((t) => t.id === 'solde_disponible')!;
+    const originalStatus = term.status;
+    const originalEwo = term.ewo;
+    try {
+      term.status = 'valide';
+      term.ewo = 'Ndoŋ ye mony ye ô kôló';
+      const result = translateText('Solde disponible', 'ewo');
+      expect(result).toEqual({
+        original: 'Solde disponible',
+        text: 'Ndoŋ ye mony ye ô kôló',
+        source: 'glossaire',
+        status: 'valide',
+      });
+    } finally {
+      term.status = originalStatus;
+      term.ewo = originalEwo;
+    }
   });
 });

@@ -43,8 +43,10 @@ pnpm install
 - [x] Protection des montants/téléphones/dates (F10) — regex + `libphonenumber-js`, testé avec Vitest
 - [x] Glossaire : 72 termes + 24 phrases-modèles en français, structure prête pour les traductions ewondo/duala
 - [x] Serveur Hono : route `/translate` validée par Zod, en attente d'une clé LLM
-- [ ] Traduction effective (glossaire → phrases-modèles → IA) — Phase 2
+- [x] **F1** (surimpression) : chaque libellé visible de la page est passé par le glossaire et remonté au panneau latéral ; tant qu'aucun terme n'est `valide`, le français original s'affiche (comportement prévu par F10/D9, pas un trou)
+- [x] **F3** (boutons parlants) : au survol/focus, chaque bouton/lien affiche une bulle et se fait lire à voix haute (voix française de secours — l'audio natif ewondo/duala arrive avec D2)
+- [ ] Traduction effective une fois des termes `valide` (glossaire → phrases-modèles → IA) — F9, Phase 2
 - [ ] Traductions ewondo/duala validées par le linguiste — bloquant, voir PLAN.md
-- [ ] Panneau Edima complet (reprend une des 3 directions visuelles explorées sur Figma)
+- [ ] Panneau Edima complet (reprend une des 3 directions visuelles explorées sur Figma) — F1/F3 tournent pour l'instant dans le panneau de base du scaffold
 
 Le glossaire ne couvre pas encore les ~150 termes visés par le cahier des charges : les 72 termes actuels sont choisis pour couvrir le parcours de test (solde, frais, transfert, récapitulatif, avertissement), à étendre avec le linguiste.
