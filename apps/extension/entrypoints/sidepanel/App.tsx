@@ -3,7 +3,9 @@ import { summarizePage } from '../../utils/summarize';
 import { formatRecapSummary, type RecapInfo } from '../../utils/recap';
 import type { StepInfo } from '../../utils/journey';
 import type { ConsistencyInfo } from '../../utils/consistency';
-import type { FieldDescription, PageTranslatedMessage, TranslatedLine } from '../../utils/messages';
+import type { FieldDescription, LanguageCode, PageTranslatedMessage, TranslatedLine } from '../../utils/messages';
+
+const LANGUAGE_LABELS: Record<LanguageCode, string> = { ewo: 'Ewondo', dua: 'Duala' };
 
 function speak(text: string) {
   if (!text || !('speechSynthesis' in window)) return;
@@ -21,6 +23,7 @@ function speak(text: string) {
  */
 export default function App() {
   const [lines, setLines] = useState<TranslatedLine[] | null>(null);
+  const [language, setLanguageState] = useState<LanguageCode>('ewo');
   const [buttonLabels, setButtonLabels] = useState<string[]>([]);
   const [warnings, setWarnings] = useState<string[]>([]);
   const [step, setStep] = useState<StepInfo | null>(null);
@@ -38,6 +41,7 @@ export default function App() {
     const apply = (message: PageTranslatedMessage) => {
       if (cancelled) return;
       setLines(message.lines);
+      setLanguageState(message.language);
       setButtonLabels(message.buttonLabels);
       setWarnings(message.warnings);
       setStep(message.step);
@@ -70,6 +74,15 @@ export default function App() {
     };
   }, []);
 
+  const changeLanguage = async (next: LanguageCode) => {
+    setLanguageState(next); // optimistic — the content script's own report confirms it right after
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tab?.id) return;
+    chrome.tabs.sendMessage(tab.id, { type: 'edima:set-language', language: next }).catch(() => {
+      // No content script on this tab — nothing to switch.
+    });
+  };
+
   const readPage = () => {
     if (!lines) return;
     const text = summarizePage(lines, buttonLabels);
@@ -99,9 +112,17 @@ export default function App() {
     <>
       <header class="header">
         <h1 class="wordmark">Edima</h1>
-        <button class="lang-pill" type="button" disabled>
-          Ewondo
-        </button>
+        <select
+          class="lang-pill"
+          value={language}
+          onChange={(e) => changeLanguage((e.target as HTMLSelectElement).value as LanguageCode)}
+        >
+          {(Object.keys(LANGUAGE_LABELS) as LanguageCode[]).map((code) => (
+            <option key={code} value={code}>
+              {LANGUAGE_LABELS[code]}
+            </option>
+          ))}
+        </select>
       </header>
       <main class="content">
         {lines === null ? (

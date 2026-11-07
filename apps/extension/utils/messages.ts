@@ -2,6 +2,9 @@ import type { RecapInfo } from './recap';
 import type { StepInfo } from './journey';
 import type { ConsistencyInfo } from './consistency';
 
+/** D5: the only two languages the cahier asks for in the MVP. */
+export type LanguageCode = 'ewo' | 'dua';
+
 export interface TranslatedLine {
   original: string;
   text: string;
@@ -21,6 +24,9 @@ export interface FieldDescription {
 export interface PageTranslatedMessage {
   type: 'edima:page-translated';
   url: string;
+  /** D5: which language this page was scanned in — lets the panel reflect
+   * the content script's current choice even right after it re-injects. */
+  language: LanguageCode;
   lines: TranslatedLine[];
   buttonLabels: string[];
   /** F7: short, keyword-matched warning lines, most recent last. */
@@ -46,7 +52,14 @@ export interface RequestStateMessage {
 export interface TranslateUnknownMessage {
   type: 'edima:translate-unknown';
   masked: string;
-  language: 'ewo' | 'dua';
+  language: LanguageCode;
+}
+
+/** D5: side panel → content script, switches the active language and
+ * triggers an immediate re-scan of the current page. */
+export interface SetLanguageMessage {
+  type: 'edima:set-language';
+  language: LanguageCode;
 }
 
 export interface TranslateUnknownResponse {
@@ -76,4 +89,5 @@ export type ExtensionMessage =
   | RequestStateMessage
   | TranslateUnknownMessage
   | SaveEnteredAmountMessage
-  | GetEnteredAmountMessage;
+  | GetEnteredAmountMessage
+  | SetLanguageMessage;

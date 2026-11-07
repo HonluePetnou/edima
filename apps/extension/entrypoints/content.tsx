@@ -12,23 +12,25 @@ import type {
   ExtensionMessage,
   FieldDescription,
   GetEnteredAmountResponse,
+  LanguageCode,
   PageTranslatedMessage,
   TranslateUnknownResponse,
   TranslatedLine,
 } from '../utils/messages';
 
-// The language picker in the side panel isn't wired to real state yet
-// (Phase 1 scaffold) — this is the single place that default will come
-// from once it is. amountToWords()/speakAmount() return null for 'ewo' until
-// the linguist delivers the number grammar, so French is used for F4's
-// spoken form in the meantime — never a guessed ewondo/duala reading.
-const ACTIVE_LANGUAGE = 'ewo' as const;
+// amountToWords()/speakAmount() return null for ewo/dua until the linguist
+// delivers each language's number grammar, so French is used for F4's
+// spoken form in the meantime — never a guessed ewondo/duala reading. This
+// is independent of the D5 language switch below (which only changes which
+// glossary column translateText() reads from).
 const AMOUNT_SPEECH_LANGUAGE = 'fr' as const;
 
 // F9: confirmed-good IA translations for this page (verified by F10 below),
 // keyed by the original French text so they survive every later rescan
-// instead of reverting to French the next time F8 notices a mutation.
-function translateVisiblePage(aiCache: Map<string, string>): TranslatedLine[] {
+// instead of reverting to French the next time F8 notices a mutation. Reset
+// on a D5 language switch (see 'edima:set-language' below) — a cached
+// translation only makes sense for the language it was produced in.
+function translateVisiblePage(aiCache: Map<string, string>, language: LanguageCode): TranslatedLine[] {
   const seen = new Set<string>();
   const lines: TranslatedLine[] = [];
   for (const { text } of extractVisibleText()) {
@@ -42,7 +44,7 @@ function translateVisiblePage(aiCache: Map<string, string>): TranslatedLine[] {
       continue;
     }
 
-    const result = translateText(text, ACTIVE_LANGUAGE);
+    const result = translateText(text, language);
     lines.push({ original: result.original, text: result.text, source: result.source, spokenAmount });
   }
   return lines;
@@ -64,6 +66,9 @@ export default defineContentScript({
   cssInjectionMode: 'ui',
 
   async main(ctx) {
+    // D5: switched live via the side panel's language selector.
+    let activeLanguage: LanguageCode = 'ewo';
+
     // Safety rule from the cahier des charges: by default the page's own DOM is
     // never written to. Every bit of Edima UI lives inside one Shadow DOM host,
     // isolated from the host page's styles and scripts.
@@ -144,7 +149,7 @@ export default defineContentScript({
     function requestAiTranslation(masked: string): Promise<string | null> {
       return new Promise((resolve) => {
         chrome.runtime.sendMessage(
-          { type: 'edima:translate-unknown', masked, language: ACTIVE_LANGUAGE },
+          { type: 'edima:translate-unknown', masked, language: activeLanguage },
           (response: TranslateUnknownResponse | undefined) => resolve(response?.translated ?? null),
         );
       });
@@ -155,7 +160,7 @@ export default defineContentScript({
         if (aiCache.has(text)) continue;
         // Only genuinely unseen content is F9's job — a known glossary term
         // (any status) was already handled by translateText() above.
-        if (translateText(text, ACTIVE_LANGUAGE).status !== null) continue;
+        if (translateText(text, activeLanguage).status !== null) continue;
         if (text.length < 8 || text.length > 200) continue; // not sentence-like enough to bother the LLM with
 
         const { masked, values } = extractProtectedValues(text);
@@ -232,7 +237,7 @@ export default defineContentScript({
     let currentConsistency: ReturnType<typeof checkConsistency> = null;
 
     const rescan = () => {
-      currentLines = translateVisiblePage(aiCache);
+      currentLines = translateVisiblePage(aiCache, activeLanguage);
       currentButtonLabels = wireInteractiveElements();
       currentWarnings = announceNewWarnings(currentLines);
 
@@ -249,6 +254,7 @@ export default defineContentScript({
       return {
         type: 'edima:page-translated',
         url: location.href,
+        language: activeLanguage,
         lines: currentLines,
         buttonLabels: currentButtonLabels,
         warnings: currentWarnings,
@@ -277,6 +283,16 @@ export default defineContentScript({
     chrome.runtime.onMessage.addListener((message: ExtensionMessage, _sender, sendResponse) => {
       if (message.type === 'edima:request-state') {
         sendResponse(buildMessage());
+        return true;
+      }
+      if (message.type === 'edima:set-language') {
+        activeLanguage = message.language;
+        aiCache.clear(); // a cached translation only makes sense for the language it was produced in
+        rescan();
+        reportToSidePanel();
+        checkRecapConsistency();
+        sendResponse({});
+        return true;
       }
       return true;
     });
