@@ -6,12 +6,13 @@
 
 > *« Le principal risque n'est pas le code mais la qualité de la langue »* — cahier des charges.
 
-Avec 2 personnes et de l'assistance IA sur le code, le goulot d'étranglement n'est pas l'ingénierie, c'est la langue. Personne ne peut produire ni valider le glossaire (150 termes + 50 phrases), la grammaire des nombres, ou les enregistrements audio sans accès à un linguiste ou à des locuteurs natifs ewondo/duala.
+Avec 2 personnes et de l'assistance IA sur le code, le goulot d'étranglement n'est pas l'ingénierie, c'est la langue. Personne ne peut produire ni valider le glossaire (150 termes + 50 phrases), la grammaire des nombres, ou les enregistrements audio sans accès à un linguiste ou à des locuteurs natifs.
 
-**Action immédiate :**
-- Identifier si l'un de vous est locuteur natif, ou mobiliser un contact (Resulam, linguistique Yaoundé I/Douala, NTeALan).
-- Trancher la langue MVP prioritaire (ewondo ou duala) dès qu'un locuteur est disponible.
-- Tant que ce n'est pas réglé, le reste du plan avance quand même (voir Phase 1), mais rien n'est *livrable* sans validation linguistique.
+**Résolu :**
+- Langue MVP tranchée : **duala (`dua`)**. L'ewondo (`ewo`) devient secondaire.
+- Un locuteur natif est dans l'équipe ; 2 relecteurs natifs valideront les traductions.
+- Le chemin critique devient la traduction puis la validation du glossaire, pas le fine-tune.
+- Détail complet : `docs/plan-langue.pdf` (v2, pivot duala).
 
 ## Répartition des rôles (2 personnes)
 
@@ -25,8 +26,9 @@ Ajuster selon les compétences réelles (si l'un de vous est aussi locuteur nati
 
 ## Phase 1 — Fondations
 
-- [ ] Lancer le recrutement linguiste / locuteurs natifs (bloquant, voir ci-dessus)
-- [ ] Trancher la langue MVP (ewondo ou duala)
+- [x] Lancer le recrutement linguiste / locuteurs natifs (résolu : locuteur natif dans l'équipe + 2 relecteurs)
+- [x] Trancher la langue MVP : **duala** (`dua`), ewondo secondaire
+- [x] Contrainte licences : uniquement gratuit et non copyleft (pas de GPL/AGPL/CC BY-SA/CC BY-NC-SA) ; base modèle M2M100 (MIT)
 - [x] Scaffold monorepo pnpm : `apps/extension`, `apps/server`, `packages/shared`
 - [x] Extension : config WXT, Manifest V3, `chrome.sidePanel`, content script en Shadow DOM isolé, `MutationObserver` + lecture générique du DOM
 - [x] Structure du glossaire JSON (72 termes + 24 phrases-modèles en français — à étendre vers 150/50 avec le linguiste)
@@ -58,4 +60,4 @@ Ajuster selon les compétences réelles (si l'un de vous est aussi locuteur nati
 
 - [ ] Date limite et format de dépôt réels de la présélection
 - [ ] Nom « Edima » confirmé par un locuteur (sens et tons) + disponibilité (Chrome Web Store, OAPI)
-- [ ] Couverture réelle de l'ewondo et du duala par MMS-TTS et Omnilingual ASR
+- [x] Couverture audio : MMS-TTS ne couvre ni l'ewondo ni le duala ; Omnilingual ASR couvre `ewo_Latn` et `dua_Latn` (Apache-2.0)

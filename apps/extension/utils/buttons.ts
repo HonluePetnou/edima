@@ -3,6 +3,7 @@
 // `guessAction` later without touching the hover-detection plumbing below.
 
 import { fillTemplate, findTemplate } from 'edima-shared';
+import type { LanguageCode } from './messages';
 
 const INTERACTIVE_SELECTOR = 'button, a[href], [role="button"], input[type="button"], input[type="submit"]';
 
@@ -40,13 +41,15 @@ function labelFor(el: HTMLElement): string {
   return text.trim().replace(/\s+/g, ' ');
 }
 
-export function describeElement(el: HTMLElement): DescribedElement | null {
+export function describeElement(el: HTMLElement, language: LanguageCode = 'dua'): DescribedElement | null {
   const label = labelFor(el);
   if (!label) return null;
 
   const action = KNOWN_ACTIONS[label.toLowerCase()] ?? `fait une action liée à « ${label} »`;
   const template = findTemplate('tpl_bouton_sert_a');
-  const description = template ? fillTemplate(template, { bouton: label, description: action }) : `${label} : ${action}`;
+  const description = template
+    ? fillTemplate(template, { bouton: label, description: action }, language)
+    : `${label} : ${action}`;
 
   return { element: el, label, description };
 }
