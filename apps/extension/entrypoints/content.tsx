@@ -75,7 +75,7 @@ export default defineContentScript({
 
   async main(ctx) {
     // D5: switched live via the side panel's language selector.
-    let activeLanguage: LanguageCode = 'ewo';
+    let activeLanguage: LanguageCode = 'dua';
 
     // Safety rule from the cahier des charges: by default the page's own DOM is
     // never written to. Every bit of Edima UI lives inside one Shadow DOM host,
@@ -107,7 +107,7 @@ export default defineContentScript({
     function wireInteractiveElements(): string[] {
       const labels: string[] = [];
       for (const el of findInteractiveElements()) {
-        const described = describeElement(el);
+        const described = describeElement(el, activeLanguage);
         if (!described) continue;
         labels.push(described.label);
         if (wiredElements.has(el)) continue;

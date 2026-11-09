@@ -32,12 +32,16 @@ export function findTemplate(id: string): TemplatePhrase | undefined {
  * app state like a chosen beneficiary name) — this function does no
  * extraction or verification of its own.
  */
-export function fillTemplate(template: TemplatePhrase, values: Record<string, string>): string {
-  // TODO (Phase 2): read from template.ewo / template.dua once a status is
-  // "valide" for the active language, falling back to `fr` until then.
+export function fillTemplate(template: TemplatePhrase, values: Record<string, string>, language: LanguageCode = 'dua'): string {
+  const statusKey = `${language}_status` as const;
+  const status = template[statusKey];
+  const translated = template[language];
+
+  const baseText = (status === 'valide' && translated) ? translated : template.fr;
+
   return template.variables.reduce(
     (text, name) => text.replaceAll(`{${name}}`, values[name] ?? `{${name}}`),
-    template.fr,
+    baseText,
   );
 }
 
@@ -52,7 +56,7 @@ export interface TranslateResult {
   text: string;
   source: 'glossaire' | 'original';
   /** The matched term's status, or null if nothing in the glossary matched this exact string. */
-  status: GlossaryTerm['status'] | null;
+  status: 'a_traduire' | 'a_valider' | 'valide' | null;
 }
 
 /**
@@ -60,17 +64,19 @@ export interface TranslateResult {
  * F9). Exact, whitespace-normalized match against the glossary.
  *
  * F10/D9's fallback rule applies here too: an unmatched string, or a term
- * that isn't yet `status: "valide"`, is shown as the original French rather
- * than an invented or unverified translation.
+ * whose `{language}_status` isn't yet "valide", is shown as the original
+ * French rather than an invented or unverified translation.
  */
 export function translateText(text: string, language: LanguageCode): TranslateResult {
   const term = termsByNormalizedFr.get(normalize(text));
   const translated = term?.[language];
+  const statusKey = `${language}_status` as const;
+  const status = term?.[statusKey] ?? null;
 
-  if (term && term.status === 'valide' && translated) {
-    return { original: text, text: translated, source: 'glossaire', status: term.status };
+  if (term && status === 'valide' && translated) {
+    return { original: text, text: translated, source: 'glossaire', status };
   }
-  return { original: text, text, source: 'original', status: term?.status ?? null };
+  return { original: text, text, source: 'original', status };
 }
 
 const explanationByTermId = new Map(explanations.map((e) => [e.termId, e]));

@@ -14,12 +14,13 @@ const WAVEFORM_HEIGHTS = [4, 7, 11, 15, 18, 20, 17, 13, 9, 6, 8, 12, 16, 19, 15,
 /**
  * Phase 1 scaffold: shows whatever the content script found (F1) and reads
  * a short summary on demand (F2). Every line currently falls back to French
- * because no glossary term is `status: "valide"` yet — that is the correct,
- * intended behaviour (F10/D9) until the linguist signs terms off, not a bug.
+ * because no term has a `dua_status`/`ewo_status` of "valide" yet — that is
+ * the correct, intended behaviour (F10/D9) until the linguist signs terms
+ * off, not a bug.
  */
 export default function App() {
   const [lines, setLines] = useState<TranslatedLine[] | null>(null);
-  const [language, setLanguageState] = useState<LanguageCode>('ewo');
+  const [language, setLanguageState] = useState<LanguageCode>('dua');
   const [buttonLabels, setButtonLabels] = useState<string[]>([]);
   const [warnings, setWarnings] = useState<string[]>([]);
   const [step, setStep] = useState<StepInfo | null>(null);
