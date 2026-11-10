@@ -1,0 +1,15 @@
+# Tested on Kaggle (Python 3.10/3.11, CUDA 12). On Kaggle, torch is already
+# installed; install the rest with: pip install -r ml/requirements.txt
+torch>=2.2
+transformers==4.44.2
+datasets>=2.20,<4
+accelerate>=0.33
+sentencepiece>=0.2.0
+sacremoses>=0.1.1
+sacrebleu>=2.4.2
+ctranslate2>=4.4
+huggingface_hub>=0.24
+pyyaml>=6.0
+numpy>=1.26
+tqdm>=4.66
+peft>=0.12

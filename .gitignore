@@ -6,3 +6,12 @@ dist
 .env
 .env.local
 .DS_Store
+
+# ML pipeline artifacts (downloaded data, checkpoints, exports)
+ml/data/
+ml/models/
+ml/out/
+ml/notebooks/.ipynb_checkpoints/
+__pycache__/
+*.pyc
+*.safetensors
