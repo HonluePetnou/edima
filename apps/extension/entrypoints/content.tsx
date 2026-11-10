@@ -18,6 +18,8 @@ import { isFinancialPage } from '../utils/financial-page';
 import { loadSettings, onSettingsChanged } from '../utils/settings';
 import TalkingBubble, { type BubbleState } from '../components/TalkingBubble';
 import FloatingMascot from '../components/FloatingMascot';
+import mascotIdleSrc from '../assets/mascot/edima-idle.webp?inline';
+import mascotAlertSrc from '../assets/mascot/edima-alert.webp?inline';
 import type {
   ExtensionMessage,
   FieldDescription,
@@ -94,8 +96,10 @@ export default defineContentScript({
     let hasAlert = false;
 
     const openPanel = () => chrome.runtime.sendMessage({ type: 'edima:open-panel' }).catch(() => {});
-    const idleSrc = browser.runtime.getURL('/mascot/edima-idle.webp');
-    const alertSrc = browser.runtime.getURL('/mascot/edima-alert.webp');
+    // Inlined as data: URLs (see imports) rather than chrome-extension:// URLs,
+    // which a bank's CSP can block and which break after an extension reload.
+    const idleSrc = mascotIdleSrc;
+    const alertSrc = mascotAlertSrc;
 
     const renderOverlay = () => {
       if (!mountContainer) return;

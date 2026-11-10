@@ -1,11 +1,21 @@
 import { Icon } from '../ui/Icon';
 import { IconButton } from '../ui/Button';
 import { Mascot, type MascotState } from '../ui/Mascot';
+import { PillMenu, type PillMenuOption } from '../ui/PillMenu';
 import type { LanguageCode } from '../../utils/messages';
 
-const LANGUAGE_LABELS: Record<LanguageCode, string> = { ewo: 'EWO (Ewondo)', dua: 'DUA (Duala)' };
 export const SPEECH_RATES = [1, 0.85, 0.7] as const;
-const RATE_LABELS = ['1.0×', '0.85×', '0.7×'];
+
+export const LANGUAGE_OPTIONS: PillMenuOption<LanguageCode>[] = [
+  { value: 'ewo', short: 'EWO (Ewondo)', label: 'Ewondo', sublabel: 'EWO' },
+  { value: 'dua', short: 'DUA (Duala)', label: 'Duala', sublabel: 'DUA' },
+];
+
+export const RATE_OPTIONS: PillMenuOption<number>[] = [
+  { value: 0, short: '1.0×', label: 'Normale', sublabel: '1.0×' },
+  { value: 1, short: '0.85×', label: 'Lente', sublabel: '0.85×' },
+  { value: 2, short: '0.7×', label: 'Très lente', sublabel: '0.7×' },
+];
 
 interface HeaderProps {
   mascot: MascotState;
@@ -34,31 +44,9 @@ export function Header({ mascot, speaking, language, onChangeLanguage, rateIndex
         <IconButton icon="x" label="Fermer Edima" onClick={onClose} />
       </div>
       <div class="panel-header-controls">
-        <label class="pill-select">
-          <Icon name="globe" size={18} />
-          <span class="sr-only">Langue</span>
-          <select value={language} onChange={(e) => onChangeLanguage((e.target as HTMLSelectElement).value as LanguageCode)}>
-            {(Object.keys(LANGUAGE_LABELS) as LanguageCode[]).map((code) => (
-              <option key={code} value={code}>
-                {LANGUAGE_LABELS[code]}
-              </option>
-            ))}
-          </select>
-          <Icon name="chevron-down" size={16} />
-        </label>
+        <PillMenu icon="globe" label="Langue" options={LANGUAGE_OPTIONS} value={language} onChange={onChangeLanguage} />
         <span class="spacer" />
-        <label class="pill-select">
-          <Icon name="gauge" size={18} />
-          <span class="sr-only">Vitesse de lecture</span>
-          <select value={rateIndex} onChange={(e) => onChangeRate(Number((e.target as HTMLSelectElement).value))}>
-            {RATE_LABELS.map((label, i) => (
-              <option key={label} value={i}>
-                {label}
-              </option>
-            ))}
-          </select>
-          <Icon name="chevron-down" size={16} />
-        </label>
+        <PillMenu icon="gauge" label="Vitesse de lecture" options={RATE_OPTIONS} value={rateIndex} onChange={onChangeRate} align="end" />
         <button type="button" class="play-btn" onClick={onPrimary} disabled={!canPlay} aria-label={isPlaying ? 'Mettre en pause' : 'Lire'}>
           <Icon name={isPlaying ? 'pause' : 'play'} size={18} />
         </button>

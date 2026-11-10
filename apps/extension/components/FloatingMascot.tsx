@@ -1,7 +1,7 @@
 import { useState } from 'preact/hooks';
 
 interface FloatingMascotProps {
-  /** Absolute extension URLs (browser.runtime.getURL) — this renders on the bank's page. */
+  /** data: URLs inlined in the content script — this renders on the bank's page. */
   idleSrc: string;
   alertSrc: string;
   alert: boolean;
@@ -16,6 +16,7 @@ const CSS = `
 .edima-fab-btn{position:relative;width:72px;height:72px;padding:4px;border:0;border-radius:999px;background:#F5A623;box-shadow:0 8px 24px rgba(26,20,8,.18);cursor:pointer}
 .edima-fab-btn:focus-visible{outline:3px solid #1E7A5F;outline-offset:3px}
 .edima-fab-btn img{display:block;width:64px;height:64px;border-radius:999px;background:#FCEBC9}
+.edima-fab-fallback{display:grid;place-items:center;width:64px;height:64px;border-radius:999px;background:#FCEBC9;color:#1A1D1B}
 .edima-fab-dot{position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:999px;background:#C6282B;border:2px solid #fff}
 .edima-fab-tip{padding:12px 16px;border:1.5px solid #FCEBC9;border-radius:16px;background:#fff;color:#1A1D1B;font-size:14px;font-weight:600;line-height:20px;box-shadow:0 2px 8px rgba(26,20,8,.08);white-space:nowrap}
 @keyframes edima-pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
@@ -25,6 +26,7 @@ const CSS = `
 /** Bottom-right shortcut to the side panel, shown only on detected financial pages. */
 export default function FloatingMascot({ idleSrc, alertSrc, alert, onOpen }: FloatingMascotProps) {
   const [hover, setHover] = useState(false);
+  const [imgFailed, setImgFailed] = useState(false);
   const label = alert ? 'Ouvrir Edima — un avertissement est affiché sur cette page' : 'Ouvrir Edima';
   return (
     <div class="edima-fab">
@@ -45,7 +47,18 @@ export default function FloatingMascot({ idleSrc, alertSrc, alert, onOpen }: Flo
         onFocus={() => setHover(true)}
         onBlur={() => setHover(false)}
       >
-        <img src={alert ? alertSrc : idleSrc} alt="" width={64} height={64} />
+        {imgFailed ? (
+          // A very strict page CSP can block even data: images — never show a broken icon.
+          <span class="edima-fab-fallback" aria-hidden="true">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z" />
+              <path d="M16 9a5 5 0 0 1 0 6" />
+              <path d="M19.364 18.364a9 9 0 0 0 0-12.728" />
+            </svg>
+          </span>
+        ) : (
+          <img src={alert ? alertSrc : idleSrc} alt="" width={64} height={64} onError={() => setImgFailed(true)} />
+        )}
         {alert && <span class="edima-fab-dot" />}
       </button>
     </div>

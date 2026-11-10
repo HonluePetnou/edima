@@ -11,8 +11,6 @@ export default defineConfig({
     // F9's fallback server (apps/server) — localhost only until it's
     // actually deployed somewhere. See apps/extension/utils/server-config.ts.
     host_permissions: ['http://localhost:8787/*'],
-    // The floating mascot (content script) shows these images on bank pages.
-    web_accessible_resources: [{ resources: ['mascot/*.webp'], matches: ['http://*/*', 'https://*/*'] }],
   },
   vite: () => ({
     plugins: [preact()],

@@ -1,4 +1,6 @@
 import { Button, Toggle } from '../../components/ui/Button';
+import { Segmented } from '../../components/ui/Segmented';
+import { LANGUAGE_OPTIONS, RATE_OPTIONS } from '../../components/panel/Header';
 import { Badge } from '../../components/ui/Badge';
 import { Icon } from '../../components/ui/Icon';
 import {
@@ -242,27 +244,30 @@ export function SettingsView(ctx: ViewContext) {
       <BackLink label="Accueil" onClick={() => ctx.go('home')} />
       <h2 class="view-title">Réglages</h2>
       <Card>
-        <div class="row">
-          <Icon name="globe" size={22} />
-          <label class="row-text" for="setting-lang">
-            <span class="row-title">Langue</span>
-          </label>
-          <select id="setting-lang" class="row-select" value={ctx.language} onChange={(e) => ctx.changeLanguage((e.target as HTMLSelectElement).value as LanguageCode)}>
-            <option value="ewo">Ewondo</option>
-            <option value="dua">Duala</option>
-          </select>
+        <div class="setting-block">
+          <p class="setting-title">
+            <Icon name="globe" size={22} />
+            Langue
+          </p>
+          <Segmented
+            label="Langue"
+            options={LANGUAGE_OPTIONS.map((o) => ({ value: o.value, label: o.sublabel!, sublabel: o.label }))}
+            value={ctx.language}
+            onChange={ctx.changeLanguage}
+          />
         </div>
         <Divider />
-        <div class="row">
-          <Icon name="gauge" size={22} />
-          <label class="row-text" for="setting-rate">
-            <span class="row-title">Vitesse de lecture</span>
-          </label>
-          <select id="setting-rate" class="row-select" value={ctx.settings.rateIndex} onChange={(e) => ctx.updateSettings({ rateIndex: Number((e.target as HTMLSelectElement).value) })}>
-            <option value={0}>Normale</option>
-            <option value={1}>Lente</option>
-            <option value={2}>Très lente</option>
-          </select>
+        <div class="setting-block">
+          <p class="setting-title">
+            <Icon name="gauge" size={22} />
+            Vitesse de lecture
+          </p>
+          <Segmented
+            label="Vitesse de lecture"
+            options={RATE_OPTIONS.map((o) => ({ value: o.value, label: o.label, sublabel: o.sublabel }))}
+            value={ctx.settings.rateIndex}
+            onChange={(v) => ctx.updateSettings({ rateIndex: v })}
+          />
         </div>
         <Divider />
         <div class="row">
