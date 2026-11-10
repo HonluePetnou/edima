@@ -56,7 +56,7 @@ ml/
 1. Cloner le repo dans le notebook :
 
    ```bash
-   git clone https://github.com/HonluePetnou/edima.git
+   git clone -b feature/moteur-de-traduction https://github.com/HonluePetnou/edima.git
    cd edima
    pip install -r ml/requirements.txt
    ```
@@ -114,8 +114,18 @@ LoRA sur 200–500 paires or issues du faux portail de démo.
   **NFC** sans supprimer les accents.
 - Le décodage contraint (glossaire) et l'abstention sont gérés côté
   application, pas dans ce pipeline.
-- `transformers` est épinglé à `4.44.2` pour garder `evaluation_strategy` et
-  l'API `Seq2SeqTrainer` utilisée ici.
+- Les scripts détectent automatiquement l'API disponible : `eval_strategy`
+  (transformers ≥ 4.46) ou `evaluation_strategy`, et `processing_class` ou
+  `tokenizer`. Aucun épinglage strict n'est nécessaire.
+
+## Dépannage
+
+- `ValueError: Some generation parameters are set in the model config` :
+  ancienne version de `03`/`05` ; le paramètre est maintenant uniquement dans
+  `model.generation_config`. Récupérer la dernière version et relancer `03`.
+- `You need to have sentencepiece ...` : `pip install sentencepiece`.
+- `AutoTokenizer` ne charge pas `m2m100_dua_init` : `03` a échoué avant de
+  sauvegarder le tokenizer ; corriger l'erreur puis relancer `03`.
 
 ## Étape suivante
 

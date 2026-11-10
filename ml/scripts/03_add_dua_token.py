@@ -70,7 +70,6 @@ def main() -> None:
             output_embeddings.weight[dua_id] = input_embeddings[dua_id]
 
     model.generation_config.forced_bos_token_id = dua_id
-    setattr(model.config, "forced_bos_token_id", dua_id)
 
     model.save_pretrained(output_dir)
     tokenizer.save_pretrained(output_dir)

@@ -1,7 +1,7 @@
 # Tested on Kaggle (Python 3.10/3.11, CUDA 12). On Kaggle, torch is already
 # installed; install the rest with: pip install -r ml/requirements.txt
 torch>=2.2
-transformers==4.44.2
+transformers>=4.46
 datasets>=2.20,<4
 accelerate>=0.33
 sentencepiece>=0.2.0

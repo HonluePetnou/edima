@@ -6,6 +6,7 @@ The best checkpoint (highest chrF on the validation split) is saved to
 from __future__ import annotations
 
 import argparse
+import inspect
 import os
 from pathlib import Path
 
@@ -77,7 +78,6 @@ def main() -> None:
         model.resize_token_embeddings(len(tokenizer))
     model.config.use_cache = False
     model.generation_config.forced_bos_token_id = dua_id
-    setattr(model.config, "forced_bos_token_id", dua_id)
 
     use_synthetic = config["synthetic"]["enabled"] and not args.no_synthetic
     train_rows = load_rows(data_dir / "train.jsonl", args.sample)
@@ -140,46 +140,59 @@ def main() -> None:
     if args.push_to_hub and not push_to_hub:
         print("HF_TOKEN is missing; disabling --push-to-hub.")
 
-    training_args = Seq2SeqTrainingArguments(
-        output_dir=str(output_dir),
-        per_device_train_batch_size=train_cfg["per_device_train_batch_size"],
-        per_device_eval_batch_size=train_cfg["per_device_eval_batch_size"],
-        gradient_accumulation_steps=train_cfg["gradient_accumulation_steps"],
-        learning_rate=train_cfg["learning_rate"],
-        num_train_epochs=(
+    eval_strategy = "steps" if val_dataset is not None else "no"
+    training_kwargs = {
+        "output_dir": str(output_dir),
+        "per_device_train_batch_size": train_cfg["per_device_train_batch_size"],
+        "per_device_eval_batch_size": train_cfg["per_device_eval_batch_size"],
+        "gradient_accumulation_steps": train_cfg["gradient_accumulation_steps"],
+        "learning_rate": train_cfg["learning_rate"],
+        "num_train_epochs": (
             args.num_epochs
             if args.num_epochs is not None
             else train_cfg["num_train_epochs"]
         ),
-        warmup_steps=train_cfg["warmup_steps"],
-        fp16=fp16,
-        gradient_checkpointing=train_cfg["gradient_checkpointing"],
-        predict_with_generate=True,
-        evaluation_strategy="steps" if val_dataset is not None else "no",
-        eval_steps=train_cfg["eval_steps"],
-        save_steps=train_cfg["save_steps"],
-        save_total_limit=train_cfg["save_total_limit"],
-        logging_steps=train_cfg["logging_steps"],
-        load_best_model_at_end=val_dataset is not None,
-        metric_for_best_model="chrf",
-        greater_is_better=True,
-        report_to="none",
-        seed=train_cfg["seed"],
-        max_steps=args.max_steps,
-        push_to_hub=push_to_hub,
-        hub_model_id=args.push_to_hub if push_to_hub else None,
-        hub_token=os.environ.get("HF_TOKEN") if push_to_hub else None,
-    )
+        "warmup_steps": train_cfg["warmup_steps"],
+        "fp16": fp16,
+        "gradient_checkpointing": train_cfg["gradient_checkpointing"],
+        "predict_with_generate": True,
+        "eval_steps": train_cfg["eval_steps"],
+        "save_steps": train_cfg["save_steps"],
+        "save_total_limit": train_cfg["save_total_limit"],
+        "logging_steps": train_cfg["logging_steps"],
+        "load_best_model_at_end": val_dataset is not None,
+        "metric_for_best_model": "chrf",
+        "greater_is_better": True,
+        "report_to": "none",
+        "seed": train_cfg["seed"],
+        "max_steps": args.max_steps,
+        "push_to_hub": push_to_hub,
+        "hub_model_id": args.push_to_hub if push_to_hub else None,
+        "hub_token": os.environ.get("HF_TOKEN") if push_to_hub else None,
+    }
+    args_params = inspect.signature(Seq2SeqTrainingArguments.__init__).parameters
+    if "eval_strategy" in args_params:
+        training_kwargs["eval_strategy"] = eval_strategy
+    else:
+        training_kwargs["evaluation_strategy"] = eval_strategy
+    training_args = Seq2SeqTrainingArguments(**training_kwargs)
 
-    trainer = Seq2SeqTrainer(
-        model=model,
-        args=training_args,
-        train_dataset=train_dataset,
-        eval_dataset=val_dataset,
-        tokenizer=tokenizer,
-        data_collator=data_collator,
-        compute_metrics=compute_metrics,
-    )
+    trainer_kwargs = {
+        "model": model,
+        "args": training_args,
+        "train_dataset": train_dataset,
+        "eval_dataset": val_dataset,
+        "data_collator": data_collator,
+        "compute_metrics": compute_metrics,
+    }
+    trainer_params = inspect.signature(Seq2SeqTrainer.__init__).parameters
+    if "processing_class" in trainer_params:
+        trainer_kwargs["processing_class"] = tokenizer
+    elif "tokenizer" in trainer_params:
+        trainer_kwargs["tokenizer"] = tokenizer
+    else:
+        trainer_kwargs["processing_class"] = tokenizer
+    trainer = Seq2SeqTrainer(**trainer_kwargs)
 
     trainer.train()
     best_dir = output_dir / "best"
