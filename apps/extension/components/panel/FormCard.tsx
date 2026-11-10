@@ -1,29 +1,32 @@
-import { Button } from '../ui/Button';
+import { ListenButton } from '../ui/Button';
 import type { FieldDescription } from '../../utils/messages';
 
 interface FormCardProps {
   fields: FieldDescription[];
-  onListen: () => void;
+  playingKey: string | null;
+  onListen: (key: string, text: string) => void;
 }
 
-export function FormCard({ fields, onListen }: FormCardProps) {
+/** F5: one row per form field, labelled exactly as on the site. */
+export function FormCard({ fields, playingKey, onListen }: FormCardProps) {
   return (
-    <section class="form-card">
-      <p class="recap-label">Ce qu'Edima t'explique</p>
-      <ol class="form-fields">
-        {fields.map((field, i) => (
-          <li key={field.label} class="form-field">
-            <span class="form-field-index">{i + 1}</span>
-            <div>
-              <p class="form-field-label">{field.label}</p>
-              <p class="form-field-desc">{field.description}</p>
+    <ol class="card field-list">
+      {fields.map((field, i) => {
+        const key = `field-${i}`;
+        return (
+          <li key={field.label}>
+            {i > 0 && <hr class="divider" />}
+            <div class="row">
+              <span class="field-num">{i + 1}</span>
+              <div class="row-text">
+                <p class="row-title">{field.label}</p>
+                <p class="row-detail">{field.description}</p>
+              </div>
+              <ListenButton label={field.label} playing={playingKey === key} onClick={() => onListen(key, `${field.label} : ${field.description}`)} />
             </div>
           </li>
-        ))}
-      </ol>
-      <Button variant="secondary" onClick={onListen}>
-        Écouter cette étape
-      </Button>
-    </section>
+        );
+      })}
+    </ol>
   );
 }

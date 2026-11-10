@@ -1,65 +1,69 @@
-import { Button } from '../ui/Button';
-import { IconAlertTriangle } from '../ui/icons';
+import { ListenButton } from '../ui/Button';
 import type { RecapInfo } from '../../utils/recap';
-import type { ConsistencyInfo } from '../../utils/consistency';
+
+function Amount({ value, total = false }: { value: string; total?: boolean }) {
+  const m = value.match(/^(.*?)(\s*(?:FCFA|F CFA|XAF))$/i);
+  return (
+    <span class={total ? 'recap-value recap-value--total' : 'recap-value'}>
+      {m ? (
+        <>
+          {m[1]}
+          <span class="amount-unit">{m[2]}</span>
+        </>
+      ) : (
+        value
+      )}
+    </span>
+  );
+}
 
 interface RecapCardProps {
   recap: RecapInfo;
-  consistency: ConsistencyInfo | null;
-  onListen: () => void;
+  playingKey: string | null;
+  onListen: (key: string, text: string) => void;
 }
 
-/** F6/D4: the total is the one number that matters before confirming — it
- * gets the display-size treatment. Everything else is a supporting detail
- * underneath, not a row of four equally-weighted facts. */
-export function RecapCard({ recap, consistency, onListen }: RecapCardProps) {
-  const mismatch = consistency?.status === 'mismatch';
+/** F6: every line is listenable on its own; the total gets the one big figure. */
+export function RecapCard({ recap, playingKey, onListen }: RecapCardProps) {
+  const [name, phone] = (recap.beneficiaire ?? '').split(/\s+[—-]\s+/);
+  const rows: { key: string; label: string; value: string; detail?: string; speech: string }[] = [];
+  if (recap.montant) rows.push({ key: 'recap-montant', label: 'Montant à envoyer', value: recap.montant, speech: `Montant à envoyer : ${recap.montant}.` });
+  if (recap.beneficiaire)
+    rows.push({
+      key: 'recap-benef',
+      label: 'Bénéficiaire',
+      value: name ?? recap.beneficiaire,
+      detail: phone,
+      speech: `Bénéficiaire : ${name ?? recap.beneficiaire}${recap.beneficiairePhoneWords ? `, numéro ${recap.beneficiairePhoneWords}` : ''}.`,
+    });
+  if (recap.frais) rows.push({ key: 'recap-frais', label: 'Frais', value: recap.frais, speech: `Frais : ${recap.frais}.` });
 
   return (
-    <section class="recap">
-      <p class="recap-label">Récapitulatif avant confirmation</p>
-
-      {mismatch && (
-        <div class="recap-mismatch" role="alert">
-          <IconAlertTriangle size={17} />
-          <p>{consistency!.message}</p>
+    <>
+      {rows.length > 0 && (
+        <div class="card">
+          {rows.map((r, i) => (
+            <div key={r.key}>
+              {i > 0 && <hr class="divider" />}
+              <div class="recap-row">
+                <span class="recap-label">{r.label}</span>
+                <span class="recap-values">
+                  <Amount value={r.value} />
+                  {r.detail && <span class="recap-detail">{r.detail}</span>}
+                </span>
+                <ListenButton label={r.label} playing={playingKey === r.key} onClick={() => onListen(r.key, r.speech)} />
+              </div>
+            </div>
+          ))}
         </div>
       )}
-
       {recap.total && (
-        <div class="recap-total">
-          <span class="recap-total-label">Total débité</span>
-          <span class="recap-total-value">{recap.total}</span>
+        <div class="recap-row recap-row--total">
+          <span class="recap-label">Total débité</span>
+          <Amount value={recap.total} total />
+          <ListenButton label="le total débité" playing={playingKey === 'recap-total'} onClick={() => onListen('recap-total', `Total débité : ${recap.total}.`)} />
         </div>
       )}
-
-      <dl class="recap-details">
-        {recap.montant && (
-          <div class="recap-detail-row">
-            <dt>Montant envoyé</dt>
-            <dd>{recap.montant}</dd>
-          </div>
-        )}
-        {recap.beneficiaire && (
-          <div class="recap-detail-row">
-            <dt>Bénéficiaire</dt>
-            <dd>
-              {recap.beneficiaire}
-              {recap.beneficiairePhoneWords && <span class="recap-spoken">{recap.beneficiairePhoneWords}</span>}
-            </dd>
-          </div>
-        )}
-        {recap.frais && (
-          <div class="recap-detail-row">
-            <dt>Frais</dt>
-            <dd>{recap.frais}</dd>
-          </div>
-        )}
-      </dl>
-
-      <Button variant="secondary" onClick={onListen}>
-        Écouter le récapitulatif
-      </Button>
-    </section>
+    </>
   );
 }

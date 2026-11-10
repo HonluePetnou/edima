@@ -14,6 +14,9 @@ importers:
 
   apps/extension:
     dependencies:
+      '@fontsource-variable/nunito-sans':
+        specifier: ^5.3.0
+        version: 5.3.0
       edima-shared:
         specifier: workspace:*
         version: link:../../packages/shared
@@ -561,6 +564,9 @@ packages:
   '@fluent/syntax@0.19.0':
     resolution: {integrity: sha512-5D2qVpZrgpjtqU4eNOcWGp1gnUCgjfM+vKGE2y03kKN6z5EBhtx0qdRFbg8QuNNj8wXNoX93KJoYb+NqoxswmQ==}
     engines: {node: '>=14.0.0', npm: '>=7.0.0'}
+
+  '@fontsource-variable/nunito-sans@5.3.0':
+    resolution: {integrity: sha512-Vk1PSfckNDwgw2yGcsvJP3o/0zEW8Rp6KzbD8Ql/6iRHQshnhhAjt+cSIfAUyp5vQuSlleGHFW2LfYaaex0diw==}
 
   '@fregante/relaxed-json@2.0.0':
     resolution: {integrity: sha512-PyUXQWB42s4jBli435TDiYuVsadwRHnMc27YaLouINktvTWsL3FcKrRMGawTayFk46X+n5bE23RjUTWQwrukWw==}
@@ -3226,6 +3232,8 @@ snapshots:
   '@exodus/bytes@1.16.0': {}
 
   '@fluent/syntax@0.19.0': {}
+
+  '@fontsource-variable/nunito-sans@5.3.0': {}
 
   '@fregante/relaxed-json@2.0.0': {}
 

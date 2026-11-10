@@ -14,13 +14,17 @@ import { findFormFields } from '../utils/form-fields';
 import { extractRecap } from '../utils/recap';
 import { classifyStep } from '../utils/journey';
 import { checkConsistency } from '../utils/consistency';
+import { isFinancialPage } from '../utils/financial-page';
+import { loadSettings, onSettingsChanged } from '../utils/settings';
 import TalkingBubble, { type BubbleState } from '../components/TalkingBubble';
+import FloatingMascot from '../components/FloatingMascot';
 import type {
   ExtensionMessage,
   FieldDescription,
   GetEnteredAmountResponse,
   LanguageCode,
   PageTranslatedMessage,
+  PanelStateResponse,
   TranslateUnknownResponse,
   TranslatedLine,
 } from '../utils/messages';
@@ -81,6 +85,30 @@ export default defineContentScript({
     // never written to. Every bit of Edima UI lives inside one Shadow DOM host,
     // isolated from the host page's styles and scripts.
     let mountContainer: Element | null = null;
+    let bubbleState: BubbleState | null = null;
+    // Floating mascot: visible on financial pages, unless the user turned it
+    // off or the side panel is already open.
+    let panelOpen = false;
+    let showMascotSetting = (await loadSettings()).showMascot;
+    let isFinancial = false;
+    let hasAlert = false;
+
+    const openPanel = () => chrome.runtime.sendMessage({ type: 'edima:open-panel' }).catch(() => {});
+    const idleSrc = browser.runtime.getURL('/mascot/edima-idle.webp');
+    const alertSrc = browser.runtime.getURL('/mascot/edima-alert.webp');
+
+    const renderOverlay = () => {
+      if (!mountContainer) return;
+      const mascotVisible = isFinancial && showMascotSetting && !panelOpen;
+      render(
+        <>
+          <TalkingBubble state={bubbleState} />
+          {mascotVisible && <FloatingMascot idleSrc={idleSrc} alertSrc={alertSrc} alert={hasAlert} onOpen={openPanel} />}
+        </>,
+        mountContainer,
+      );
+    };
+
     const ui = await createShadowRootUi(ctx, {
       name: 'edima-overlay',
       position: 'inline',
@@ -88,7 +116,7 @@ export default defineContentScript({
       append: 'last',
       onMount(container) {
         mountContainer = container;
-        render(<TalkingBubble state={null} />, container);
+        renderOverlay();
       },
       onRemove(container) {
         if (container) render(null, container);
@@ -97,8 +125,18 @@ export default defineContentScript({
     ui.mount();
 
     const showBubble = (state: BubbleState | null) => {
-      if (mountContainer) render(<TalkingBubble state={state} />, mountContainer);
+      bubbleState = state;
+      renderOverlay();
     };
+
+    onSettingsChanged((s) => {
+      showMascotSetting = s.showMascot;
+      renderOverlay();
+    });
+    chrome.runtime.sendMessage({ type: 'edima:get-panel-state' }, (response: PanelStateResponse | undefined) => {
+      panelOpen = response?.open ?? false;
+      renderOverlay();
+    });
 
     // ---- F3: boutons parlants (also re-run on F8 mutations below, so a
     // button inside a freshly-injected pop-up gets wired up too) ----
@@ -222,6 +260,8 @@ export default defineContentScript({
       const enteredAmount = await requestEnteredAmount();
       const result = checkConsistency(enteredAmount, currentRecap.montant);
       currentConsistency = result;
+      hasAlert = currentWarnings.length > 0 || result?.status === 'mismatch';
+      renderOverlay();
 
       // Same priority treatment as an F7 warning — a mismatched amount is
       // exactly the kind of thing that must interrupt and be heard first.
@@ -255,6 +295,10 @@ export default defineContentScript({
       currentRecap = extractRecap(currentLines);
       currentStep = classifyStep(currentLines, fields.length > 0, currentRecap !== null);
       wireMontantCapture(fields);
+
+      isFinancial = isFinancialPage(currentLines, currentStep);
+      hasAlert = currentWarnings.length > 0 || currentConsistency?.status === 'mismatch';
+      renderOverlay();
     };
     rescan();
 
@@ -292,6 +336,11 @@ export default defineContentScript({
       if (message.type === 'edima:request-state') {
         sendResponse(buildMessage());
         return true;
+      }
+      if (message.type === 'edima:panel-state') {
+        panelOpen = message.open;
+        renderOverlay();
+        return false;
       }
       if (message.type === 'edima:set-language') {
         activeLanguage = message.language;

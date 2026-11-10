@@ -2,6 +2,8 @@ import { SERVER_URL } from '../utils/server-config';
 import type {
   ExtensionMessage,
   GetEnteredAmountResponse,
+  PanelStateMessage,
+  PanelStateResponse,
   TranslateUnknownResponse,
 } from '../utils/messages';
 
@@ -11,7 +13,39 @@ export default defineBackground(() => {
   // Clicking the toolbar icon opens the side panel directly, instead of a popup.
   chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(console.error);
 
-  chrome.runtime.onMessage.addListener((message: ExtensionMessage, _sender, sendResponse) => {
+  // The side panel holds an "edima-panel" port while it's open; the floating
+  // mascot on every tab hides for as long as at least one is connected.
+  let openPanels = 0;
+  const broadcastPanelState = async () => {
+    const message: PanelStateMessage = { type: 'edima:panel-state', open: openPanels > 0 };
+    for (const tab of await chrome.tabs.query({})) {
+      if (tab.id !== undefined) chrome.tabs.sendMessage(tab.id, message).catch(() => {});
+    }
+  };
+  chrome.runtime.onConnect.addListener((port) => {
+    if (port.name !== 'edima-panel') return;
+    openPanels++;
+    broadcastPanelState();
+    port.onDisconnect.addListener(() => {
+      openPanels = Math.max(0, openPanels - 1);
+      broadcastPanelState();
+    });
+  });
+
+  chrome.runtime.onMessage.addListener((message: ExtensionMessage, sender, sendResponse) => {
+    // Floating mascot click. sidePanel.open() only works inside a user
+    // gesture, so it's called synchronously here — no await before it.
+    if (message.type === 'edima:open-panel') {
+      const tabId = sender.tab?.id;
+      if (tabId !== undefined) chrome.sidePanel.open({ tabId }).catch(console.error);
+      return undefined;
+    }
+    if (message.type === 'edima:get-panel-state') {
+      const response: PanelStateResponse = { open: openPanels > 0 };
+      sendResponse(response);
+      return undefined;
+    }
+
     // F9: relays the content script's fallback-translation request to
     // apps/server. Runs here rather than in the content script so the
     // request is never subject to the host page's own CSP.

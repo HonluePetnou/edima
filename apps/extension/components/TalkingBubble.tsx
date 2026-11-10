@@ -7,12 +7,12 @@ export interface BubbleState {
   tone?: 'default' | 'danger';
 }
 
-// Matches the panel's own ink/accent/danger tokens (entrypoints/sidepanel/style.css)
+// Matches the panel's text/accent/danger tokens (entrypoints/sidepanel/style.css)
 // — this component can't `import` that stylesheet since it renders inside a
 // Shadow DOM on arbitrary bank pages, so the values are kept in sync by hand.
 const PALETTE = {
-  default: { background: '#231f1c', dot: '#e8955f' },
-  danger: { background: '#8c2e24', dot: '#f2a99d' },
+  default: { background: '#1a1d1b', dot: '#f5a623' },
+  danger: { background: '#9b1c1f', dot: '#ff9a9c' },
 };
 
 /** The F3 hover bubble — visual echo of whatever Edima just spoke. Reuses

@@ -1,21 +1,17 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { summarizePage } from '../../utils/summarize';
 import { formatRecapSummary } from '../../utils/recap';
-import { Header } from '../../components/panel/Header';
-import { WarningBanner } from '../../components/panel/WarningBanner';
-import { RecapCard } from '../../components/panel/RecapCard';
-import { FormCard } from '../../components/panel/FormCard';
-import { LineList } from '../../components/panel/LineList';
-import { CommandBar } from '../../components/panel/CommandBar';
-import { IdleState, LoadingState, UnsupportedState } from '../../components/panel/PanelStates';
+import { loadSettings, saveSettings, DEFAULT_SETTINGS, type EdimaSettings } from '../../utils/settings';
+import { Header, SPEECH_RATES } from '../../components/panel/Header';
+import { AlertBanner } from '../../components/panel/Blocks';
+import { HomeView, ReadView, LinesView, GuideView, SafetyView, TransparencyView, SettingsView, PanelFooter, type View, type ViewContext } from './views';
+import { LoadingState, NoBankPageState, UnsupportedState } from './states';
+import type { MascotState } from '../../components/ui/Mascot';
 import { DEV_SCENARIOS, type DevScenarioKey } from '../../utils/devMocks';
 import type { FieldDescription, LanguageCode, PageTranslatedMessage, TranslatedLine } from '../../utils/messages';
 import type { RecapInfo } from '../../utils/recap';
 import type { StepInfo } from '../../utils/journey';
 import type { ConsistencyInfo } from '../../utils/consistency';
-
-const SPEECH_RATES = [1, 0.85, 0.7];
-const RATE_LABELS = ['1×', '0.85×', '0.7×'];
 
 // The panel's own source of truth is whatever the content script reports —
 // never assumed from `chrome` alone, since this file also renders as a
@@ -31,34 +27,43 @@ export default function App() {
   const [formFields, setFormFields] = useState<FieldDescription[]>([]);
   const [recap, setRecap] = useState<RecapInfo | null>(null);
   const [consistency, setConsistency] = useState<ConsistencyInfo | null>(null);
-  const [summary, setSummary] = useState<string | null>(null);
   const [loading, setLoading] = useState(hasExtensionContext);
   const [unsupported, setUnsupported] = useState(false);
+  const [online, setOnline] = useState(typeof navigator === 'undefined' ? true : navigator.onLine);
+  const [settings, setSettings] = useState<EdimaSettings>(DEFAULT_SETTINGS);
 
-  // D9: a click reveals the French original (adapted from the spec's long-press,
-  // since a side panel has no long-press gesture of its own).
+  const [view, setView] = useState<View>('home');
+  const [showAllOriginal, setShowAllOriginal] = useState(false);
   const [expandedLines, setExpandedLines] = useState<Set<string>>(new Set());
-  // D10 "Explique-moi ce mot" — independent of D9's toggle: a line can have
-  // both an original-text reveal and a jargon explanation open at once.
   const [expandedExplanations, setExpandedExplanations] = useState<Set<string>>(new Set());
 
-  const [isSpeaking, setIsSpeaking] = useState(false);
+  // Speech: one utterance at a time; `playingKey` says which item is being read.
+  const [playingKey, setPlayingKey] = useState<string | null>(null);
   const [isPaused, setIsPaused] = useState(false);
-  const lastTextRef = useRef<string | null>(null);
-  const rateIndexRef = useRef(0);
+  const rateRef = useRef(0);
+  rateRef.current = settings.rateIndex;
 
-  const speak = (text: string) => {
+  const speak = (key: string, text: string) => {
     if (!text || !('speechSynthesis' in window)) return;
-    lastTextRef.current = text;
+    if (playingKey === key && !isPaused) {
+      speechSynthesis.pause();
+      setIsPaused(true);
+      return;
+    }
+    if (playingKey === key && isPaused) {
+      speechSynthesis.resume();
+      setIsPaused(false);
+      return;
+    }
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'fr-FR';
-    utterance.rate = SPEECH_RATES[rateIndexRef.current] ?? 1;
+    utterance.rate = SPEECH_RATES[rateRef.current] ?? 1;
     utterance.onstart = () => {
-      setIsSpeaking(true);
+      setPlayingKey(key);
       setIsPaused(false);
     };
     utterance.onend = () => {
-      setIsSpeaking(false);
+      setPlayingKey((current) => (current === key ? null : current));
       setIsPaused(false);
     };
     speechSynthesis.cancel();
@@ -66,8 +71,42 @@ export default function App() {
   };
 
   useEffect(() => {
+    loadSettings().then(setSettings);
+    const up = () => setOnline(true);
+    const down = () => setOnline(false);
+    window.addEventListener('online', up);
+    window.addEventListener('offline', down);
+    return () => {
+      window.removeEventListener('online', up);
+      window.removeEventListener('offline', down);
+    };
+  }, []);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (settings.theme) root.dataset.theme = settings.theme;
+    else delete root.dataset.theme;
+  }, [settings.theme]);
+
+  const updateSettings = (patch: Partial<EdimaSettings>) => {
+    setSettings((s) => ({ ...s, ...patch }));
+    saveSettings(patch);
+  };
+
+  useEffect(() => {
     if (!hasExtensionContext) return;
     let cancelled = false;
+
+    // Lets the background hide the floating mascot while the panel is open.
+    // Reconnects if the service worker restarts and drops the port.
+    let port: chrome.runtime.Port | null = null;
+    const connect = () => {
+      port = chrome.runtime.connect({ name: 'edima-panel' });
+      port.onDisconnect.addListener(() => {
+        if (!cancelled) setTimeout(connect, 500);
+      });
+    };
+    connect();
 
     const apply = (message: PageTranslatedMessage) => {
       if (cancelled) return;
@@ -79,7 +118,6 @@ export default function App() {
       setFormFields(message.formFields);
       setRecap(message.recap);
       setConsistency(message.consistency);
-      setSummary(null); // a new page invalidates any summary read for the previous one
       setUnsupported(false);
     };
 
@@ -106,10 +144,14 @@ export default function App() {
       if (message.type === 'edima:page-translated') apply(message);
     };
     chrome.runtime.onMessage.addListener(onMessage);
+    const onTabActivated = () => requestCurrentState();
+    chrome.tabs.onActivated.addListener(onTabActivated);
 
     return () => {
       cancelled = true;
+      port?.disconnect();
       chrome.runtime.onMessage.removeListener(onMessage);
+      chrome.tabs.onActivated.removeListener(onTabActivated);
     };
   }, []);
 
@@ -123,122 +165,133 @@ export default function App() {
     });
   };
 
-  const readPage = () => {
-    if (!lines) return;
-    const text = summarizePage(lines, buttonLabels);
-    setSummary(text);
-    speak(text);
-  };
-
-  const toggleOriginal = (key: string) => {
-    setExpandedLines((prev) => {
+  const toggleIn = (setter: typeof setExpandedLines) => (key: string) =>
+    setter((prev) => {
       const next = new Set(prev);
       if (next.has(key)) next.delete(key);
       else next.add(key);
       return next;
     });
-  };
 
-  const toggleExplanation = (key: string) => {
-    setExpandedExplanations((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
-  };
+  const mismatch = consistency?.status === 'mismatch' ? consistency.message : null;
+  // D4 mismatch first, then the latest F7 warning — both stay visible.
+  const alerts = [mismatch, warnings.length > 0 ? warnings[warnings.length - 1]! : null].filter((a): a is string => !!a);
+  const priorityAlert = alerts[0] ?? null;
 
-  const readFormStep = () => {
-    const intro = `Étape ${step?.index} sur ${step?.total} : ${step?.label}.`;
-    const fields = formFields.map((f) => `${f.label} : ${f.description}`).join(' ');
-    speak(`${intro} ${fields}`);
-  };
+  // F6/D4: when a récap (or a mismatch) appears, jump to it once — the user
+  // can still go back to the welcome screen afterwards.
+  const needsGuide = !!recap || !!mismatch;
+  useEffect(() => {
+    if (needsGuide) setView('guide');
+  }, [needsGuide]);
+  const effectiveView = view;
 
+  const summary = lines ? summarizePage(lines, buttonLabels) : '';
   const recapSummary = recap ? `${formatRecapSummary(recap)}${consistency ? ` ${consistency.message}` : ''}` : '';
+  const formSpeech = step ? `Étape ${step.index} sur ${step.total} : ${step.label}. ${formFields.map((f) => `${f.label} : ${f.description}`).join(' ')}` : '';
 
-  const canPlay = !!recap || (step?.id === 'formulaire' && formFields.length > 0) || !!(lines && lines.length > 0);
+  // What the header's play button reads for the current screen.
+  const primary: { key: string; text: string } | null =
+    effectiveView === 'guide' && recap
+      ? { key: 'recap-all', text: recapSummary }
+      : effectiveView === 'guide' && formFields.length > 0
+        ? { key: 'form-all', text: formSpeech }
+        : lines && lines.length > 0
+          ? { key: 'summary', text: summary }
+          : null;
 
+  const isPlaying = playingKey !== null && !isPaused;
   const handlePrimary = () => {
-    if (isSpeaking && !isPaused) {
-      speechSynthesis.pause();
-      setIsPaused(true);
+    if (playingKey) {
+      speak(playingKey, '-'); // same key → pause/resume toggle
       return;
     }
-    if (isPaused) {
-      speechSynthesis.resume();
-      setIsPaused(false);
-      return;
-    }
-    if (recap) {
-      speak(recapSummary);
-    } else if (step?.id === 'formulaire' && formFields.length > 0) {
-      readFormStep();
-    } else if (lines && lines.length > 0) {
-      readPage();
-    }
+    if (primary) speak(primary.key, primary.text);
   };
 
-  const handleRepeat = () => {
-    if (lastTextRef.current) speak(lastTextRef.current);
+  const mascot: MascotState = isPlaying
+    ? 'speaking'
+    : isPaused
+      ? 'paused'
+      : priorityAlert
+        ? 'alert'
+        : loading
+          ? 'thinking'
+          : !online
+            ? 'offline'
+            : 'idle';
+
+  const ctx: ViewContext = {
+    lines: lines ?? [],
+    step,
+    formFields,
+    recap,
+    summary,
+    online,
+    settings,
+    language,
+    playingKey: isPaused ? null : playingKey,
+    showAllOriginal,
+    expandedLines,
+    expandedExplanations,
+    go: setView,
+    speak,
+    toggleOriginal: toggleIn(setExpandedLines),
+    toggleExplanation: toggleIn(setExpandedExplanations),
+    updateSettings,
+    changeLanguage,
   };
 
-  const handleSlower = () => {
-    rateIndexRef.current = (rateIndexRef.current + 1) % SPEECH_RATES.length;
-    if (lastTextRef.current) speak(lastTextRef.current);
-  };
-
-  const primaryLabel = isSpeaking && !isPaused ? 'Pause' : isPaused ? 'Reprendre' : 'Lire';
-  const avatarSrc = isSpeaking && !isPaused ? '/mascot/edima-speaking.webp' : isPaused ? '/mascot/edima-paused.webp' : warnings.length > 0 ? '/mascot/edima-alert.webp' : '/mascot/edima-idle.webp';
+  const showFooter = !loading && !unsupported && lines !== null && (effectiveView === 'read' || effectiveView === 'lines' || effectiveView === 'guide');
 
   return (
     <div class="panel">
-      <Header language={language} onChangeLanguage={changeLanguage} avatarSrc={avatarSrc} />
+      <Header
+        mascot={mascot}
+        speaking={isPlaying}
+        language={language}
+        onChangeLanguage={changeLanguage}
+        rateIndex={settings.rateIndex}
+        onChangeRate={(i) => updateSettings({ rateIndex: i })}
+        canPlay={!!primary || playingKey !== null}
+        isPlaying={isPlaying}
+        onPrimary={handlePrimary}
+        onClose={() => window.close()}
+      />
 
       <main class="panel-content">
-        {loading ? (
+        {!loading &&
+          !unsupported &&
+          alerts.map((message, i) => (
+            <AlertBanner key={message} message={message} playing={ctx.playingKey === `alert-${i}`} onListen={() => speak(`alert-${i}`, message)} />
+          ))}
+
+        {effectiveView === 'settings' ? (
+          <SettingsView {...ctx} />
+        ) : effectiveView === 'safety' ? (
+          <SafetyView {...ctx} />
+        ) : loading ? (
           <LoadingState />
         ) : unsupported ? (
           <UnsupportedState />
         ) : lines === null ? (
-          <IdleState />
+          <NoBankPageState />
+        ) : effectiveView === 'read' ? (
+          <ReadView {...ctx} />
+        ) : effectiveView === 'lines' ? (
+          <LinesView {...ctx} />
+        ) : effectiveView === 'guide' ? (
+          <GuideView {...ctx} />
+        ) : effectiveView === 'transparency' ? (
+          <TransparencyView {...ctx} />
         ) : (
-          <>
-            {step && (
-              <p class="eyebrow">
-                Étape {step.index} sur {step.total} — {step.label}
-              </p>
-            )}
-
-            {summary && <p class="summary-readout">{summary}</p>}
-
-            {warnings.length > 0 && <WarningBanner text={warnings[warnings.length - 1]!} onReplay={() => speak(warnings[warnings.length - 1]!)} />}
-
-            {recap && <RecapCard recap={recap} consistency={consistency} onListen={() => speak(recapSummary)} />}
-
-            {step?.id === 'formulaire' && formFields.length > 0 && <FormCard fields={formFields} onListen={readFormStep} />}
-
-            {lines.length > 0 && (
-              <LineList
-                lines={lines}
-                expandedLines={expandedLines}
-                expandedExplanations={expandedExplanations}
-                onToggleOriginal={toggleOriginal}
-                onToggleExplanation={toggleExplanation}
-              />
-            )}
-          </>
+          <HomeView {...ctx} />
         )}
       </main>
 
-      <CommandBar
-        canPlay={canPlay}
-        isSpeaking={isSpeaking && !isPaused}
-        primaryLabel={primaryLabel}
-        rateLabel={RATE_LABELS[rateIndexRef.current] ?? '1×'}
-        onRepeat={handleRepeat}
-        onPrimary={handlePrimary}
-        onSlower={handleSlower}
-      />
+      {showFooter && (
+        <PanelFooter showAllOriginal={showAllOriginal} onToggleOriginal={() => setShowAllOriginal((v) => !v)} onTransparency={() => setView('transparency')} />
+      )}
 
       {import.meta.env.DEV && !hasExtensionContext && (
         <DevScenarioSwitcher
@@ -251,14 +304,18 @@ export default function App() {
             setFormFields(scenario.formFields);
             setRecap(scenario.recap);
             setConsistency(scenario.consistency);
-            setSummary(null);
             setLoading(false);
             setUnsupported(false);
+            setView('home');
           }}
           onState={(s) => {
             setLines(null);
+            setWarnings([]);
+            setRecap(null);
+            setConsistency(null);
             setLoading(s === 'loading');
             setUnsupported(s === 'unsupported');
+            if (s === 'offline') setOnline((o) => !o);
           }}
         />
       )}
@@ -274,12 +331,9 @@ function DevScenarioSwitcher({
   onState,
 }: {
   onPick: (key: DevScenarioKey) => void;
-  onState: (s: 'idle' | 'loading' | 'unsupported') => void;
+  onState: (s: 'idle' | 'loading' | 'unsupported' | 'offline') => void;
 }) {
-  // Inline styles, not a stylesheet class: this component is already fully
-  // tree-shaken out of production (see the `import.meta.env.DEV` guard
-  // above), and a class here would otherwise leave dead rules in the
-  // shipped CSS even though no production element ever uses them.
+  // Inline styles: tree-shaken out of production with the component itself.
   const wrapStyle = { display: 'flex', flexWrap: 'wrap', gap: '4px', padding: '6px', background: '#111' } as const;
   const labelStyle = { color: '#fff', fontSize: '10px', fontWeight: 700, padding: '4px' } as const;
   const btnStyle = { fontSize: '10px', padding: '4px 8px', border: '1px solid #444', background: '#222', color: '#fff', borderRadius: '4px', cursor: 'pointer' } as const;
@@ -292,15 +346,11 @@ function DevScenarioSwitcher({
           {key}
         </button>
       ))}
-      <button type="button" style={btnStyle} onClick={() => onState('idle')}>
-        idle
-      </button>
-      <button type="button" style={btnStyle} onClick={() => onState('loading')}>
-        loading
-      </button>
-      <button type="button" style={btnStyle} onClick={() => onState('unsupported')}>
-        unsupported
-      </button>
+      {(['idle', 'loading', 'unsupported', 'offline'] as const).map((s) => (
+        <button key={s} type="button" style={btnStyle} onClick={() => onState(s)}>
+          {s}
+        </button>
+      ))}
     </div>
   );
 }

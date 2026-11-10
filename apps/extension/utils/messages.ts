@@ -87,10 +87,34 @@ export interface GetEnteredAmountResponse {
   amount: number | null;
 }
 
+/** Floating mascot click (content script → background). The background must
+ * call chrome.sidePanel.open() synchronously in its handler to keep the
+ * user gesture. */
+export interface OpenPanelMessage {
+  type: 'edima:open-panel';
+}
+
+/** Background → every tab: hide the floating mascot while the panel is open. */
+export interface PanelStateMessage {
+  type: 'edima:panel-state';
+  open: boolean;
+}
+
+export interface GetPanelStateMessage {
+  type: 'edima:get-panel-state';
+}
+
+export interface PanelStateResponse {
+  open: boolean;
+}
+
 export type ExtensionMessage =
   | PageTranslatedMessage
   | RequestStateMessage
   | TranslateUnknownMessage
   | SaveEnteredAmountMessage
   | GetEnteredAmountMessage
-  | SetLanguageMessage;
+  | SetLanguageMessage
+  | OpenPanelMessage
+  | PanelStateMessage
+  | GetPanelStateMessage;
