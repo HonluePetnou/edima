@@ -1,0 +1,96 @@
+GLOSSAIRE À TRADUIRE (FRANÇAIS → DUALA)
+72 termes. Écris la traduction duala après le signe « = ».
+Ne modifie pas le texte français ni les titres de catégorie.
+Si un terme ne se traduit pas (ex. FCFA, Edima), réécris-le tel quel.
+
+## COMPTE
+Solde disponible = 
+Compte n° = 
+Compte courant = 
+Dernières opérations = 
+Transfert reçu = 
+Paiement facture = 
+Retrait au guichet = 
+Solde insuffisant = 
+
+## TRANSFERT
+Bénéficiaire = 
+Montant envoyé = 
+Montant à envoyer = 
+Frais = 
+Total débité = 
+Date = 
+Message (optionnel) = 
+Tu envoies = 
+À = 
+FCFA = 
+Numéro de téléphone = 
+Transfert refusé = 
+
+## NAVIGATION
+Envoyer de l'argent = 
+Retirer = 
+Payer une facture = 
+Accueil = 
+Comptes = 
+Virements = 
+Aide = 
+Bonjour = 
+
+## CONFIRMATION
+Confirmer = 
+Confirmer le transfert = 
+Annuler = 
+Étape = 
+sur = 
+Récapitulatif = 
+Récapitulatif du transfert = 
+Cette opération est irréversible = 
+
+## SÉCURITÉ
+Code secret = 
+Ne partage jamais ton code secret, même par téléphone = 
+Ne communiquez jamais votre code secret, même à un conseiller de la banque = 
+Alerte sécurité = 
+Arnaque possible = 
+Ce n'est pas ta banque = 
+Message détecté sur la page = 
+Action requise = 
+Détecté à l'instant = 
+Erreur = 
+Avertissement = 
+
+## VOIX
+Lis-moi cette page = 
+Écouter = 
+Répéter = 
+Pause = 
+Plus lent = 
+Réécouter = 
+J'ai compris = 
+Ce que dit la page = 
+
+## TRANSPARENCE
+Validé = 
+Validé par le linguiste = 
+Non vérifié = 
+IA — non vérifié = 
+Voir le français = 
+Texte original = 
+
+## PARCOURS
+La page, dans l'ordre = 
+Ce qu'Edima t'explique = 
+Étape 1 sur 3 — Consulter le solde = 
+Étape 2 sur 3 : remplir = 
+Étape 3 sur 3 : vérifier = 
+
+## COHÉRENCE
+Les montants sont les mêmes que ceux que tu as saisis = 
+Montant vérifié — correspond à ta saisie = 
+
+## DIVERS
+Edima = 
+Ta banque parle ta langue = 
+En attente d'une page à expliquer = 
+Nouveau message détecté = 
