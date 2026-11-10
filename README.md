@@ -57,7 +57,7 @@ pnpm install
 - [x] **D5** (changement de langue en direct) : sélecteur Ewondo/Duala fonctionnel, re-scan immédiat de la même page sans rechargement — les deux langues affichent le même repli français tant qu'aucun terme n'est validé des deux côtés
 - [x] **D12** (numéros lus par groupes de deux) : le numéro du bénéficiaire dans le récapitulatif est lu comme on le dicte au Cameroun (un chiffre puis des paires), pas chiffre par chiffre
 - [x] **D10** (Explique-moi ce mot) : bouton « ? » sur 9 termes jargon (frais, bénéficiaire, solde...) avec explication simple + exemple en FCFA, indépendant du statut de traduction
-- [x] Panneau Edima complet : reprend un mix des 3 directions visuelles explorées sur Figma (hero/orbe + barre de commande de la v2, sélecteur de langue de la v2, cartes et boutons épurés de la direction minimaliste)
+- [x] Panneau Edima redessiné : direction éditoriale sobre (encre + accent terracotta, un seul chiffre dominant par écran — le total débité, pas quatre lignes à poids égal), composants réutilisables (`components/ui`, `components/panel`), icônes SVG propres (pas d'emoji), focus clavier visible AA, cibles tactiles ≥44px, états vide/chargement/erreur réels
 - [ ] Traductions ewondo/duala validées par le linguiste — bloquant, voir PLAN.md
 
 Le glossaire ne couvre pas encore les ~150 termes visés par le cahier des charges : les 72 termes actuels sont choisis pour couvrir le parcours de test (solde, frais, transfert, récapitulatif, avertissement), à étendre avec le linguiste.

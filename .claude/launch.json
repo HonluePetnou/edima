@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "edima-sidepanel",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "edima-extension", "dev"],
+      "port": 3000
+    }
+  ]
+}

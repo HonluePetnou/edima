@@ -1,26 +1,82 @@
+/* =========================================================================
+   Tokens
+   A deliberately small palette: one ink, one accent (terracotta), two status
+   colors, used with conviction rather than ten near-identical pastels.
+   ========================================================================= */
 :root {
   color-scheme: light;
   font-family: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
-  --indigo: #233072;
-  --indigo-soft: #e6e9f7;
-  --glow-1: #5b8cff;
-  --glow-2: #9a7bff;
-  --text-main: #1c1917;
-  --text-soft: #574f45;
-  --border: #e4dfd6;
-  --success: #158033;
-  --success-soft: #e3f4e8;
-  --danger: #b91c1c;
-  --danger-soft: #fde8e8;
+
+  /* color */
+  --ink: #231f1c;
+  --ink-soft: #6b5f54;
+  --ink-faint: #796e61; /* darkened from an earlier draft — the lighter value failed AA (~2.9:1) on white */
+  --surface: #ffffff;
+  --surface-sunken: #faf6f1;
+  --border: #e3dcd2;
+
+  --accent: #ae4f27; /* button fills — AA with white text */
+  --accent-ink: #8a3f1e; /* text/links on white — higher contrast still */
+  --accent-soft: #f4e4d8;
+
+  --success-ink: #28633f;
+  --success-soft: #e8f2ea;
+
+  --danger: #8c2e24; /* solid fills, white text on top */
+  --danger-ink: #8c2e24;
+  --danger-soft: #fbeae7;
+
+  /* type scale — few steps, strong contrast between them */
+  --text-display: 32px;
+  --text-title: 19px;
+  --text-body: 15px;
+  --text-meta: 13px;
+  --text-micro: 11px;
+
+  /* spacing scale (4px base) */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* =========================================================================
+   Base / reset
+   ========================================================================= */
+* {
+  box-sizing: border-box;
 }
 
 html,
 body {
   margin: 0;
   width: 100%;
-  overflow-x: hidden;
-  background: #ffffff;
-  color: var(--text-main);
+  min-width: 280px;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+body {
+  font-size: var(--text-body);
+  line-height: 1.5;
 }
 
 #app {
@@ -29,355 +85,422 @@ body {
   height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+button,
+select {
+  font-family: inherit;
+  color: inherit;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
   overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
-/* Flexbox default is min-width/min-height: auto, which refuses to shrink a
-   flex item below its content's unwrapped size — with several nested flex
-   containers holding long sentences, that silently forces the whole panel
-   hundreds of pixels wider than the viewport instead of wrapping. Every
-   flex container that can hold text gets min-width: 0 so text wraps like
-   normal block content instead. */
-.content,
-.hero,
-.hero-message,
-.flat-card,
-.flat-card-title,
-.flat-row,
-.flat-row-label,
-.flat-row-value,
-.consistency-row,
-.warning-card,
-.warning-row,
-.line-item,
-.line-text-group,
-.line-text-row,
-.line-text,
-.line-original,
-.line-explanation,
-.command-bar,
-.command-button {
+/* Two-tone ring: the white inner line stays visible on dark fills (the
+   warning banner, the primary button), the accent outer line stays visible
+   on white — a single-color ring only ever has 3:1 contrast against one
+   of the two. */
+:focus-visible {
+  outline: 2.5px solid #ffffff;
+  outline-offset: 1px;
+  box-shadow: 0 0 0 4px var(--accent);
+  border-radius: var(--radius-sm);
+}
+
+.panel {
+  width: 100%;
   min-width: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
 }
 
-/* ---- header ---- */
-
-.header {
+/* =========================================================================
+   Header
+   ========================================================================= */
+.panel-header {
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5);
   border-bottom: 1px solid var(--border);
 }
 
-.brand {
+.panel-header-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--sp-2);
+  min-width: 0;
 }
 
-.brand-dot {
-  width: 24px;
-  height: 24px;
+.brand-avatar {
+  width: 32px;
+  height: 32px;
   border-radius: 999px;
-  background: radial-gradient(circle at 35% 35%, #e4eaff 0%, #8fa8ff 22%, #5e78f5 48%, #4b2fc9 78%, #2a1c7e 100%);
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--accent-soft);
+}
+
+.brand-name {
+  margin: 0;
+  font-size: var(--text-title);
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.lang-select {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  min-height: 44px;
+  padding: 0 var(--sp-2);
+  color: var(--accent-ink);
   flex-shrink: 0;
 }
 
-.wordmark {
-  font-size: 19px;
-  font-weight: 700;
-  color: var(--indigo);
-  margin: 0;
-}
-
-.lang-pill {
+.lang-select select {
+  appearance: none;
+  background: none;
   border: none;
-  border-radius: 999px;
-  background: var(--indigo-soft);
-  color: var(--indigo);
-  font-weight: 600;
-  font-size: 13px;
-  padding: 7px 12px;
+  font-size: var(--text-meta);
+  font-weight: 700;
+  color: inherit;
+  padding-right: var(--sp-4);
   cursor: pointer;
 }
 
-/* ---- scrollable content ---- */
+.lang-select svg {
+  position: absolute;
+  right: var(--sp-2);
+  pointer-events: none;
+}
 
-.content {
+/* =========================================================================
+   Content area
+   ========================================================================= */
+.panel-content {
   flex: 1;
   min-height: 0;
+  min-width: 0;
   overflow-y: auto;
-  padding: 20px;
+  padding: var(--sp-5);
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--sp-5);
 }
 
-.status {
-  font-size: 14px;
-  color: var(--text-soft);
+.eyebrow {
   margin: 0;
-}
-
-/* ---- hero: orb, waveform, current message, stat pills ---- */
-
-.hero {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  text-align: center;
-  padding-bottom: 4px;
-}
-
-.orb-button {
-  border: none;
-  background: none;
-  padding: 0;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
-
-.orb {
-  width: 68px;
-  height: 68px;
-  border-radius: 999px;
-  background: radial-gradient(circle at 35% 35%, #e4eaff 0%, #8fa8ff 22%, #5e78f5 48%, #4b2fc9 78%, #2a1c7e 100%);
-  box-shadow: 0 0 0 0 transparent;
-  transition: box-shadow 0.2s ease;
-}
-
-.orb-button:hover .orb,
-.orb--active {
-  box-shadow: 0 0 24px 4px rgba(91, 140, 255, 0.45);
-}
-
-.waveform {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  height: 20px;
-}
-
-.waveform span {
-  display: block;
-  width: 2px;
-  border-radius: 999px;
-  background: rgba(35, 48, 114, 0.35);
-}
-
-.hero-message {
-  margin: 0;
-  max-width: 300px;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-main);
-  line-height: 1.4;
-}
-
-.hero-link {
-  border: none;
-  background: none;
-  padding: 0;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--indigo);
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-.hero-pills {
-  display: flex;
-  gap: 8px;
-}
-
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 5px 10px;
-  border-radius: 999px;
-}
-
-.pill--success {
-  background: var(--success-soft);
-  color: var(--success);
-}
-
-.pill--outline {
-  background: none;
-  border: 1px solid var(--border);
-  color: var(--text-soft);
-}
-
-/* ---- step eyebrow ---- */
-
-.step-eyebrow {
-  margin: 0;
-  font-size: 12px;
+  font-size: var(--text-micro);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--indigo);
+  letter-spacing: 0.08em;
+  color: var(--accent-ink);
 }
 
-/* ---- summary ---- */
-
-.summary {
+.summary-readout {
   margin: 0;
-  padding: 12px 14px;
-  border-radius: 10px;
-  background: var(--indigo-soft);
-  color: var(--indigo);
-  font-size: 14px;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+  color: var(--ink);
+  font-size: var(--text-body);
   font-weight: 600;
   line-height: 1.5;
 }
 
-/* ---- flat buttons (épuré) ---- */
-
-.primary-button {
-  border: none;
-  border-radius: 10px;
-  background: var(--indigo);
+/* =========================================================================
+   Warning banner (F7) — solid fill, not a pastel card
+   ========================================================================= */
+.warning-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  border-radius: var(--radius-lg);
+  background: var(--danger);
   color: #ffffff;
-  font-size: 15px;
-  font-weight: 600;
-  padding: 12px 18px;
-  cursor: pointer;
+  min-width: 0;
 }
 
-.secondary-button {
-  align-self: flex-start;
-  border: 1px solid var(--indigo);
-  border-radius: 8px;
-  background: #ffffff;
-  color: var(--indigo);
-  font-size: 13px;
-  font-weight: 600;
-  padding: 8px 14px;
-  cursor: pointer;
-}
-
-.secondary-button--danger {
-  border-color: var(--danger);
-  color: var(--danger);
-}
-
-/* ---- warning card (stays visually prominent — safety takes priority over minimalism) ---- */
-
-.warning-card {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 16px;
-  border-radius: 12px;
-  border: 1px solid var(--danger);
-  background: var(--danger-soft);
-}
-
-.warning-title {
-  margin: 0;
-  font-size: 13px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #991b1b;
-}
-
-.warning-row {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 600;
-  color: #7a1414;
-}
-
-/* ---- flat hairline list, reused by the form card and the récap card ---- */
-
-.flat-card {
-  display: flex;
-  flex-direction: column;
+.warning-banner > svg {
   flex-shrink: 0;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
+  margin-top: 2px;
 }
 
-.flat-card-title {
-  margin: 0;
-  padding: 12px 14px 0;
-  font-size: 12px;
+.warning-banner-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.warning-banner-title {
+  margin: 0 0 2px;
+  font-size: var(--text-micro);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--text-soft);
+  letter-spacing: 0.06em;
+  opacity: 0.85;
 }
 
-.flat-row {
+.warning-banner-text {
+  margin: 0;
+  font-size: var(--text-body);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.warning-banner-replay {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.warning-banner-replay:hover {
+  background: rgba(255, 255, 255, 0.26);
+}
+
+/* =========================================================================
+   Récap card — the total is the display-size hero fact, details are
+   secondary. This is the single biggest hierarchy fix over the old design.
+   ========================================================================= */
+.recap,
+.form-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  min-width: 0;
+}
+
+.recap-label {
+  margin: 0;
+  font-size: var(--text-micro);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
+
+.recap-mismatch {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  border-radius: var(--radius-md);
+  background: var(--danger-soft);
+  color: var(--danger-ink);
+}
+
+.recap-mismatch svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.recap-mismatch p {
+  margin: 0;
+  font-size: var(--text-meta);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.recap-total {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: var(--sp-1);
+}
+
+.recap-total-label {
+  font-size: var(--text-meta);
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.recap-total-value {
+  font-size: var(--text-display);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.recap-details {
+  margin: 0;
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.recap-detail-row {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  gap: 10px;
-  padding: 12px 14px;
-  border-top: 1px solid var(--border);
-  font-size: 14px;
+  gap: var(--sp-3);
 }
 
-.flat-row:first-of-type {
-  border-top: none;
-}
-
-.flat-row-label {
-  color: var(--text-soft);
+.recap-detail-row dt {
+  margin: 0;
+  font-size: var(--text-meta);
+  color: var(--ink-soft);
   flex-shrink: 0;
 }
 
-.flat-row-value {
-  color: var(--text-main);
-  font-weight: 600;
-  text-align: right;
-}
-
-.flat-row-value--total {
-  font-size: 17px;
-}
-
-.flat-row-index {
-  color: var(--indigo);
-  font-weight: 700;
-  margin-right: 8px;
-}
-
-.flat-card-footer {
-  padding: 10px 14px 14px;
-}
-
-.consistency-row {
+.recap-detail-row dd {
   margin: 0;
-  font-size: 13px;
-  font-weight: 600;
-  padding: 10px 14px;
-  border-top: 1px solid var(--border);
+  font-size: var(--text-meta);
+  font-weight: 700;
+  color: var(--ink);
+  text-align: right;
+  min-width: 0;
 }
 
-.consistency-row--ok {
-  color: var(--success);
-  background: var(--success-soft);
+.recap-spoken {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--ink-faint);
 }
 
-.consistency-row--alert {
-  color: var(--danger);
-  background: var(--danger-soft);
+/* =========================================================================
+   Form card (étape 2)
+   ========================================================================= */
+.form-fields {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
 }
 
-/* ---- translated line list ---- */
+.form-field {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: flex-start;
+}
+
+.form-field-index {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.form-field-label {
+  margin: 0;
+  font-size: var(--text-meta);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.form-field-desc {
+  margin: 2px 0 0;
+  font-size: var(--text-meta);
+  color: var(--ink-soft);
+  line-height: 1.4;
+}
+
+/* =========================================================================
+   Buttons
+   ========================================================================= */
+.btn {
+  min-height: 44px;
+  padding: 0 var(--sp-4);
+  border-radius: var(--radius-md);
+  font-size: var(--text-meta);
+  font-weight: 700;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  border: none;
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: var(--accent-ink);
+}
+
+.btn--secondary {
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.btn--secondary:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.btn--danger {
+  border: 1.5px solid var(--danger);
+  background: var(--surface);
+  color: var(--danger-ink);
+}
+
+/* =========================================================================
+   Translated line list — compact, de-emphasized relative to the récap card
+   ========================================================================= */
+.lines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  min-width: 0;
+}
+
+.lines-label {
+  margin: 0;
+  font-size: var(--text-micro);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
 
 .line-list {
   list-style: none;
@@ -385,16 +508,17 @@ body {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--sp-2);
 }
 
 .line-item {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  padding: 10px 12px;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
+  min-width: 0;
 }
 
 .line-item--clickable {
@@ -402,10 +526,12 @@ body {
 }
 
 .line-item--clickable:hover {
-  background: #faf8f3;
+  border-color: var(--ink-faint);
 }
 
-.line-text-group {
+.line-body {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -414,127 +540,222 @@ body {
 .line-text-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--sp-2);
+  min-width: 0;
 }
 
 .line-text {
-  font-size: 14px;
+  margin: 0;
+  font-size: var(--text-meta);
+  color: var(--ink);
   line-height: 1.4;
 }
 
-.line-spoken {
-  font-size: 12px;
-  font-style: italic;
-  color: #8a8378;
-}
-
-.line-verified {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--success);
-}
-
-.line-original {
-  font-size: 12px;
-  color: var(--text-soft);
-  padding-top: 2px;
-  border-top: 1px dashed var(--border);
-}
-
-.explain-button {
+.line-explain {
   flex-shrink: 0;
-  width: 16px;
-  height: 16px;
-  border-radius: 999px;
-  border: 1px solid var(--indigo);
-  background: #ffffff;
-  color: var(--indigo);
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 1;
-  padding: 0;
-  cursor: pointer;
-}
-
-.line-explanation {
-  font-size: 12px;
-  color: var(--text-main);
-  padding-top: 2px;
-  border-top: 1px dashed var(--border);
-}
-
-.line-badge {
-  flex-shrink: 0;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 3px 8px;
-  border-radius: 999px;
-}
-
-.line-badge--glossaire {
-  background: var(--success-soft);
-  color: var(--success);
-}
-
-.line-badge--original {
-  background: #f1ede4;
-  color: var(--text-soft);
-}
-
-.line-badge--ia {
-  background: #fff1e0;
-  color: #b45309;
-}
-
-/* ---- command bar ---- */
-
-.command-bar {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  padding: 14px 20px 18px;
-  border-top: 1px solid var(--border);
-}
-
-.command-button {
-  border: none;
-  background: none;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  color: var(--text-soft);
-}
-
-.command-button-icon {
   width: 44px;
   height: 44px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
+  margin: -11px -11px -11px 0;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.command-button-label {
-  font-size: 11px;
-  font-weight: 600;
-}
-
-.command-button--primary .command-button-icon {
-  width: 56px;
-  height: 56px;
   border: none;
-  background: radial-gradient(circle at 35% 35%, #9db3ff 0%, #5b8cff 55%, #5a3fd6 100%);
-  box-shadow: 0 6px 18px rgba(91, 140, 255, 0.4);
-  color: #ffffff;
+  background: none;
+  color: var(--accent-ink);
+  cursor: pointer;
 }
 
-.command-button--primary .command-button-label {
-  color: var(--indigo);
+.line-spoken {
+  margin: 0;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--ink-faint);
 }
+
+.line-verified {
+  margin: 0;
+  font-size: var(--text-micro);
+  font-weight: 700;
+  color: var(--success-ink);
+}
+
+.line-original,
+.line-explanation {
+  margin: 2px 0 0;
+  padding-top: 4px;
+  border-top: 1px dashed var(--border);
+  font-size: 12px;
+  color: var(--ink-soft);
+  line-height: 1.4;
+}
+
+/* =========================================================================
+   Badge — dot + label, not a filled pill
+   ========================================================================= */
+.badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+  font-size: var(--text-micro);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+}
+
+.badge--glossaire {
+  color: var(--success-ink);
+}
+.badge--glossaire .badge-dot {
+  background: var(--success-ink);
+}
+
+.badge--ia {
+  color: var(--accent-ink);
+}
+.badge--ia .badge-dot {
+  background: var(--accent-ink);
+}
+
+.badge--original {
+  color: var(--ink-faint);
+}
+.badge--original .badge-dot {
+  background: var(--ink-faint);
+}
+
+/* =========================================================================
+   Command bar — one primary labelled control, two icon-only secondaries
+   ========================================================================= */
+.command-bar {
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-5) var(--sp-4);
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.command-icon-btn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.command-icon-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.command-icon-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.command-rate-btn {
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.command-primary-btn {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  border: none;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #ffffff;
+  font-size: var(--text-meta);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.command-primary-btn:hover:not(:disabled) {
+  background: var(--accent-ink);
+}
+
+.command-primary-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* =========================================================================
+   Panel states — idle / loading / unsupported
+   ========================================================================= */
+.panel-state {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  color: var(--ink-soft);
+  padding-top: var(--sp-6);
+}
+
+.panel-state svg {
+  color: var(--ink-faint);
+  margin-bottom: var(--sp-1);
+}
+
+.panel-state-title {
+  margin: 0;
+  font-size: var(--text-title);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.panel-state-text {
+  margin: 0;
+  font-size: var(--text-meta);
+  line-height: 1.5;
+  max-width: 42ch;
+}
+
+.skeleton-row {
+  height: 16px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken);
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+.skeleton-row--wide {
+  width: 70%;
+  height: 32px;
+}
+
+.skeleton-row--short {
+  width: 45%;
+}
+
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
