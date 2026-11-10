@@ -2,819 +2,7 @@
 
 **Session ID:** ses_e3e5b1dabffeE0hKSPFxhoysy7
 **Created:** 09/11/2026 19:49:30
-**Updated:** 10/11/2026 07:02:01
-
----
-
-## Assistant (Build · Big Pickle · 4.4s)
-
-**Tool: bash**
-
-**Input:**
-```json
-{
-  "command": "git commit -m \"Track translation status per language and default to duala\" 2>&1 | Out-String; git log --oneline -3; git status --short"
-}
-```
-
-**Output:**
-```
-[feature/moteur-de-traduction 8ad6d6b] Track translation status per language and default to duala
- 10 files changed, 275 insertions(+), 127 deletions(-)
- create mode 100644 docs/plan-langue.pdf
-
-8ad6d6b Track translation status per language and default to duala
-c61de0a Redesign side panel UI mixing the 3 Figma directions
-d839eb3 Update README state for D10
-
-```
-
----
-
-## Assistant (Build · Big Pickle · 3.6s)
-
-Commit `8ad6d6b` créé (10 fichiers).
-
----
-
-## User
-
-push sur la branche feature
-
----
-
-## Assistant (Build · Big Pickle · 6.5s)
-
-_Thinking:_
-
-User wants to push on the feature branch. Check remote and upstream. Branch feature/moteur-de-traduction. Let me check git status -b and remotes, then push. The instruction says only push when explicitly requested — it is. Let me check remote tracking.
-
-**Tool: bash**
-
-**Input:**
-```json
-{
-  "command": "git remote -v; git status -sb"
-}
-```
-
-**Output:**
-```
-origin	https://github.com/HonluePetnou/edima.git (fetch)
-origin	https://github.com/HonluePetnou/edima.git (push)
-## feature/moteur-de-traduction
-
-```
-
----
-
-## Assistant (Build · Big Pickle · 11.2s)
-
-_Thinking:_
-
-No upstream configured for the branch. Push with -u origin feature/moteur-de-traduction. That's a normal push, not force. Let's do it.
-
-**Tool: bash**
-
-**Input:**
-```json
-{
-  "command": "git push -u origin feature/moteur-de-traduction 2>&1 | Out-String",
-  "timeout": 180000
-}
-```
-
-**Output:**
-```
-git : remote: 
-Au caract�re Ligne:1 : 1
-+ git push -u origin feature/moteur-de-traduction 2>&1 | Out-String
-+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : NotSpecified: (remote: :String) [], RemoteException
-    + FullyQualifiedErrorId : NativeCommandError
- 
-remote: Create a pull request for 'feature/moteur-de-traduction' on GitHub by visiting:        
-remote:      https://github.com/HonluePetnou/edima/pull/new/feature/moteur-de-traduction        
-remote: 
-branch 'feature/moteur-de-traduction' set up to track 'origin/feature/moteur-de-traduction'.
-To https://github.com/HonluePetnou/edima.git
- * [new branch]      feature/moteur-de-traduction -> feature/moteur-de-traduction
-
-
-```
-
----
-
-## Assistant (Build · Big Pickle · 2.9s)
-
-Poussé sur `origin/feature/moteur-de-traduction` (upstream configuré).
-
-PR possible : https://github.com/HonluePetnou/edima/pull/new/feature/moteur-de-traduction
-
----
-
-## User
-
-ce que tu vas faire maintenant, c'est que tu vas me creer un fichier txt ou docx  contenant les textes en francais a tradure du fichier D:\hackathon\edima\packages\shared\data\glossary\terms.json, tu les ecrits ligne par ligne pour qu'on puisse juste ecrire la traduction a la suite
-
----
-
-## Assistant (Build · Big Pickle · 6.7s)
-
-_Thinking:_
-
-The user wants a txt or docx file containing the French texts to translate from terms.json, line by line so they can write the translation right after.
-
-Let me read terms.json to understand structure. I'll generate a txt file (simpler, editable) with each French term on a line followed by a separator for translation, e.g.:
-
-```
-Solde disponible = 
-Frais = 
-...
-```
-
-But they said "les ecrits ligne par ligne pour qu'on puisse juste ecrire la traduction a la suite" — write them line by line so they can just write the translation after. So format like `terme_fr : ` and blank after.
-
-Consider including the id for mapping back? Maybe helpful but could clutter. The user wants simple. But for re-import, having id is useful. However they explicitly want just to write translation after. I could include id in a subtle way? Better: line format:
-
-`1. Solde disponible -> `
-or
-`Solde disponible = `
-
-Maybe include context/category? Let me inspect terms.json structure first.
-
-Also there are 72 terms. Also templates.json has 24 phrase templates, but user only asked terms.json. Stick to terms.json.
-
-Let me read the file.
-
-**Tool: read**
-
-**Input:**
-```json
-{
-  "filePath": "D:\\hackathon\\edima\\packages\\shared\\data\\glossary\\terms.json"
-}
-```
-
-**Output:**
-```
-<path>D:\hackathon\edima\packages\shared\data\glossary\terms.json</path>
-<type>file</type>
-<content>
-1: [
-2:   {
-3:     "id": "solde_disponible",
-4:     "category": "compte",
-5:     "fr": "Solde disponible",
-6:     "ewo": null,
-7:     "dua": null,
-8:     "ewo_status": "a_traduire",
-9:     "dua_status": "a_traduire"
-10:   },
-11:   {
-12:     "id": "numero_compte",
-13:     "category": "compte",
-14:     "fr": "Compte n°",
-15:     "ewo": null,
-16:     "dua": null,
-17:     "ewo_status": "a_traduire",
-18:     "dua_status": "a_traduire"
-19:   },
-20:   {
-21:     "id": "compte_courant",
-22:     "category": "compte",
-23:     "fr": "Compte courant",
-24:     "ewo": null,
-25:     "dua": null,
-26:     "ewo_status": "a_traduire",
-27:     "dua_status": "a_traduire"
-28:   },
-29:   {
-30:     "id": "dernieres_operations",
-31:     "category": "compte",
-32:     "fr": "Dernières opérations",
-33:     "ewo": null,
-34:     "dua": null,
-35:     "ewo_status": "a_traduire",
-36:     "dua_status": "a_traduire"
-37:   },
-38:   {
-39:     "id": "transfert_recu",
-40:     "category": "compte",
-41:     "fr": "Transfert reçu",
-42:     "ewo": null,
-43:     "dua": null,
-44:     "ewo_status": "a_traduire",
-45:     "dua_status": "a_traduire"
-46:   },
-47:   {
-48:     "id": "paiement_facture",
-49:     "category": "compte",
-50:     "fr": "Paiement facture",
-51:     "ewo": null,
-52:     "dua": null,
-53:     "ewo_status": "a_traduire",
-54:     "dua_status": "a_traduire"
-55:   },
-56:   {
-57:     "id": "retrait_guichet",
-58:     "category": "compte",
-59:     "fr": "Retrait au guichet",
-60:     "ewo": null,
-61:     "dua": null,
-62:     "ewo_status": "a_traduire",
-63:     "dua_status": "a_traduire"
-64:   },
-65:   {
-66:     "id": "solde_insuffisant",
-67:     "category": "compte",
-68:     "fr": "Solde insuffisant",
-69:     "ewo": null,
-70:     "dua": null,
-71:     "ewo_status": "a_traduire",
-72:     "dua_status": "a_traduire"
-73:   },
-74:   {
-75:     "id": "beneficiaire",
-76:     "category": "transfert",
-77:     "fr": "Bénéficiaire",
-78:     "ewo": null,
-79:     "dua": null,
-80:     "ewo_status": "a_traduire",
-81:     "dua_status": "a_traduire"
-82:   },
-83:   {
-84:     "id": "montant_envoye",
-85:     "category": "transfert",
-86:     "fr": "Montant envoyé",
-87:     "ewo": null,
-88:     "dua": null,
-89:     "ewo_status": "a_traduire",
-90:     "dua_status": "a_traduire"
-91:   },
-92:   {
-93:     "id": "montant_a_envoyer",
-94:     "category": "transfert",
-95:     "fr": "Montant à envoyer",
-96:     "ewo": null,
-97:     "dua": null,
-98:     "ewo_status": "a_traduire",
-99:     "dua_status": "a_traduire"
-100:   },
-101:   {
-102:     "id": "frais",
-103:     "category": "transfert",
-104:     "fr": "Frais",
-105:     "ewo": null,
-106:     "dua": null,
-107:     "ewo_status": "a_traduire",
-108:     "dua_status": "a_traduire"
-109:   },
-110:   {
-111:     "id": "total_debite",
-112:     "category": "transfert",
-113:     "fr": "Total débité",
-114:     "ewo": null,
-115:     "dua": null,
-116:     "ewo_status": "a_traduire",
-117:     "dua_status": "a_traduire"
-118:   },
-119:   {
-120:     "id": "date",
-121:     "category": "transfert",
-122:     "fr": "Date",
-123:     "ewo": null,
-124:     "dua": null,
-125:     "ewo_status": "a_traduire",
-126:     "dua_status": "a_traduire"
-127:   },
-128:   {
-129:     "id": "message_optionnel",
-130:     "category": "transfert",
-131:     "fr": "Message (optionnel)",
-132:     "ewo": null,
-133:     "dua": null,
-134:     "ewo_status": "a_traduire",
-135:     "dua_status": "a_traduire"
-136:   },
-137:   {
-138:     "id": "tu_envoies",
-139:     "category": "transfert",
-140:     "fr": "Tu envoies",
-141:     "ewo": null,
-142:     "dua": null,
-143:     "ewo_status": "a_traduire",
-144:     "dua_status": "a_traduire"
-145:   },
-146:   {
-147:     "id": "a_destinataire",
-148:     "category": "transfert",
-149:     "fr": "À",
-150:     "ewo": null,
-151:     "dua": null,
-152:     "ewo_status": "a_traduire",
-153:     "dua_status": "a_traduire"
-154:   },
-155:   {
-156:     "id": "franc_cfa",
-157:     "category": "transfert",
-158:     "fr": "FCFA",
-159:     "ewo": null,
-160:     "dua": null,
-161:     "ewo_status": "a_traduire",
-162:     "dua_status": "a_traduire"
-163:   },
-164:   {
-165:     "id": "numero_telephone",
-166:     "category": "transfert",
-167:     "fr": "Numéro de téléphone",
-168:     "ewo": null,
-169:     "dua": null,
-170:     "ewo_status": "a_traduire",
-171:     "dua_status": "a_traduire"
-172:   },
-173:   {
-174:     "id": "transfert_refuse",
-175:     "category": "transfert",
-176:     "fr": "Transfert refusé",
-177:     "ewo": null,
-178:     "dua": null,
-179:     "ewo_status": "a_traduire",
-180:     "dua_status": "a_traduire"
-181:   },
-182:   {
-183:     "id": "envoyer_argent",
-184:     "category": "navigation",
-185:     "fr": "Envoyer de l'argent",
-186:     "ewo": null,
-187:     "dua": null,
-188:     "ewo_status": "a_traduire",
-189:     "dua_status": "a_traduire"
-190:   },
-191:   {
-192:     "id": "retirer",
-193:     "category": "navigation",
-194:     "fr": "Retirer",
-195:     "ewo": null,
-196:     "dua": null,
-197:     "ewo_status": "a_traduire",
-198:     "dua_status": "a_traduire"
-199:   },
-200:   {
-201:     "id": "payer_facture",
-202:     "category": "navigation",
-203:     "fr": "Payer une facture",
-204:     "ewo": null,
-205:     "dua": null,
-206:     "ewo_status": "a_traduire",
-207:     "dua_status": "a_traduire"
-208:   },
-209:   {
-210:     "id": "accueil",
-211:     "category": "navigation",
-212:     "fr": "Accueil",
-213:     "ewo": null,
-214:     "dua": null,
-215:     "ewo_status": "a_traduire",
-216:     "dua_status": "a_traduire"
-217:   },
-218:   {
-219:     "id": "comptes",
-220:     "category": "navigation",
-221:     "fr": "Comptes",
-222:     "ewo": null,
-223:     "dua": null,
-224:     "ewo_status": "a_traduire",
-225:     "dua_status": "a_traduire"
-226:   },
-227:   {
-228:     "id": "virements",
-229:     "category": "navigation",
-230:     "fr": "Virements",
-231:     "ewo": null,
-232:     "dua": null,
-233:     "ewo_status": "a_traduire",
-234:     "dua_status": "a_traduire"
-235:   },
-236:   {
-237:     "id": "aide",
-238:     "category": "navigation",
-239:     "fr": "Aide",
-240:     "ewo": null,
-241:     "dua": null,
-242:     "ewo_status": "a_traduire",
-243:     "dua_status": "a_traduire"
-244:   },
-245:   {
-246:     "id": "bonjour",
-247:     "category": "navigation",
-248:     "fr": "Bonjour",
-249:     "ewo": null,
-250:     "dua": null,
-251:     "ewo_status": "a_traduire",
-252:     "dua_status": "a_traduire"
-253:   },
-254:   {
-255:     "id": "confirmer",
-256:     "category": "confirmation",
-257:     "fr": "Confirmer",
-258:     "ewo": null,
-259:     "dua": null,
-260:     "ewo_status": "a_traduire",
-261:     "dua_status": "a_traduire"
-262:   },
-263:   {
-264:     "id": "confirmer_transfert",
-265:     "category": "confirmation",
-266:     "fr": "Confirmer le transfert",
-267:     "ewo": null,
-268:     "dua": null,
-269:     "ewo_status": "a_traduire",
-270:     "dua_status": "a_traduire"
-271:   },
-272:   {
-273:     "id": "annuler",
-274:     "category": "confirmation",
-275:     "fr": "Annuler",
-276:     "ewo": null,
-277:     "dua": null,
-278:     "ewo_status": "a_traduire",
-279:     "dua_status": "a_traduire"
-280:   },
-281:   {
-282:     "id": "etape",
-283:     "category": "confirmation",
-284:     "fr": "Étape",
-285:     "ewo": null,
-286:     "dua": null,
-287:     "ewo_status": "a_traduire",
-288:     "dua_status": "a_traduire"
-289:   },
-290:   {
-291:     "id": "sur",
-292:     "category": "confirmation",
-293:     "fr": "sur",
-294:     "ewo": null,
-295:     "dua": null,
-296:     "ewo_status": "a_traduire",
-297:     "dua_status": "a_traduire"
-298:   },
-299:   {
-300:     "id": "recapitulatif",
-301:     "category": "confirmation",
-302:     "fr": "Récapitulatif",
-303:     "ewo": null,
-304:     "dua": null,
-305:     "ewo_status": "a_traduire",
-306:     "dua_status": "a_traduire"
-307:   },
-308:   {
-309:     "id": "recapitulatif_transfert",
-310:     "category": "confirmation",
-311:     "fr": "Récapitulatif du transfert",
-312:     "ewo": null,
-313:     "dua": null,
-314:     "ewo_status": "a_traduire",
-315:     "dua_status": "a_traduire"
-316:   },
-317:   {
-318:     "id": "operation_irreversible",
-319:     "category": "confirmation",
-320:     "fr": "Cette opération est irréversible",
-321:     "ewo": null,
-322:     "dua": null,
-323:     "ewo_status": "a_traduire",
-324:     "dua_status": "a_traduire"
-325:   },
-326:   {
-327:     "id": "code_secret",
-328:     "category": "securite",
-329:     "fr": "Code secret",
-330:     "ewo": null,
-331:     "dua": null,
-332:     "ewo_status": "a_traduire",
-333:     "dua_status": "a_traduire"
-334:   },
-335:   {
-336:     "id": "ne_jamais_partager_code_tel",
-337:     "category": "securite",
-338:     "fr": "Ne partage jamais ton code secret, même par téléphone",
-339:     "ewo": null,
-340:     "dua": null,
-341:     "ewo_status": "a_traduire",
-342:     "dua_status": "a_traduire"
-343:   },
-344:   {
-345:     "id": "ne_jamais_communiquer_code_agence",
-346:     "category": "securite",
-347:     "fr": "Ne communiquez jamais votre code secret, même à un conseiller de la banque",
-348:     "ewo": null,
-349:     "dua": null,
-350:     "ewo_status": "a_traduire",
-351:     "dua_status": "a_traduire"
-352:   },
-353:   {
-354:     "id": "alerte_securite",
-355:     "category": "securite",
-356:     "fr": "Alerte sécurité",
-357:     "ewo": null,
-358:     "dua": null,
-359:     "ewo_status": "a_traduire",
-360:     "dua_status": "a_traduire"
-361:   },
-362:   {
-363:     "id": "arnaque_possible",
-364:     "category": "securite",
-365:     "fr": "Arnaque possible",
-366:     "ewo": null,
-367:     "dua": null,
-368:     "ewo_status": "a_traduire",
-369:     "dua_status": "a_traduire"
-370:   },
-371:   {
-372:     "id": "ce_nest_pas_ta_banque",
-373:     "category": "securite",
-374:     "fr": "Ce n'est pas ta banque",
-375:     "ewo": null,
-376:     "dua": null,
-377:     "ewo_status": "a_traduire",
-378:     "dua_status": "a_traduire"
-379:   },
-380:   {
-381:     "id": "message_detecte",
-382:     "category": "securite",
-383:     "fr": "Message détecté sur la page",
-384:     "ewo": null,
-385:     "dua": null,
-386:     "ewo_status": "a_traduire",
-387:     "dua_status": "a_traduire"
-388:   },
-389:   {
-390:     "id": "action_requise",
-391:     "category": "securite",
-392:     "fr": "Action requise",
-393:     "ewo": null,
-394:     "dua": null,
-395:     "ewo_status": "a_traduire",
-396:     "dua_status": "a_traduire"
-397:   },
-398:   {
-399:     "id": "detecte_a_linstant",
-400:     "category": "securite",
-401:     "fr": "Détecté à l'instant",
-402:     "ewo": null,
-403:     "dua": null,
-404:     "ewo_status": "a_traduire",
-405:     "dua_status": "a_traduire"
-406:   },
-407:   {
-408:     "id": "erreur",
-409:     "category": "securite",
-410:     "fr": "Erreur",
-411:     "ewo": null,
-412:     "dua": null,
-413:     "ewo_status": "a_traduire",
-414:     "dua_status": "a_traduire"
-415:   },
-416:   {
-417:     "id": "avertissement",
-418:     "category": "securite",
-419:     "fr": "Avertissement",
-420:     "ewo": null,
-421:     "dua": null,
-422:     "ewo_status": "a_traduire",
-423:     "dua_status": "a_traduire"
-424:   },
-425:   {
-426:     "id": "lis_moi_cette_page",
-427:     "category": "voix",
-428:     "fr": "Lis-moi cette page",
-429:     "ewo": null,
-430:     "dua": null,
-431:     "ewo_status": "a_traduire",
-432:     "dua_status": "a_traduire"
-433:   },
-434:   {
-435:     "id": "ecouter",
-436:     "category": "voix",
-437:     "fr": "Écouter",
-438:     "ewo": null,
-439:     "dua": null,
-440:     "ewo_status": "a_traduire",
-441:     "dua_status": "a_traduire"
-442:   },
-443:   {
-444:     "id": "repeter",
-445:     "category": "voix",
-446:     "fr": "Répéter",
-447:     "ewo": null,
-448:     "dua": null,
-449:     "ewo_status": "a_traduire",
-450:     "dua_status": "a_traduire"
-451:   },
-452:   {
-453:     "id": "pause",
-454:     "category": "voix",
-455:     "fr": "Pause",
-456:     "ewo": null,
-457:     "dua": null,
-458:     "ewo_status": "a_traduire",
-459:     "dua_status": "a_traduire"
-460:   },
-461:   {
-462:     "id": "plus_lent",
-463:     "category": "voix",
-464:     "fr": "Plus lent",
-465:     "ewo": null,
-466:     "dua": null,
-467:     "ewo_status": "a_traduire",
-468:     "dua_status": "a_traduire"
-469:   },
-470:   {
-471:     "id": "reecouter",
-472:     "category": "voix",
-473:     "fr": "Réécouter",
-474:     "ewo": null,
-475:     "dua": null,
-476:     "ewo_status": "a_traduire",
-477:     "dua_status": "a_traduire"
-478:   },
-479:   {
-480:     "id": "jai_compris",
-481:     "category": "voix",
-482:     "fr": "J'ai compris",
-483:     "ewo": null,
-484:     "dua": null,
-485:     "ewo_status": "a_traduire",
-486:     "dua_status": "a_traduire"
-487:   },
-488:   {
-489:     "id": "ce_que_dit_la_page",
-490:     "category": "voix",
-491:     "fr": "Ce que dit la page",
-492:     "ewo": null,
-493:     "dua": null,
-494:     "ewo_status": "a_traduire",
-495:     "dua_status": "a_traduire"
-496:   },
-497:   {
-498:     "id": "valide",
-499:     "category": "transparence",
-500:     "fr": "Validé",
-501:     "ewo": null,
-502:     "dua": null,
-503:     "ewo_status": "a_traduire",
-504:     "dua_status": "a_traduire"
-505:   },
-506:   {
-507:     "id": "valide_par_linguiste",
-508:     "category": "transparence",
-509:     "fr": "Validé par le linguiste",
-510:     "ewo": null,
-511:     "dua": null,
-512:     "ewo_status": "a_traduire",
-513:     "dua_status": "a_traduire"
-514:   },
-515:   {
-516:     "id": "non_verifie",
-517:     "category": "transparence",
-518:     "fr": "Non vérifié",
-519:     "ewo": null,
-520:     "dua": null,
-521:     "ewo_status": "a_traduire",
-522:     "dua_status": "a_traduire"
-523:   },
-524:   {
-525:     "id": "ia_non_verifie",
-526:     "category": "transparence",
-527:     "fr": "IA — non vérifié",
-528:     "ewo": null,
-529:     "dua": null,
-530:     "ewo_status": "a_traduire",
-531:     "dua_status": "a_traduire"
-532:   },
-533:   {
-534:     "id": "voir_le_francais",
-535:     "category": "transparence",
-536:     "fr": "Voir le français",
-537:     "ewo": null,
-538:     "dua": null,
-539:     "ewo_status": "a_traduire",
-540:     "dua_status": "a_traduire"
-541:   },
-542:   {
-543:     "id": "texte_original",
-544:     "category": "transparence",
-545:     "fr": "Texte original",
-546:     "ewo": null,
-547:     "dua": null,
-548:     "ewo_status": "a_traduire",
-549:     "dua_status": "a_traduire"
-550:   },
-551:   {
-552:     "id": "la_page_dans_lordre",
-553:     "category": "parcours",
-554:     "fr": "La page, dans l'ordre",
-555:     "ewo": null,
-556:     "dua": null,
-557:     "ewo_status": "a_traduire",
-558:     "dua_status": "a_traduire"
-559:   },
-560:   {
-561:     "id": "ce_quedima_texplique",
-562:     "category": "parcours",
-563:     "fr": "Ce qu'Edima t'explique",
-564:     "ewo": null,
-565:     "dua": null,
-566:     "ewo_status": "a_traduire",
-567:     "dua_status": "a_traduire"
-568:   },
-569:   {
-570:     "id": "etape_1_sur_3_consulter_solde",
-571:     "category": "parcours",
-572:     "fr": "Étape 1 sur 3 — Consulter le solde",
-573:     "ewo": null,
-574:     "dua": null,
-575:     "ewo_status": "a_traduire",
-576:     "dua_status": "a_traduire"
-577:   },
-578:   {
-579:     "id": "etape_2_sur_3_remplir",
-580:     "category": "parcours",
-581:     "fr": "Étape 2 sur 3 : remplir",
-582:     "ewo": null,
-583:     "dua": null,
-584:     "ewo_status": "a_traduire",
-585:     "dua_status": "a_traduire"
-586:   },
-587:   {
-588:     "id": "etape_3_sur_3_verifier",
-589:     "category": "parcours",
-590:     "fr": "Étape 3 sur 3 : vérifier",
-591:     "ewo": null,
-592:     "dua": null,
-593:     "ewo_status": "a_traduire",
-594:     "dua_status": "a_traduire"
-595:   },
-596:   {
-597:     "id": "montants_identiques_saisie",
-598:     "category": "coherence",
-599:     "fr": "Les montants sont les mêmes que ceux que tu as saisis",
-600:     "ewo": null,
-601:     "dua": null,
-602:     "ewo_status": "a_traduire",
-603:     "dua_status": "a_traduire"
-604:   },
-605:   {
-606:     "id": "montant_verifie_saisie",
-607:     "category": "coherence",
-608:     "fr": "Montant vérifié — correspond à ta saisie",
-609:     "ewo": null,
-610:     "dua": null,
-611:     "ewo_status": "a_traduire",
-612:     "dua_status": "a_traduire"
-613:   },
-614:   {
-615:     "id": "edima",
-616:     "category": "divers",
-617:     "fr": "Edima",
-618:     "ewo": null,
-619:     "dua": null,
-620:     "ewo_status": "a_traduire",
-621:     "dua_status": "a_traduire"
-622:   },
-623:   {
-624:     "id": "slogan",
-625:     "category": "divers",
-626:     "fr": "Ta banque parle ta langue",
-627:     "ewo": null,
-628:     "dua": null,
-629:     "ewo_status": "a_traduire",
-630:     "dua_status": "a_traduire"
-631:   },
-632:   {
-633:     "id": "en_attente_page",
-634:     "category": "divers",
-635:     "fr": "En attente d'une page à expliquer",
-636:     "ewo": null,
-637:     "dua": null,
-638:     "ewo_status": "a_traduire",
-639:     "dua_status": "a_traduire"
-640:   },
-641:   {
-642:     "id": "nouveau_message_detecte",
-643:     "category": "divers",
-644:     "fr": "Nouveau message détecté",
-645:     "ewo": null,
-646:     "dua": null,
-647:     "ewo_status": "a_traduire",
-648:     "dua_status": "a_traduire"
-649:   }
-650: ]
-
-(End of file - total 650 lines)
-</content>
-```
+**Updated:** 10/11/2026 07:13:13
 
 ---
 
@@ -12060,6 +11248,532 @@ Vérifie la fin du log et dis-moi si tu vois :
 - `Saved best model -> .../best`
 
 Si `05` tourne encore, laisse-le finir (200 steps sur T4, quelques minutes). Si tu as un traceback, colle-le. Si c'est OK, on enchaîne : soit `04_make_synthetic_fr.py` puis le `05` complet, soit directement le `05` complet sans synthétique pour gagner du temps.
+
+---
+
+## User
+
+au fait qu'est ce qui est en train de se passer exactement ici ?
+
+---
+
+## Assistant (Build · Big Pickle · 23.1s)
+
+_Thinking:_
+
+The user asks: "au fait qu'est ce qui est en train de se passer exactement ici ?" — "By the way, what exactly is happening here?"
+
+They want an explanation of what the scripts/pipeline are doing, likely in the context of the Kaggle cells they just ran. Need to explain clearly and concisely what's happening at each step: downloading model/data, preparing data, adding Duala token, and the smoke test training.
+
+We should explain:
+- `01_download.py`: downloads M2M100-418M base model (~3.9 GB) and MT560 EN–DUA dataset (15,351 pairs) to `ml/models` and `ml/data/raw`.
+- `02_prepare_data.py`: cleans, deduplicates, filters (length ratio, max words), normalizes NFC, splits 11,018 train / 612 val / 612 test.
+- `03_add_dua_token.py`: loads M2M100, adds `__dua__` token, resizes embeddings, initializes its embedding as mean of related Bantu languages, sets `forced_bos_token_id`, saves `m2m100_dua_init`. This is the crucial step because M2M100 doesn't know Duala.
+- `05_train.py --sample 2000 --max-steps 200 --no-synthetic`: a smoke test. It loads the init model, takes 2,000 EN→DUA pairs, fine-tunes for 200 steps (not 5 epochs), evaluates chrF/BLEU on validation, saves `best`. It's a pipeline sanity check, not the real model. It verifies: tokenizer/token works, training loop runs, generation/eval works, memory OK.
+- The `&&` chain ensures each step only runs if the previous succeeded.
+- The second cell re-ran 01/02/03/05; redundant, but final state is fine.
+
+Also explain what is NOT happening yet:
+- No synthetic FR→DUA data (because `--no-synthetic`).
+- No full training (only 200 steps on 2k examples).
+- No domain/banking adaptation.
+- No evaluation on glossary yet.
+
+And what to look for: loss decreasing, chrF computed, saved best model.
+
+Also, clarify the architecture: this model is a draft layer, not the validated glossary. The glossary/templates remain the source of truth.
+
+The user might be asking "what is happening exactly" because they see the training logs and don't know what's going on. Explain in simple terms, maybe with a flow diagram.
+
+Keep it concise but informative. The user asked for an explanation, so a bit more detail is warranted, but still avoid excessive length. Use bullets.
+
+Let me structure:
+1. The big picture: we're preparing a neural translation model for Duala, but the real translations for banking terms will come from the validated glossary; the model handles unseen text.
+2. Step by step of the four scripts.
+3. What the smoke test is doing and why 200 steps / 2k examples.
+4. What it does NOT do yet.
+5. What to check in the logs.
+
+Also mention the `__dua__` token trick: M2M100 has 100 languages but not Duala; we add a new language token and initialize it from related Bantu languages; the model learns to use it during fine-tuning.
+
+And explain `--no-synthetic`: only English→Duala for now; the French→Duala direction comes from synthetic French data generated in step 04, which we skipped for the smoke test.
+
+And the "second cell" redundancy: it re-ran steps; not a problem.
+
+Let me answer in French. Use simple terms.
+
+Maybe include a mini flow:
+
+```
+MT560 (EN–DUA) ──02──> train/val/test JSONL
+M2M100-418M ──03(+__dua__)──> m2m100_dua_init
+                                   │
+                           05 (smoke 200 steps)
+                                   │
+                              best/ + chrF
+```
+
+Then explain.
+
+Let me write final.
+
+En ce moment, tu ne fais pas encore le « vrai » entraînement : tu vérifies que toute la chaîne fonctionne. Concrètement :
+
+## Ce que font les scripts
+
+1. **`01_download.py`** — télécharge la base M2M100-418M (~3,9 Go) et le corpus MT560 anglais→duala (15 351 paires) dans `ml/models` et `ml/data/raw`.
+2. **`02_prepare_data.py`** — nettoie, déduplique, filtre (ratio de longueur, mots max), normalise en NFC, puis découpe : 11 018 train / 612 val / 612 test.
+3. **`03_add_dua_token.py`** — M2M100 ne connaît pas le duala. On ajoute le token `__dua__`, on agrandit les embeddings, et on initialise son vecteur comme la moyenne de langues bantoues proches (`ln`, `lg`, `rw`, `ny`, `sw`, `zu`, `xh`). Résultat : `ml/models/m2m100_dua_init`.
+4. **`05_train.py --sample 2000 --max-steps 200 --no-synthetic`** — **smoke test** : prend seulement 2 000 paires EN→DUA, entraîne 200 steps (pas les 5 époques), évalue en chrF/BLEU, et sauvegarde `out/m2m100_dua/best`.
+
+## Ce que ça vérifie
+
+- le token `__dua__` est bien pris en compte ;
+- le tokenizer et les labels sont corrects ;
+- la boucle d'entraînement tourne sans OOM sur le T4 ;
+- la génération et l'évaluation fonctionnent ;
+- la loss descend et un `best/` est sauvegardé.
+
+## Ce que ça ne fait pas encore
+
+- pas de direction **français→duala** (c'est `04_make_synthetic_fr.py` qui la crée) ;
+- pas d'entraînement complet (200 steps ≠ 5 époques) ;
+- pas d'adaptation au domaine bancaire ;
+- pas d'évaluation sur le glossaire validé.
+
+Le glossaire et les phrases-modèles restent la source de vérité pour la banque ; le modèle ne sert qu'au texte inédit, avec abstention. Le deuxième cellule a juste refait `01`/`02` en double, ce n'est pas grave.
+
+---
+
+## User
+
+bon la je suis en train de sortir et je vais devoir laisser le pc, je vais travailler avec un autre a l'ecole je fais comment ?
+
+---
+
+## Assistant (Build · Big Pickle · 27.3s)
+
+_Thinking:_
+
+The user says: "bon la je suis en train de sortir et je vais devoir laisser le pc, je vais travailler avec un autre à l'école je fais comment ?" — They're leaving, leaving the PC, and will work with someone else at school. How do they continue?
+
+They need a way to resume work on another machine (school PC) without the local PC. Key considerations:
+- Everything important is on GitHub (`feature/moteur-de-traduction`), including the ML pipeline and docs. The Kaggle notebook is also in the repo. So they can clone on the school PC or open Kaggle in the browser.
+- Kaggle is cloud-based: they can continue training from any browser by opening their Kaggle account. But Kaggle sessions are ephemeral; if the current session stops, outputs in `/kaggle/working` are lost unless saved. They need to save to HF Hub or Kaggle output/dataset.
+- The training smoke test may still be running; if they close the browser, the Kaggle session may continue for a while but eventually stop. They should save checkpoints to HF Hub. The full training cell uses `--push-to-hub`; the smoke test doesn't. For the smoke test, no need to save.
+- If they need to continue the full training later, use `--push-to-hub` and/or save outputs to a Kaggle Dataset. Also, Kaggle notebooks can be saved and re-run; the code is in GitHub.
+- On the school PC: install Git, clone the repo, or just use GitHub web + Kaggle. They don't need the local PC. If they need to run local commands (Node/pnpm), they can clone. But for ML, Kaggle is browser-based.
+- Accounts: they need their GitHub, Kaggle, Hugging Face accounts and tokens. Ensure they have access (passwords/2FA). Don't share tokens in chat. They can use Kaggle Secrets for HF_TOKEN; the secret persists in their Kaggle account, so on another machine they can use the same Kaggle account.
+- The repo branch: clone `-b feature/moteur-de-traduction`.
+- The docs/translation work: the two txt files are on GitHub; they can access via GitHub web or clone. The collaborator can translate directly in the files (or use a shared doc).
+- If they want to collaborate with another person: add them as a collaborator on GitHub (Settings → Collaborators) or have them fork/PR. For Kaggle, share the notebook (Kaggle allows sharing) or add them as a collaborator on the notebook; for HF, add them to the model repo if pushing.
+- Since they're leaving the PC, make sure the latest work is pushed (it is: commit `9e09fd6`). The local PC can be shut down; no uncommitted changes? We should check `git status` to ensure clean. Earlier status was clean after push. But the user may have local changes? We should verify before they leave. Run `git status --short` and maybe `git log`. Also, the Kaggle work is in the cloud; the local repo is just code. Good.
+- If the smoke test is still running on Kaggle, they can check from another device by logging into Kaggle. But if they close the laptop, the Kaggle session continues server-side until timeout; the browser can reconnect. They can also use Kaggle's "Save & Run All" / commit feature to run in background, but that requires the notebook to be committed and the data available. For now, the smoke test is not critical; they can rerun it later.
+- Important: Kaggle sessions have a max duration (9h/12h) and idle timeout. If they leave, the session may stop. Any unsaved `/kaggle/working` files are lost. The code is on GitHub; data can be re-downloaded; the only thing to save is the trained model. For the smoke test, no need. For the full training, push to HF Hub.
+- The `ml/data`, `ml/models`, `ml/out` are gitignored, so not on GitHub. That's fine; they can be regenerated. The trained model should go to HF Hub.
+- The two translation txt files are on GitHub; the collaborator can work on them. But if the collaborator edits on the school PC, they need to clone and push, or use GitHub web editor (edit files directly in the browser). GitHub web editor is easiest: open the file, click pencil, edit, commit to a branch/PR. But for a long list of 72 terms, a shared Google Doc might be easier; then paste back. The user asked "je fais comment" — give practical steps.
+
+We should provide a concise handoff plan:
+1. Verify local repo is clean and pushed (we can run git status now).
+2. On the school PC, use a browser:
+   - GitHub: repo/branch; the code and translation sheets are there.
+   - Kaggle: log in with the same account; open the notebook; the HF_TOKEN secret is already in the account (if they added it). If not, add it.
+   - HF: log in; model repo if pushing.
+3. If the Kaggle session is still running, they can reconnect; otherwise, re-run `01→03` and then the desired step. To avoid losing work, use `--push-to-hub` for full training, and/or save `out/` as a Kaggle Dataset/Output.
+4. For the collaborator: add them as GitHub collaborator or have them use GitHub web editor; for Kaggle, share the notebook; for HF, add as collaborator to the model repo.
+5. Security: don't share passwords/tokens; use Kaggle Secrets/HF tokens with fine-grained permissions; revoke if needed.
+6. If they need to continue on a different local machine with the code: `git clone -b feature/moteur-de-traduction https://github.com/HonluePetnou/edima.git`, `pnpm install` for the app, etc. But for ML, browser-only is enough.
+
+We should also check if there are uncommitted changes locally before they leave. Let's run `git status --short` and `git log --oneline -3`. If clean, tell them. If there are changes, commit/push? The user didn't ask, but if they're leaving, it's important. Let's check.
+
+Also, the user's Kaggle run may be in progress. We can't see it. Tell them: if it's still running, don't close the Kaggle tab abruptly? Closing the browser doesn't stop the kernel immediately; Kaggle keeps it running for a while. But to be safe, they can let it finish and then save. If they must leave, the smoke test can be rerun; no loss.
+
+Let's run git status.
+
+**Tool: bash**
+
+**Input:**
+```json
+{
+  "command": "git status --short; Write-Output '---'; git log --oneline -3; Write-Output '---'; git status -sb | Select-Object -First 1"
+}
+```
+
+**Output:**
+```
+---
+b39e047 donnees de session opencode
+9e09fd6 Fix Duala token save and support newer transformers
+4be5a0d donnees de session opencode
+---
+## feature/moteur-de-traduction...origin/feature/moteur-de-traduction
+
+```
+
+---
+
+## Assistant (Build · Big Pickle · 47.7s)
+
+_Thinking:_
+
+Interesting: The local branch has a new commit `b39e047 donnees de session opencode` on top of `9e09fd6`, and it's in sync with origin. This must have been committed/pushed by the user or an automated process (opencode session data). The working tree is clean. Good.
+
+So everything is pushed. Now answer the user's question about working from school with another person.
+
+Need to be practical and concise. The user is leaving the PC; they want to continue with someone at school. We should explain:
+
+- Everything code is on GitHub; the local PC is not needed.
+- Kaggle is cloud; log in from any browser. If the session is still running, reconnect; if not, rerun the pipeline. Save models to HF Hub.
+- On the school PC: clone the repo or use GitHub web. For translation work, use GitHub web editor or a shared doc.
+- Collaboration: add the other person as GitHub collaborator, share Kaggle notebook, add to HF model repo. Don't share tokens.
+- If they need to run the app locally at school: install Node/pnpm, clone, `pnpm install`, etc. But for ML, Kaggle is enough.
+- Important: `ml/data`, `ml/models`, `ml/out` are not on GitHub (gitignored), so they won't transfer. That's fine; regenerate via `01`→`03`. The trained model should be pushed to HF Hub; otherwise it's lost when the Kaggle session ends.
+- If the smoke test is still running, let it finish or just rerun later; no need to save it.
+- For the full training, use `--push-to-hub` and/or Kaggle "Save version" / output dataset.
+- The translation sheets are on GitHub; the collaborator can edit via GitHub web (pencil icon) or clone. If they edit directly on the feature branch, they can commit; or use a PR. For a non-technical collaborator, a Google Doc/Word is easier; then paste back.
+
+Also, mention the local uncommitted state: clean, everything pushed (commit `b39e047`). They can shut down the PC safely.
+
+Let me provide a clear handoff checklist:
+
+**Avant de partir**
+- Repo clean and pushed: yes.
+- Kaggle: if smoke test running, either wait or note it can be rerun.
+- HF token: stored in Kaggle Secrets (account-level), so available on another machine.
+
+**À l'école**
+1. Browser: GitHub → repo → branch `feature/moteur-de-traduction`.
+2. Kaggle: same account → open notebook (or create new) → run.
+3. HF: same account for push_to_hub.
+4. If new Kaggle session: rerun `01`→`03` (data/model are not persisted), then `05`.
+5. For full training: `--push-to-hub` to avoid losing the model.
+6. Collaborator: add to GitHub repo (Settings → Collaborators), share Kaggle notebook, add to HF model repo. Never share tokens; each uses their own.
+
+**Translation work**
+- Edit `docs/glossaire-a-traduire-duala.txt` and `docs/phrases-modeles-a-traduire-duala.txt` via GitHub web editor (pencil) or clone; commit to a branch/PR.
+- Or use a shared doc and paste back.
+
+**If they want to run the app at school**
+- Install Node.js 20+, pnpm, clone, `pnpm install`, `pnpm dev` (or whatever the repo uses). But maybe not needed.
+
+Let me check the repo's package manager/commands? The user didn't ask about running the app; focus on ML. But "travailler avec un autre à l'école" could mean continuing the project. Mention both options briefly.
+
+Also, one important point: The user's local PC has the `session-ses_*.md` files committed (opencode session data), which may contain conversation logs. Not relevant. But if they work with someone, be mindful not to share secrets. The session files might contain sensitive info? They are in the repo and pushed. Could mention: "Attention, les fichiers `session-ses_*.md` contiennent l'historique de session et sont dans le repo public ; si tu partages le repo, vérifie qu'il n'y a pas de secrets." That's important! The repo is public (`https://github.com/HonluePetnou/edima.git`). The session files may contain tokens or personal data. We should flag this. The user didn't ask, but it's a security concern. The session files are 11k lines and contain conversation; could include HF tokens? They pasted no tokens in chat, but the session log may include environment details. We should advise checking/removing them before sharing the repo or adding collaborators. This is a valuable warning.
+
+Let me check if the repo is public? The remote is GitHub; we can't easily verify without gh. But likely public. The `session-ses_*.md` files were committed. If the repo is public, that's a privacy/security risk. We should mention it. But the user's immediate question is how to continue. We can add a short warning.
+
+Also, the user said "je vais travailler avec un autre à l'école" — if they add a collaborator, the session files are visible. Warn them.
+
+Let me formulate the answer:
+
+- "Tout est sur GitHub, ton PC local ne sert plus à rien pour continuer."
+- "Vérifié : arbre propre, tout est poussé (commit b39e047)."
+- Steps:
+  1. Connexion navigateur (GitHub/Kaggle/HF) avec tes comptes.
+  2. Kaggle : la session actuelle peut continuer sans ton PC ; si elle est coupée, relance 01→03 puis 05. Les données/modèles ne sont pas sur GitHub.
+  3. Pour ne rien perdre : `--push-to-hub` pour le run complet ; le smoke test peut être refait.
+  4. Collaboration : ajoute l'autre personne en collaborateur GitHub, partage le notebook Kaggle, ajoute-la au repo HF. Chacun ses tokens.
+  5. Traduction : éditer les .txt via GitHub web ou un doc partagé.
+- Warning: session files in repo; check secrets before sharing.
+
+Let me be concise. Use bullet points. The user is leaving, so actionable.
+
+Also, note: The Kaggle session may stop when the browser closes? Kaggle notebooks keep running for a while, but eventually stop. If they need the smoke test result, they can check later. The full training should be done with "Save & Run All" or keep the tab open. Actually, Kaggle notebooks run server-side; closing the browser doesn't stop the kernel immediately, but Kaggle may stop it after inactivity. For long runs, use "Save & Run All (Commit)" which runs in the background and saves output. Mention this: for the full training, use "Save Version → Save & Run All" so it runs without the browser. But the notebook must be self-contained and data must be available; since data is downloaded at runtime, it will re-download. That's fine but time-consuming. Alternatively, keep the session and push to HF.
+
+Let me mention: "Pour un run long, utilise Save Version → Save & Run All (Commit) sur Kaggle : ça tourne côté serveur et sauvegarde la sortie."
+
+Let me write final in French.
+
+Tout est déjà sur GitHub et à jour : arbre propre, dernier commit `b39e047` poussé sur `feature/moteur-de-traduction`. Ton PC local ne sert plus à rien pour continuer.
+
+## À l'école, depuis un navigateur
+
+1. **GitHub** : connecte-toi, ouvre le repo sur la branche `feature/moteur-de-traduction`. Le code, le notebook et les fiches de traduction y sont.
+2. **Kaggle** : reconnecte-toi avec le même compte. Le secret `HF_TOKEN` est stocké dans ton compte Kaggle, donc il te suivra. Si la session actuelle est encore vivante, tu peux la reprendre ; sinon, relance `01` → `02` → `03` (les dossiers `ml/data`, `ml/models`, `ml/out` ne sont **pas** sur GitHub).
+3. **Hugging Face** : même compte pour `--push-to-hub`. C'est le seul moyen de ne pas perdre le modèle quand la session Kaggle s'arrête.
+4. **Run long** : utilise sur Kaggle `Save Version → Save & Run All (Commit)` pour que ça tourne côté serveur sans garder le navigateur ouvert.
+
+## Avec l'autre personne
+
+- Ajoute-la comme **collaboratrice GitHub** (Settings → Collaborators), partage le **notebook Kaggle**, et ajoute-la au **repo HF** si elle doit pousser le modèle.
+- Chacun utilise **ses propres tokens** ; ne partage jamais un token dans le chat ou le repo.
+- Pour les traductions : éditez `docs/glossaire-a-traduire-duala.txt` et `docs/phrases-modeles-a-traduire-duala.txt` directement via GitHub (icône crayon) ou dans un Google Doc puis recopiez.
+
+## Attention sécurité
+
+Le repo contient des fichiers `session-ses_*.md` (historique de session). Avant de le partager ou d'ajouter un collaborateur, vérifie qu'ils ne contiennent pas de secrets/tokens ; si besoin, supprime-les et pousse un commit.
+
+---
+
+## User
+
+je parle surtout pour kaggle il ne s'arrete pas si je chqange de pc ?
+
+
+---
+
+## Assistant (Build · Big Pickle · 22.7s)
+
+_Thinking:_
+
+The user clarifies: they're mainly asking about Kaggle — does the Kaggle session stop if they change PCs? Need to answer accurately.
+
+Kaggle notebooks run server-side in the cloud, tied to the account, not the PC. If you close the browser or switch PCs, the kernel/session continues running for a while (subject to Kaggle's idle timeout and max session duration). You can reconnect from another PC and see the running session. However:
+- Kaggle sessions have a maximum runtime (typically 9 hours for CPU/GPU, 12 hours? Actually Kaggle notebooks: 9 hours for CPU, 9 hours for GPU? Let me recall: Kaggle Notebooks have a maximum session length of 9 hours (CPU) and 9 hours (GPU)? There used to be 9 hours for CPU and 9 hours for GPU, and 12 hours for TPU? I think Kaggle notebooks max out at 9 hours for CPU/GPU and 12 hours for TPU. Also, idle timeout: 20 minutes? Kaggle may stop sessions after 20 minutes of inactivity? Actually Kaggle has an idle timeout of 20 minutes for interactive sessions? Let me verify. I know Kaggle notebooks stop after 20 minutes of inactivity (when no code is running) or 9 hours max. But if code is actively running, it doesn't stop due to browser closure. The session persists server-side.
+- The session is tied to the notebook/account, not the machine. Switching PCs is fine; log in on the other PC and open the same notebook. You may need to click "Connect" / resume.
+- However, if the browser is closed, the kernel keeps running, but the output may not be saved unless the notebook is committed/saved. When you reconnect, you should see the running session and its output? In Kaggle, if you close the tab, the kernel continues; when you reopen the notebook, you can reconnect to the running session. But there's a caveat: Kaggle may only keep the session alive while the notebook is open? Let me recall from experience: Kaggle notebooks run in a container; closing the browser does not stop the kernel. You can reopen and reconnect. But if you navigate away for too long, the session may be stopped due to idle timeout (if no code running). If code is running, it continues.
+- Also, Kaggle's "interactive session" has a max duration; the output is saved only if you "Save Version" (commit). Otherwise, when the session ends, the output is lost. So for long runs, use "Save & Run All (Commit)" to run in the background and persist the output. Committed runs have a max runtime (9h/12h) and are not affected by browser closure.
+- If they switch PCs, they can log into Kaggle and reopen the notebook; the running session should be there. If it's not, they'll need to rerun. The code is on GitHub, so no loss of code; data/models can be re-downloaded; but any unsaved output in `/kaggle/working` is lost when the session stops.
+
+Need to be precise: Does Kaggle stop the session when you close the browser? No, not immediately. It stops after the max session duration or idle timeout. But "idle" means no code executing? Kaggle's idle timeout is 20 minutes for interactive sessions when not running code? Let me check the exact policy. I can search the web, but I'm fairly confident: Kaggle notebooks have a 9-hour max session and a 20-minute idle timeout (when no code is running). If a cell is running, it's not idle. Closing the browser doesn't stop it.
+
+Let me verify with a quick web search to be accurate, since the user is relying on this. Use websearch "Kaggle notebook session timeout close browser 2026". But maybe not necessary; I can answer with the general behavior and caveats. However, accuracy matters. Let me search.
+
+Also, the user's smoke test is 200 steps; it may take ~10-20 min. If they close the laptop and go to school, the session may continue and finish. When they log in at school, they can see the output if the session is still alive. But if the session ended, output lost. For the smoke test, no big deal; rerun. For the full training (hours), they should use "Save & Run All" or push to HF Hub.
+
+Let me do a quick web search to confirm Kaggle session behavior/timeouts.
+
+**Tool: websearch**
+
+**Input:**
+```json
+{
+  "query": "Kaggle notebook session continues running when browser closed idle timeout max duration 2026",
+  "numResults": 5
+}
+```
+
+**Output:**
+```
+Title: Getting Started on Kaggle | Kaggle
+URL: https://www.kaggle.com/docs/notebooks
+Published: N/A
+Author: N/A
+Highlights:
+Notebooks is more than just a code editor. It’s a versioned computational environment designed to make it easy to reproduce data science work. In the Notebooks IDE, you have access to an interactive session running in a Docker container with pre-installed packages, the ability to mount versioned data sources, customizable compute resources like GPUs, and more.
+
+...
+
+When you create a Notebook version using 'Save & Run All', you execute the Notebook from top to bottom in a separate session from your interactive session. Once it finishes, you will have generated a new Notebook version. A Notebook version is a snapshot of your work including your compiled code, log files, output files, data sources, and more. The latest Notebook version of your Notebook is what is shown to users in the Notebook viewer.
+
+...
+
+To add a GPU, navigate to the “Settings” pane from the Notebook editor and click the “Accelerator" > GPU option. Your session will restart which may take a few moments to several minutes if you don’t need to wait in a queue to access a GPU-enabled machine.
+
+...
+
+- Time-based (Frequency): set the notebook to run daily, weekly, or monthly.
+- Dataset update: have the notebook run whenever the datasets it uses change. This will happen at most once per day, even if the data changes multiple times.
+
+...
+
+### Technical Specifications
+
+Kaggle Notebooks run in a remote computational environment. We provide the hardware—you need only worry about the code.
+
+At time of writing, each Notebook editing session is provided with the following resources:
+
+- 12 hours execution time for CPU and GPU notebook sessions and 9 hours for TPU notebook sessions
+- 20 Gigabytes of auto-saved disk space (/kaggle/working)
+- Additional scratchpad disk space (outside /kaggle/working) that will not be saved outside of the current session 
+
+CPU Specifications
+
+- 4 CPU cores
+- 30 Gigabytes of RAM
+
+P100 GPU Specifications
+
+- 1 Nvidia Tesla P100 GPU
+- 4 CPU cores
+- 29 Gigabytes of RAM
+
+T4 x2 GPU Specifications
+
+- 2 Nvidia Tesla T4 GPUs
+- 4 CPU cores
+- 29 Gigabytes of RAM
+
+TPU 1VM Specifications
+
+- 96 CPU cores
+- 330 Gigabytes of RAM
+
+NOTE: CPU Platforms (ex. Intel Skylake, Broadwell, AMD) may be variable during regular notebook runs, however submissions runs (for code competitions or when submissions are rerun in bulk) are always run on Intel Skylake CPUs.
+
+CPU Specifications
+
+While editing a Notebook, you are provided with 20 minutes of idle time for your interactive session. If the code is not modified or executed in that time the current interactive session will end. If this happens, you will need to click the Edit button again to continue editing. If you want to run a computation that takes longer, you can Save a Version of your Notebook from top to bottom by selecting the "Save & Run All" option in the "Save Version" menu (see below).
+
+Once you are satisfied with the contents of the Notebook you can click "Save Version" to save your changes. From there you will have two options for creating a new version:
+
+- Quick Save skips the top-to-bottom notebook execution and just takes a snapshot of your notebook exactly as it’s displayed in the editor. This is a great option for taking a bunch of versions while you’re still actively experimenting. Quick Save is a brand new way of saving work on Kaggle.
+- Save & Run All creates a new session with a completely clean state and runs your notebook from top to bottom. This is perfect for major milestones or when you want to share your work, as it gives you (and anyone else who reads your notebook) the confidence that your notebook can be run reproducibly. In order to save successfully, the entire Notebook must execute within 12 hours (9 hours for TPU notebooks). Save & Run All is identical to the “Commit” behavior you may have used previously on Kaggle.
+
+---
+
+Title: Kaggle Notebooks: Free GPU Limits, Sessions and When to Move On (2026)
+URL: https://fastero.com/blog/kaggle-notebooks
+Published: 2026-10-31T01:50:28.000Z
+Author: Fastero Dev Team
+Highlights:
+The short answer: Kaggle Notebooks are free. A session runs for up to 12 hours on CPU or GPU and 9 hours on a TPU, with 4 CPU cores, about 30 GB of RAM and 20 GB of saved disk. You can add one P100 or two T4 GPUs, within a weekly quota Kaggle puts at "30 hours or sometimes higher"; your exact quota is in your account settings. An interactive session stops after 20 idle minutes, but Save & Run All runs the whole notebook as its own session, and notebooks can rerun daily, weekly or monthly, which consumer Colab no longer does. Kaggle fits learning, competitions and experiments on public data. It's a poor fit for a notebook that reads your company's database and that colleagues rely on.
+
+...
+
+From Kaggle's notebook documentation, read on 31 October 2026:
+
+| | CPU | P100 GPU | T4 x2 GPU | TPU |
+| --- | --- | --- | --- | --- |
+| Accelerator | None | 1 Nvidia Tesla P100 | 2 Nvidia Tesla T4 | TPU v3-8 |
+| CPU cores | 4 | 4 | 4 | 96 |
+| RAM | 30 GB | 29 GB | 29 GB | 330 GB |
+| Longest session | 12 hours | 12 hours | 12 hours | 9 hours |
+| Saved disk (`/kaggle/working`) | 20 GB | 20 GB | 20 GB | 20 GB |
+| Weekly quota | None | About 30 hours, shared across GPUs | Same quota | About 20 hours |
+
+Kaggle's GPU tips page gives the GPU figure: "The quota resets weekly and is 30 hours or sometimes higher depending on demand and resources." The TPU figure comes from users. Your own quota and what's left of it are in your Kaggle account settings. It has moved over the years, so treat 30 hours as a guide.
+
+Anything outside `/kaggle/working` is scratch space and disappears when the session ends.
+
+## Kaggle's limits, in practice
+
+- Interactive sessions stop after 20 idle minutes. If the code isn't changed or run in that time, the session ends. That catches people out far more often than the 12-hour limit does.
+- GPUs aren't guaranteed on demand. "Free GPU availability is limited: in busy times, you might be placed in a queue."
+- New accounts need a verified phone number before GPUs and internet access work. If the Internet switch is missing from Settings, that's usually why.
+- Some competitions need internet off when you submit, so install packages offline through the dependency manager for those.
+- There's a limit on how many notebooks you can schedule. Kaggle doesn't publish the number; the Active Events pane lists what you have running.
+- It's built around sharing. Notebooks can be private, but public datasets, competitions and other people's notebooks are the point of Kaggle, not private company data.
+
+...
+
+## Keep a run going: Save & Run All
+
+Kaggle has two ways to save a version:
+
+- Quick Save takes a snapshot of the notebook as it stands, without running anything.
+- Save & Run All starts a new session with a clean state and runs the notebook from top to bottom in its own session, within the same 12-hour limit. It keeps going after you close the tab, and its output is saved with the version.
+
+So the usual pattern is to experiment interactively, then use Save & Run All for the long training run instead of keeping a browser tab alive.
+
+...
+
+### How long can a Kaggle notebook run?
+
+Up to 12 hours on CPU or GPU and 9 hours on a TPU. An interactive session ends sooner if it sits idle for 20 minutes, so use Save & Run All for long jobs.
+
+### Does a Kaggle notebook keep running if I close the browser?
+
+A run started with Save & Run All does, as its own session. An interactive session doesn't: it stops after 20 idle minutes.
+
+---
+
+Title: It gets really frustrating training deep learning models in Kaggle... | Kaggle
+URL: https://www.kaggle.com/discussions/general/211505
+Published: N/A
+Author: N/A
+Highlights:
+Posted 6 years ago
+
+If you are running into idle timeouts I would recommend clicking on the "save version" button in the top right corner of the notebook editor (this way you will only have to worry about the 9 hr total execution time limit).
+
+The "interactive session" has an idle timeout, but the "batch session" that runs in the background when you "commit" or "save a new version" does not have an idle timeout (instead it has a 9hr total execution time).
+
+One important thing to note about the idle timeout is that it only starts counting once you no longer have any cells executing -- there should be nothing preventing you from having a 9hr interactive session if you have a notebook that truly takes 9 hours to run.
+
+Hopefully that helps!
+
+---
+
+Title: Kaggle Alternatives (2026): 12 Notebook Platforms Compared on GPU Hours, Sessions and Price
+URL: https://fastero.com/blog/kaggle-alternatives
+Published: 2026-11-08T02:46:56.000Z
+Author: Fastero Dev Team
+Highlights:
+## What you're leaving: Kaggle's limits
+
+| Kaggle Notebooks | November 2026 |
+| --- | --- |
+| GPU | One P100 or two T4s |
+| GPU allowance | "30 hours or sometimes higher depending on demand and resources", resetting weekly |
+| Session length | "12 hours execution time for CPU and GPU notebook sessions and 9 hours for TPU notebook sessions" |
+| Idle timeout | 20 minutes in an interactive session; Save & Run All keeps going with the tab closed |
+| Storage kept | 20 GB in `/kaggle/working` |
+| Busy times | "Free GPU availability is limited: in busy times, you might be placed in a queue." |
+| Paid plan | None. Colab Pro and Pro+ subscribers get 15 and 30 extra Kaggle GPU hours a week as a promotion |
+
+---
+
+Title: Background notebooks terminate
+URL: https://www.kaggle.com/discussions/product-feedback/228981
+Published: N/A
+Author: N/A
+Highlights:
+It appears that the notebooks sometimes terminate when put in the background. Through this week this hasn't been an issue, but recently (today) I experienced a notebook failing to continue to run twice.
+
+The code has been run several times before unaltered without any problem. I use a GPU acceleration and the notebook continues to run, but when I leave the editor several minutes into starting the "run all & save" process, I get prompted whether i would really want to leave the notebook. Upon klicking yes, I am redirected to the page I clicked on(frontpage) and the notebook continues to run, and I have an active Event for acurrently running notebook as well. I assume that the 40min inactivity in the notebook causes the save-job to terminate, but I am not sure. However, I leave and come back later only to find that notebook and save-job have been terminated. No warning, no notice or message, time is deducated as expectec but I would think that the save job out to finish regardless instead of being terminated.
+
+...
+
+Save Versions are not terminated by the 40m timeout (the message in the timeout prompt actually calls this out specifically because we had so many questions about this).
+
+Your Active Events show both open notebooks and running Save Versions, the Save Version should not be terminated by anything except:
+
+- You hit cancel save version or on the active event of the save version (I suspect some people cancel the save version when they mean to stop the interactive notebook).
+- Notebook execution completes successfully or because of an error
+- Runtime exceeds the limit for that time of machine (~9hrs usually)
+
+Did you open the failed save version in the viewer and check the execution info/details to see why it exited?
+
+...
+
+//Edit
+
+I found the error. The code I commented in, changing from CPU back to GPU-calculation(only altering the range of the data being processed) was malformed,so the notebook will run, get to the affected cell and then die because Python cannot parse the code without a notice. It will then mark the termination as success in the event log. This would explain why i was only able to retrieve one file. Solving the syntax issue will also solve the problem described, so I am pretty certain now that the notebooks are not resilient when run with bad syntax which can be something small as a missing comma or one too many.
+```
+
+---
+
+## Assistant (Build · Big Pickle · 43.1s)
+
+_Thinking:_
+
+The search confirms:
+- Kaggle interactive session: 12h max CPU/GPU, 20 min idle timeout (idle starts when no cells executing).
+- Closing the browser: an interactive session continues while code is running, but if no code is executing for 20 min, it stops. Switching PCs is fine; log in and reconnect.
+- `Save & Run All` (commit) runs in a separate background session, keeps going after closing the tab, output saved. Use for long runs.
+
+So answer: No, switching PCs doesn't stop it by itself. The session is server-side and tied to your Kaggle account. But:
+- If the code is actively running, it continues even if you close the browser; you can reconnect from another PC.
+- If no code is running for 20 min, the interactive session stops (idle timeout).
+- Max 12h.
+- To be safe for long runs, use `Save Version → Save & Run All`; it runs in the background and saves output, independent of the browser.
+- Unsaved `/kaggle/working` is lost when the session ends. Push model to HF Hub or use Save & Run All to persist.
+
+Also, the user's smoke test: if it's still running, it will continue after closing the laptop; at school, log in and open the notebook to see it. If it finished and then idled 20 min, the session may be stopped; output might still be visible in the notebook? Interactive output is not saved unless you save a version; if the session stops, the kernel state/output may be lost. So for the smoke test, don't worry; rerun if needed. For the full training, use Save & Run All or `--push-to-hub`.
+
+Need to answer concisely in French. Mention the key facts:
+- Non, changer de PC n'arrête pas la session : elle tourne côté Kaggle.
+- Si une cellule est en cours, elle continue navigateur fermé ; tu peux te reconnecter depuis l'école.
+- Mais session interactive = 20 min d'inactivité (aucune cellule en cours) → arrêt ; max 12h.
+- Pour un run long : `Save Version → Save & Run All` (tourne en arrière-plan, output sauvegardé) ou `--push-to-hub`.
+- Les fichiers dans `/kaggle/working` non sauvegardés sont perdus à la fin de session.
+- Pour le smoke test en cours : laisse-le tourner ; si la session s'arrête, relance-le, ce n'est pas grave.
+
+Also, mention: If they close the laptop, the browser tab closes but the kernel continues; when they log in on another PC, open the same notebook and reconnect. Kaggle may show "Your session is running" or they may need to click "Edit"/"Connect".
+
+Let me write final.
+
+Non, changer de PC n'arrête pas la session Kaggle : elle tourne **côté serveur**, liée à ton compte, pas à ta machine.
+
+- Si une cellule est **en cours d'exécution**, elle continue même si tu fermes le navigateur ou éteins le PC. À l'école, reconnecte-toi à Kaggle, rouvre le notebook et reprends la session.
+- Si **aucune cellule ne tourne** pendant **20 minutes**, la session interactive s'arrête (idle timeout). C'est le piège principal.
+- Durée max d'une session : **12 h** (CPU/GPU).
+- Tout ce qui est dans `/kaggle/working` et non sauvegardé est perdu à la fin de la session.
+
+Pour un run long (le `05` complet), ne compte pas sur l'onglet ouvert : utilise **`Save Version → Save & Run All`**. Ça lance une session séparée qui continue navigateur fermé et sauvegarde la sortie. Sinon, `--push-to-hub` pour le modèle.
+
+Pour ton smoke test en cours : laisse-le finir ; s'il est coupé par l'idle timeout, tu le relanceras, ce n'est pas grave.
 
 ---
 
