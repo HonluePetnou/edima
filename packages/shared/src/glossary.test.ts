@@ -14,7 +14,8 @@ describe('glossary data', () => {
   it('loads and validates every term', () => {
     expect(glossaryTerms.length).toBeGreaterThan(0);
     for (const term of glossaryTerms) {
-      expect(term.status).toBe('a_traduire');
+      expect(term.ewo_status).toBe('a_traduire');
+      expect(term.dua_status).toBe('a_traduire');
       expect(term.ewo).toBeNull();
       expect(term.dua).toBeNull();
     }
@@ -57,6 +58,22 @@ describe('fillTemplate', () => {
     const result = fillTemplate(template, { montant: '5 000 FCFA' });
     expect(result).toBe('Tu vas envoyer 5 000 FCFA à {nom}.');
   });
+
+  it('uses the duala column once that template is valide, independent of ewondo', () => {
+    const template = findTemplate('tpl_envoi_montant_nom')!;
+    const originalStatus = template.dua_status;
+    const originalDua = template.dua;
+    try {
+      template.dua_status = 'valide';
+      template.dua = 'U la tila {montant} i {nom}.';
+      const values = { montant: '5 000 FCFA', nom: 'Paul Mballa' };
+      expect(fillTemplate(template, values, 'dua')).toBe('U la tila 5 000 FCFA i Paul Mballa.');
+      expect(fillTemplate(template, values, 'ewo')).toBe('Tu vas envoyer 5 000 FCFA à Paul Mballa.');
+    } finally {
+      template.dua_status = originalStatus;
+      template.dua = originalDua;
+    }
+  });
 });
 
 describe('translateText', () => {
@@ -84,10 +101,10 @@ describe('translateText', () => {
 
   it('uses the glossary translation once a term is valide', () => {
     const term = glossaryTerms.find((t) => t.id === 'solde_disponible')!;
-    const originalStatus = term.status;
+    const originalStatus = term.ewo_status;
     const originalEwo = term.ewo;
     try {
-      term.status = 'valide';
+      term.ewo_status = 'valide';
       term.ewo = 'Ndoŋ ye mony ye ô kôló';
       const result = translateText('Solde disponible', 'ewo');
       expect(result).toEqual({
@@ -97,8 +114,29 @@ describe('translateText', () => {
         status: 'valide',
       });
     } finally {
-      term.status = originalStatus;
+      term.ewo_status = originalStatus;
       term.ewo = originalEwo;
+    }
+  });
+
+  it('uses the duala translation once a term is dua_status valide', () => {
+    const term = glossaryTerms.find((t) => t.id === 'solde_disponible')!;
+    const originalStatus = term.dua_status;
+    const originalDua = term.dua;
+    try {
+      term.dua_status = 'valide';
+      term.dua = 'Ndoŋ ye mony ye ô kôló';
+      const result = translateText('Solde disponible', 'dua');
+      expect(result).toEqual({
+        original: 'Solde disponible',
+        text: 'Ndoŋ ye mony ye ô kôló',
+        source: 'glossaire',
+        status: 'valide',
+      });
+      expect(translateText('Solde disponible', 'ewo').source).toBe('original');
+    } finally {
+      term.dua_status = originalStatus;
+      term.dua = originalDua;
     }
   });
 });
