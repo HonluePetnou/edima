@@ -12,6 +12,9 @@ const TranslateRequestSchema = z.object({
   language: LanguageCode,
 });
 
+const SIDECAR_URL = process.env.EDIMA_SIDECAR_URL ?? 'http://127.0.0.1:8000';
+const SIDECAR_TIMEOUT_MS = Number(process.env.EDIMA_SIDECAR_TIMEOUT_MS ?? 20000);
+
 export const app = new Hono();
 
 app.get('/health', (c) => c.json({ ok: true }));
@@ -23,22 +26,45 @@ app.post('/translate', async (c) => {
     return c.json({ error: 'invalid_request', details: parsed.error.flatten() }, 400);
   }
 
-  const apiKey = process.env.LLM_API_KEY;
-  if (!apiKey) {
-    // Phase 2 plugs the real call in here (Vercel AI SDK). Until a provider
-    // key is configured, the fallback is simply unavailable — the client
-    // falls back to the original French rather than guessing.
-    return c.json({ error: 'llm_not_configured' }, 503);
+  // The local M2M100 sidecar only serves Duala today. Ewondo stays on the
+  // original French until a model for it exists, which is the same safe
+  // fallback as an unreachable sidecar.
+  if (parsed.data.language !== 'dua') {
+    return c.json({ error: 'language_not_supported' }, 503);
   }
 
-  // TODO (Phase 2): call the LLM with `parsed.data.masked` only, and
-  // respond `{ translated: string }` — still masked, same {{Vn}} tokens as
-  // the request, untouched. The extension (utils/messages.ts,
-  // TranslateUnknownResponse) reinserts the real values, runs F10's
-  // verifyValuesIntact() check, and only then tags the line source "ia" for
-  // the "non vérifié" badge (D1). Never resolve the tokens server-side —
-  // the server never sees the real amounts/names in the first place.
-  return c.json({ error: 'not_implemented' }, 501);
+  // The sidecar receives `parsed.data.masked` only — the same {{Vn}} tokens
+  // as the request, never the real amounts/names. The extension
+  // (utils/messages.ts, TranslateUnknownResponse) reinserts the values, runs
+  // F10's verifyValuesIntact() check, and only then tags the line source
+  // "ia" for the "non vérifié" badge (D1).
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), SIDECAR_TIMEOUT_MS);
+  try {
+    const response = await fetch(`${SIDECAR_URL}/translate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ masked: parsed.data.masked, language: parsed.data.language }),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      return c.json({ error: 'model_unavailable' }, 503);
+    }
+
+    const data = (await response.json()) as { translated?: string | null };
+    if (typeof data.translated !== 'string' || data.translated.length === 0) {
+      return c.json({ error: 'model_unavailable' }, 503);
+    }
+
+    return c.json({ translated: data.translated });
+  } catch {
+    // Timeout, connection refused, malformed JSON: the client always falls
+    // back to the French original rather than guessing.
+    return c.json({ error: 'model_unavailable' }, 503);
+  } finally {
+    clearTimeout(timeout);
+  }
 });
 
 if (process.env.NODE_ENV !== 'test') {
