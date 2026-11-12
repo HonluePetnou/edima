@@ -24,7 +24,7 @@ const hasExtensionContext = typeof chrome !== 'undefined' && !!chrome.runtime?.i
 
 export default function App() {
   const [lines, setLines] = useState<TranslatedLine[] | null>(null);
-  const [language, setLanguageState] = useState<LanguageCode>('ewo');
+  const [language, setLanguageState] = useState<LanguageCode>('dua');
   const [buttonLabels, setButtonLabels] = useState<string[]>([]);
   const [warnings, setWarnings] = useState<string[]>([]);
   const [step, setStep] = useState<StepInfo | null>(null);

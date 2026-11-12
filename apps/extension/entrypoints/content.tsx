@@ -75,7 +75,7 @@ export default defineContentScript({
 
   async main(ctx) {
     // D5: switched live via the side panel's language selector.
-    let activeLanguage: LanguageCode = 'ewo';
+    let activeLanguage: LanguageCode = 'dua';
 
     // Safety rule from the cahier des charges: by default the page's own DOM is
     // never written to. Every bit of Edima UI lives inside one Shadow DOM host,
@@ -104,10 +104,17 @@ export default defineContentScript({
     // button inside a freshly-injected pop-up gets wired up too) ----
     const wiredElements = new WeakSet<HTMLElement>();
 
+    // Hover descriptions are generated from a French template until the
+    // linguist validates a Duala version, so F9 translates them on demand.
+    // Cache by French source text; bump the request id on every hover/leave
+    // so a slow response never replaces a newer bubble.
+    const hoverCache = new Map<string, string>();
+    let hoverRequestId = 0;
+
     function wireInteractiveElements(): string[] {
       const labels: string[] = [];
       for (const el of findInteractiveElements()) {
-        const described = describeElement(el);
+        const described = describeElement(el, activeLanguage);
         if (!described) continue;
         labels.push(described.label);
         if (wiredElements.has(el)) continue;
@@ -115,10 +122,38 @@ export default defineContentScript({
 
         const speak = () => {
           const rect = el.getBoundingClientRect();
-          showBubble({ x: rect.left + rect.width / 2, y: rect.top - 8, text: described.description });
-          speakFrench(described.description);
+          const x = rect.left + rect.width / 2;
+          const y = rect.top - 8;
+          const frenchDescription = described.description;
+          const language = activeLanguage;
+          const requestId = ++hoverRequestId;
+          const cached = hoverCache.get(frenchDescription);
+
+          showBubble({ x, y, text: cached ?? frenchDescription });
+          speakFrench(frenchDescription);
+
+          if (language !== 'dua' || cached) return;
+
+          const { masked, values } = extractProtectedValues(frenchDescription);
+          void requestAiTranslation(masked, language).then((translated) => {
+            if (!translated || requestId !== hoverRequestId) return;
+
+            const final = reinsertProtectedValues(translated, values);
+            if (!verifyValuesIntact(final, values)) return; // F10: never show a value mismatch
+
+            hoverCache.set(frenchDescription, final);
+            const currentRect = el.getBoundingClientRect();
+            showBubble({
+              x: currentRect.left + currentRect.width / 2,
+              y: currentRect.top - 8,
+              text: final,
+            });
+          });
         };
-        const hide = () => showBubble(null);
+        const hide = () => {
+          hoverRequestId++;
+          showBubble(null);
+        };
 
         el.addEventListener('mouseenter', speak);
         el.addEventListener('focus', speak);
@@ -154,10 +189,13 @@ export default defineContentScript({
     // does today. Unmatched text here goes straight to the IA fallback.)
     const aiCache = new Map<string, string>();
 
-    function requestAiTranslation(masked: string): Promise<string | null> {
+    function requestAiTranslation(
+      masked: string,
+      language: LanguageCode = activeLanguage,
+    ): Promise<string | null> {
       return new Promise((resolve) => {
         chrome.runtime.sendMessage(
-          { type: 'edima:translate-unknown', masked, language: activeLanguage },
+          { type: 'edima:translate-unknown', masked, language },
           (response: TranslateUnknownResponse | undefined) => resolve(response?.translated ?? null),
         );
       });
