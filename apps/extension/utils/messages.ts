@@ -58,6 +58,14 @@ export interface TranslateUnknownMessage {
   language: LanguageCode;
 }
 
+/** D10: side panel → background. Explanations are static glossary content,
+ * not page data, so they are sent as-is rather than masked. */
+export interface TranslateExplanationMessage {
+  type: 'edima:translate-explanation';
+  text: string;
+  language: LanguageCode;
+}
+
 /** D5: side panel → content script, switches the active language and
  * triggers an immediate re-scan of the current page. */
 export interface SetLanguageMessage {
@@ -91,6 +99,7 @@ export type ExtensionMessage =
   | PageTranslatedMessage
   | RequestStateMessage
   | TranslateUnknownMessage
+  | TranslateExplanationMessage
   | SaveEnteredAmountMessage
   | GetEnteredAmountMessage
   | SetLanguageMessage;

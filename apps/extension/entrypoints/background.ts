@@ -14,12 +14,14 @@ export default defineBackground(() => {
   chrome.runtime.onMessage.addListener((message: ExtensionMessage, _sender, sendResponse) => {
     // F9: relays the content script's fallback-translation request to
     // apps/server. Runs here rather than in the content script so the
-    // request is never subject to the host page's own CSP.
-    if (message.type === 'edima:translate-unknown') {
+    // request is never subject to the host page's own CSP. D10 explanations
+    // use the same endpoint but are static glossary text, not page data.
+    if (message.type === 'edima:translate-unknown' || message.type === 'edima:translate-explanation') {
+      const text = message.type === 'edima:translate-unknown' ? message.masked : message.text;
       fetch(`${SERVER_URL}/translate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ masked: message.masked, language: message.language }),
+        body: JSON.stringify({ masked: text, language: message.language }),
       })
         .then((res) => (res.ok ? res.json() : null))
         .then((data: { translated?: string } | null) => {

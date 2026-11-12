@@ -9,7 +9,13 @@ import { LineList } from '../../components/panel/LineList';
 import { CommandBar } from '../../components/panel/CommandBar';
 import { IdleState, LoadingState, UnsupportedState } from '../../components/panel/PanelStates';
 import { DEV_SCENARIOS, type DevScenarioKey } from '../../utils/devMocks';
-import type { FieldDescription, LanguageCode, PageTranslatedMessage, TranslatedLine } from '../../utils/messages';
+import type {
+  FieldDescription,
+  LanguageCode,
+  PageTranslatedMessage,
+  TranslateUnknownResponse,
+  TranslatedLine,
+} from '../../utils/messages';
 import type { RecapInfo } from '../../utils/recap';
 import type { StepInfo } from '../../utils/journey';
 import type { ConsistencyInfo } from '../../utils/consistency';
@@ -21,6 +27,22 @@ const RATE_LABELS = ['1×', '0.85×', '0.7×'];
 // never assumed from `chrome` alone, since this file also renders as a
 // plain page in dev (see the scenario switcher at the bottom of this file).
 const hasExtensionContext = typeof chrome !== 'undefined' && !!chrome.runtime?.id;
+
+// D10 explanations are static glossary content (never user data), so they can
+// go to the fallback server as-is; masking their illustrative amounts would
+// only make the model drop the placeholders and return nothing.
+function requestAiTranslation(text: string, language: LanguageCode): Promise<string | null> {
+  return new Promise((resolve) => {
+    if (!hasExtensionContext) {
+      resolve(null);
+      return;
+    }
+    chrome.runtime.sendMessage(
+      { type: 'edima:translate-explanation', text, language },
+      (response: TranslateUnknownResponse | undefined) => resolve(response?.translated ?? null),
+    );
+  });
+}
 
 export default function App() {
   const [lines, setLines] = useState<TranslatedLine[] | null>(null);
@@ -41,6 +63,10 @@ export default function App() {
   // D10 "Explique-moi ce mot" — independent of D9's toggle: a line can have
   // both an original-text reveal and a jargon explanation open at once.
   const [expandedExplanations, setExpandedExplanations] = useState<Set<string>>(new Set());
+  const [explanationTranslations, setExplanationTranslations] = useState<
+    Record<string, { simple: string; example: string }>
+  >({});
+  const pendingExplanationKeys = useRef<Set<string>>(new Set());
 
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -139,13 +165,42 @@ export default function App() {
     });
   };
 
+  const translateExplanation = async (key: string, explanation: { simple: string; example: string }) => {
+    if (
+      !hasExtensionContext ||
+      language !== 'dua' ||
+      explanationTranslations[key] ||
+      pendingExplanationKeys.current.has(key)
+    ) {
+      return;
+    }
+
+    pendingExplanationKeys.current.add(key);
+    try {
+      const [simple, example] = await Promise.all([
+        requestAiTranslation(explanation.simple, 'dua'),
+        requestAiTranslation(explanation.example, 'dua'),
+      ]);
+      if (!simple || !example) return; // server unavailable — the French gloss keeps showing
+      setExplanationTranslations((prev) => ({ ...prev, [key]: { simple, example } }));
+    } finally {
+      pendingExplanationKeys.current.delete(key);
+    }
+  };
+
   const toggleExplanation = (key: string) => {
+    const isOpening = !expandedExplanations.has(key);
     setExpandedExplanations((prev) => {
       const next = new Set(prev);
       if (next.has(key)) next.delete(key);
       else next.add(key);
       return next;
     });
+
+    if (isOpening) {
+      const line = lines?.find((candidate) => candidate.original === key);
+      if (line?.explanation) void translateExplanation(key, line.explanation);
+    }
   };
 
   const readFormStep = () => {
@@ -220,8 +275,10 @@ export default function App() {
             {lines.length > 0 && (
               <LineList
                 lines={lines}
+                language={language}
                 expandedLines={expandedLines}
                 expandedExplanations={expandedExplanations}
+                explanationTranslations={explanationTranslations}
                 onToggleOriginal={toggleOriginal}
                 onToggleExplanation={toggleExplanation}
               />

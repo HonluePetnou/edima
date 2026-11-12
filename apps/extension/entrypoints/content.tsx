@@ -186,8 +186,12 @@ export default defineContentScript({
     // ---- F9: contenu inédit — chaîne glossaire → phrases-modèles → IA ----
     // (phrases-modèles matching isn't wired yet: it needs real sentence
     // structure matching, not just the exact-string lookup translateText()
-    // does today. Unmatched text here goes straight to the IA fallback.)
+    // does today. Text without a validated glossary entry goes to the IA
+    // fallback, including glossary terms still waiting for linguist review.)
     const aiCache = new Map<string, string>();
+    // Texts already sent to the model (successful or not), so a failed request
+    // is not retried on every DOM mutation. Cleared on a language switch.
+    const aiAttempted = new Set<string>();
 
     function requestAiTranslation(
       masked: string,
@@ -201,22 +205,29 @@ export default defineContentScript({
       });
     }
 
-    async function tryAiFallback(addedTexts: string[]) {
-      for (const text of addedTexts) {
-        if (aiCache.has(text)) continue;
-        // Only genuinely unseen content is F9's job — a known glossary term
-        // (any status) was already handled by translateText() above.
-        if (translateText(text, activeLanguage).status !== null) continue;
+    async function tryAiFallback(texts: string[]) {
+      let changed = false;
+      for (const text of texts) {
+        if (aiCache.has(text) || aiAttempted.has(text)) continue;
+        // A validated glossary entry always wins; unvalidated entries (and
+        // genuinely unseen text) are allowed to get a provisional IA reading.
+        if (translateText(text, activeLanguage).source === 'glossaire') continue;
         if (text.length < 8 || text.length > 200) continue; // not sentence-like enough to bother the LLM with
 
+        aiAttempted.add(text);
         const { masked, values } = extractProtectedValues(text);
         const translated = await requestAiTranslation(masked);
-        if (!translated) continue; // server unavailable — French original keeps showing, correctly
+        if (!translated) continue; // server unavailable �?" French original keeps showing, correctly
 
         const final = reinsertProtectedValues(translated, values);
         if (!verifyValuesIntact(final, values)) continue; // F10's safety net: never show a value mismatch
 
         aiCache.set(text, final);
+        changed = true;
+      }
+
+      // One rescan/report for the whole batch instead of one per translated line.
+      if (changed) {
         rescan();
         reportToSidePanel();
       }
@@ -318,6 +329,8 @@ export default defineContentScript({
     };
     reportToSidePanel();
     checkRecapConsistency();
+    void tryAiFallback(currentLines.map((l) => l.original));
+
 
     observeNewContent((added) => {
       rescan();
@@ -334,9 +347,11 @@ export default defineContentScript({
       if (message.type === 'edima:set-language') {
         activeLanguage = message.language;
         aiCache.clear(); // a cached translation only makes sense for the language it was produced in
+        aiAttempted.clear();
         rescan();
         reportToSidePanel();
         checkRecapConsistency();
+        void tryAiFallback(currentLines.map((l) => l.original));
         sendResponse({});
         return true;
       }
