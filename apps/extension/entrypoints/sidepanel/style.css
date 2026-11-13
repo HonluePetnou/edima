@@ -618,6 +618,13 @@ select {
   background: var(--success-ink);
 }
 
+.badge--phrase_modele {
+  color: var(--success-ink);
+}
+.badge--phrase_modele .badge-dot {
+  background: var(--success-ink);
+}
+
 .badge--ia {
   color: var(--accent-ink);
 }

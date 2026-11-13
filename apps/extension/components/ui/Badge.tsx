@@ -2,6 +2,7 @@ import type { TranslatedLine } from '../../utils/messages';
 
 const LABELS: Record<TranslatedLine['source'], string> = {
   glossaire: 'Validé',
+  phrase_modele: 'Phrase modèle',
   ia: 'IA — non vérifié',
   original: 'Français',
 };

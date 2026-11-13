@@ -45,6 +45,76 @@ export function fillTemplate(template: TemplatePhrase, values: Record<string, st
   );
 }
 
+export interface TemplateMatch {
+  template: TemplatePhrase;
+  values: Record<string, string>;
+}
+
+function normalizeLiteral(text: string): string {
+  return text
+    .replace(/[«»"]/g, '"')
+    .replace(/[’']/g, "'")
+    .replace(/\s+/g, ' ');
+}
+
+function normalizeForMatch(text: string): string {
+  return normalizeLiteral(text).trim();
+}
+
+function escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Longer French sentences first: if two templates could match, the more
+// specific one wins (e.g. a sentence with a phone number over a short one).
+const templatesBySpecificity = [...templatePhrases].sort((a, b) => b.fr.length - a.fr.length);
+
+/**
+ * F9: matches a visible French sentence against a validated template phrase
+ * and captures its `{variables}`. This is deliberately a whole-string match:
+ * partial matches would translate only half a sentence and leave the rest in
+ * French. Only templates validated for `language` are considered.
+ */
+export function matchTemplatePhrase(text: string, language: LanguageCode): TemplateMatch | null {
+  const normalizedText = normalizeForMatch(text);
+  if (!normalizedText) return null;
+
+  const statusKey = `${language}_status` as const;
+
+  for (const template of templatesBySpecificity) {
+    if (template[statusKey] !== 'valide' || !template[language]) continue;
+
+    const names: string[] = [];
+    const pattern = template.fr
+      .split(/(\{[^{}]+\})/g)
+      .map((part) => {
+        const placeholder = part.match(/^\{([^{}]+)\}$/);
+        if (placeholder) {
+          const name = placeholder[1]!.trim();
+          if (template.variables.includes(name)) {
+            names.push(name);
+            return '(.+?)';
+          }
+          return escapeRegExp(part);
+        }
+        return escapeRegExp(normalizeLiteral(part)).replace(/ /g, '\\s+');
+      })
+      .join('');
+
+    const match = new RegExp(`^${pattern}$`, 'i').exec(normalizedText);
+    if (!match) continue;
+
+    const values: Record<string, string> = {};
+    names.forEach((name, index) => {
+      const value = match[index + 1]?.trim();
+      if (value) values[name] = value;
+    });
+    return { template, values };
+  }
+
+  return null;
+}
+
 function normalize(text: string): string {
   return text.trim().replace(/\s+/g, ' ').toLowerCase();
 }
@@ -60,8 +130,9 @@ export interface TranslateResult {
 }
 
 /**
- * F1's first and only link for now (phrases-modèles and IA come in later —
- * F9). Exact, whitespace-normalized match against the glossary.
+ * F1/F9's exact glossary lookup. Template sentences are handled separately
+ * by matchTemplatePhrase(); the IA fallback is the content script's last
+ * step for genuinely unseen text.
  *
  * F10/D9's fallback rule applies here too: an unmatched string, or a term
  * whose `{language}_status` isn't yet "valide", is shown as the original

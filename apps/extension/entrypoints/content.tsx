@@ -1,7 +1,9 @@
 import { render } from 'preact';
 import {
   extractProtectedValues,
+  fillTemplate,
   findExplanationForText,
+  matchTemplatePhrase,
   reinsertProtectedValues,
   speakAmount,
   translateText,
@@ -46,13 +48,30 @@ function translateVisiblePage(aiCache: Map<string, string>, language: LanguageCo
     const spokenAmount = speakAmount(text, AMOUNT_SPEECH_LANGUAGE) ?? undefined;
     const explanation = findExplanationForText(text) ?? undefined;
 
+    const result = translateText(text, language);
+    if (result.source === 'glossaire') {
+      lines.push({ original: result.original, text: result.text, source: 'glossaire', spokenAmount, explanation });
+      continue;
+    }
+
+    const templateMatch = matchTemplatePhrase(text, language);
+    if (templateMatch) {
+      lines.push({
+        original: text,
+        text: fillTemplate(templateMatch.template, templateMatch.values, language),
+        source: 'phrase_modele',
+        spokenAmount,
+        explanation,
+      });
+      continue;
+    }
+
     const cached = aiCache.get(text);
     if (cached) {
       lines.push({ original: text, text: cached, source: 'ia', spokenAmount, explanation });
       continue;
     }
 
-    const result = translateText(text, language);
     lines.push({ original: result.original, text: result.text, source: result.source, spokenAmount, explanation });
   }
   return lines;
@@ -184,10 +203,9 @@ export default defineContentScript({
     }
 
     // ---- F9: contenu inédit — chaîne glossaire → phrases-modèles → IA ----
-    // (phrases-modèles matching isn't wired yet: it needs real sentence
-    // structure matching, not just the exact-string lookup translateText()
-    // does today. Text without a validated glossary entry goes to the IA
-    // fallback, including glossary terms still waiting for linguist review.)
+    // Exact glossary match first, then validated template sentences, then the
+    // IA fallback for genuinely unseen text (including glossary terms still
+    // waiting for linguist review).
     const aiCache = new Map<string, string>();
     // Texts already sent to the model (successful or not), so a failed request
     // is not retried on every DOM mutation. Cleared on a language switch.
@@ -209,9 +227,11 @@ export default defineContentScript({
       let changed = false;
       for (const text of texts) {
         if (aiCache.has(text) || aiAttempted.has(text)) continue;
-        // A validated glossary entry always wins; unvalidated entries (and
-        // genuinely unseen text) are allowed to get a provisional IA reading.
+        // A validated glossary entry or template phrase always wins;
+        // unvalidated entries (and genuinely unseen text) are allowed to get
+        // a provisional IA reading.
         if (translateText(text, activeLanguage).source === 'glossaire') continue;
+        if (matchTemplatePhrase(text, activeLanguage)) continue;
         if (text.length < 8 || text.length > 200) continue; // not sentence-like enough to bother the LLM with
 
         aiAttempted.add(text);

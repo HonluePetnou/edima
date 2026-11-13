@@ -6,6 +6,7 @@ import {
   findTemplate,
   findTerm,
   glossaryTerms,
+  matchTemplatePhrase,
   templatePhrases,
   translateText,
 } from './glossary';
@@ -33,6 +34,30 @@ describe('glossary data', () => {
     }
   });
 
+  it('keeps every translation placeholder-complete', () => {
+    for (const template of templatePhrases) {
+      for (const language of ['ewo', 'dua'] as const) {
+        const status = template[`${language}_status`];
+        const translated = template[language];
+
+        if (status === 'valide') {
+          expect(translated, `${template.id} is valide without a ${language} translation`).toBeTruthy();
+        }
+        if (!translated) continue;
+
+        for (const variable of template.variables) {
+          expect(translated, `${template.id} ${language} is missing {${variable}}`).toContain(`{${variable}}`);
+        }
+        for (const placeholder of translated.matchAll(/\{([^{}]+)\}/g)) {
+          expect(
+            template.variables,
+            `${template.id} ${language} has undeclared {${placeholder[1]!.trim()}}`,
+          ).toContain(placeholder[1]!.trim());
+        }
+      }
+    }
+  });
+
   it('finds a known term and template by id', () => {
     expect(findTerm('solde_disponible')?.fr).toBe('Solde disponible');
     expect(findTemplate('tpl_envoi_montant_nom')?.fr).toBe('Tu vas envoyer {montant} à {nom}.');
@@ -49,14 +74,24 @@ describe('glossary data', () => {
 describe('fillTemplate', () => {
   it('substitutes every placeholder', () => {
     const template = findTemplate('tpl_envoi_montant_nom')!;
-    const result = fillTemplate(template, { montant: '5 000 FCFA', nom: 'Paul Mballa' });
+    const result = fillTemplate(template, { montant: '5 000 FCFA', nom: 'Paul Mballa' }, 'ewo');
     expect(result).toBe('Tu vas envoyer 5 000 FCFA à Paul Mballa.');
   });
 
   it('leaves an unmatched placeholder visibly unresolved rather than guessing', () => {
     const template = findTemplate('tpl_envoi_montant_nom')!;
-    const result = fillTemplate(template, { montant: '5 000 FCFA' });
+    const result = fillTemplate(template, { montant: '5 000 FCFA' }, 'ewo');
     expect(result).toBe('Tu vas envoyer 5 000 FCFA à {nom}.');
+  });
+
+  it('fills the validated duala template while preserving protected values', () => {
+    const template = findTemplate('tpl_envoi_montant_nom')!;
+    expect(template.dua_status).toBe('valide');
+    const result = fillTemplate(template, { montant: '5 000 FCFA', nom: 'Paul Mballa' });
+    expect(result).toContain('5 000 FCFA');
+    expect(result).toContain('Paul Mballa');
+    expect(result).not.toContain('{');
+    expect(result).not.toBe(template.fr);
   });
 
   it('uses the duala column once that template is valide, independent of ewondo', () => {
@@ -73,6 +108,62 @@ describe('fillTemplate', () => {
       template.dua_status = originalStatus;
       template.dua = originalDua;
     }
+  });
+});
+
+describe('matchTemplatePhrase', () => {
+  it('captures amount and name from a validated sentence', () => {
+    const match = matchTemplatePhrase('Tu vas envoyer 5 000 FCFA à Paul Mballa.', 'dua');
+    expect(match?.template.id).toBe('tpl_envoi_montant_nom');
+    expect(match?.values).toEqual({ montant: '5 000 FCFA', nom: 'Paul Mballa' });
+  });
+
+  it('is tolerant of case, repeated spaces and apostrophe style', () => {
+    const match = matchTemplatePhrase('  tu   vas ENVOYER 5 000 FCFA à   Paul Mballa.  ', 'dua');
+    expect(match?.template.id).toBe('tpl_envoi_montant_nom');
+    expect(match?.values.nom).toBe('Paul Mballa');
+
+    expect(matchTemplatePhrase('Aujourd’hui, 13 novembre 2026.', 'dua')?.values.date).toBe('13 novembre 2026');
+  });
+
+  it('matches a sentence without variables', () => {
+    const match = matchTemplatePhrase('edima LIT ce passage.', 'dua');
+    expect(match?.template.id).toBe('tpl_edima_lit_passage');
+    expect(match?.values).toEqual({});
+  });
+
+  it('captures the phone number in the longer sentence', () => {
+    const match = matchTemplatePhrase('Tu envoies 5 000 FCFA à Paul Mballa, numéro 6 99 12 34 56.', 'dua');
+    expect(match?.template.id).toBe('tpl_envoi_complet');
+    expect(match?.values).toEqual({
+      montant: '5 000 FCFA',
+      nom: 'Paul Mballa',
+      telephone: '6 99 12 34 56',
+    });
+  });
+
+  it('captures a button label inside typographic quotes', () => {
+    const match = matchTemplatePhrase('Si tout est juste, clique toi-même sur « Confirmer ».', 'dua');
+    expect(match?.template.id).toBe('tpl_clique_toi_meme');
+    expect(match?.values).toEqual({ bouton: 'Confirmer' });
+  });
+
+  it('captures variables independently of their declaration order', () => {
+    const match = matchTemplatePhrase('Transfert reçu de Paul Mballa, 5 000 FCFA.', 'dua');
+    expect(match?.template.id).toBe('tpl_transfert_recu_de');
+    expect(match?.values).toEqual({ nom: 'Paul Mballa', montant: '5 000 FCFA' });
+  });
+
+  it('only matches templates validated for the requested language', () => {
+    expect(matchTemplatePhrase('Tu vas envoyer 5 000 FCFA à Paul Mballa.', 'ewo')).toBeNull();
+  });
+
+  it('does not match a template that is still empty', () => {
+    expect(matchTemplatePhrase('Retrait au guichet, 5 000 FCFA.', 'dua')).toBeNull();
+  });
+
+  it('does not match an unrelated sentence', () => {
+    expect(matchTemplatePhrase('Bienvenue sur notre site.', 'dua')).toBeNull();
   });
 });
 

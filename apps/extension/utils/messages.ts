@@ -11,7 +11,7 @@ export interface TranslatedLine {
   /** "ia" (F9) means: matched neither the glossary nor a template phrase,
    * and the fallback server's response survived F10's value check. Shown
    * with a "non vérifié" badge (D1) — never treated as validated. */
-  source: 'glossaire' | 'ia' | 'original';
+  source: 'glossaire' | 'phrase_modele' | 'ia' | 'original';
   /** F4: the amount in words, when this line is (or contains) an FCFA amount. */
   spokenAmount?: string;
   /** D10: a plain-language gloss for this line, when it matches a jargon
