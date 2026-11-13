@@ -11,7 +11,7 @@ import { HomeView, ReadView, LinesView, GuideView, SafetyView, TransparencyView,
 import { LoadingState, NoBankPageState, UnsupportedState } from './states';
 import type { MascotState } from '../../components/ui/Mascot';
 import { DEV_SCENARIOS, type DevScenarioKey } from '../../utils/devMocks';
-import type { FieldDescription, LanguageCode, PageTranslatedMessage, TranslatedLine } from '../../utils/messages';
+import type { FieldDescription, LanguageCode, PageTranslatedMessage, TranslateUnknownResponse, TranslatedLine } from '../../utils/messages';
 import type { RecapInfo } from '../../utils/recap';
 import type { StepInfo } from '../../utils/journey';
 import type { ConsistencyInfo } from '../../utils/consistency';
@@ -39,6 +39,14 @@ export default function App() {
   const [showAllOriginal, setShowAllOriginal] = useState(false);
   const [expandedLines, setExpandedLines] = useState<Set<string>>(new Set());
   const [expandedExplanations, setExpandedExplanations] = useState<Set<string>>(new Set());
+
+  // D10 AI pass: translates an explanation's simple gloss + example, only
+  // when the user turned on "Traduction IA (expérimentale)". Keyed by
+  // language so switching EWO/DUA doesn't show a stale translation. `null`
+  // means "tried, got nothing back" — stays in French without a badge,
+  // same as never having tried.
+  const [explanationTranslations, setExplanationTranslations] = useState<Record<string, { simple: string; example: string } | null>>({});
+  const [explanationLoading, setExplanationLoading] = useState<Set<string>>(new Set());
 
   // Speech: one utterance at a time; `playingKey` says which item is being read.
   const [playingKey, setPlayingKey] = useState<string | null>(null);
@@ -124,6 +132,46 @@ export default function App() {
     setSettings((s) => ({ ...s, ...patch }));
     saveSettings(patch);
   };
+
+  // D10 AI pass (F-4): sends the (already French, static glossary) text to
+  // the background's translate-explanation relay — the same local server
+  // F9 uses, never a page value, so it needs no masking.
+  function translateViaAi(text: string, lang: LanguageCode): Promise<string | null> {
+    if (!hasExtensionContext) return Promise.resolve(null);
+    return new Promise((resolve) => {
+      chrome.runtime.sendMessage({ type: 'edima:translate-explanation', text, language: lang }, (response?: TranslateUnknownResponse) =>
+        resolve(response?.translated ?? null),
+      );
+    });
+  }
+
+  useEffect(() => {
+    if (!settings.aiEnabled || !hasExtensionContext) return;
+    for (const original of expandedExplanations) {
+      const cacheKey = `${language}:${original}`;
+      if (cacheKey in explanationTranslations || explanationLoading.has(cacheKey)) continue;
+      const line = lines?.find((l) => l.original === original);
+      if (!line?.explanation) continue;
+
+      setExplanationLoading((prev) => new Set(prev).add(cacheKey));
+      const { simple, example } = line.explanation;
+      Promise.all([translateViaAi(simple, language), translateViaAi(example, language)]).then(([tSimple, tExample]) => {
+        setExplanationLoading((prev) => {
+          const next = new Set(prev);
+          next.delete(cacheKey);
+          return next;
+        });
+        setExplanationTranslations((prev) => ({
+          ...prev,
+          [cacheKey]: tSimple && tExample ? { simple: tSimple, example: tExample } : null,
+        }));
+      });
+    }
+    // explanationTranslations/explanationLoading are read for their current
+    // value, not watched — re-running this effect for their own updates
+    // would just re-check the same (by-then-resolved) keys for nothing.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [expandedExplanations, settings.aiEnabled, language, lines]);
 
   useEffect(() => {
     if (!hasExtensionContext) return;
@@ -288,6 +336,8 @@ export default function App() {
     toggleExplanation: toggleIn(setExpandedExplanations),
     updateSettings,
     changeLanguage,
+    explanationOverride: (original) => explanationTranslations[`${language}:${original}`] ?? null,
+    explanationLoading: (original) => explanationLoading.has(`${language}:${original}`),
   };
 
   const showFooter = !loading && !unsupported && lines !== null && (effectiveView === 'read' || effectiveView === 'lines' || effectiveView === 'guide');

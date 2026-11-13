@@ -50,6 +50,11 @@ export interface ViewContext {
   toggleExplanation: (key: string) => void;
   updateSettings: (patch: Partial<EdimaSettings>) => void;
   changeLanguage: (next: LanguageCode) => void;
+  /** D10 AI pass (F-4): the translated {simple, example}, or null when none
+   * (AI off, not yet requested, or the request failed) — LineItem then
+   * falls back to the French original with no "IA" badge. */
+  explanationOverride: (original: string) => { simple: string; example: string } | null;
+  explanationLoading: (original: string) => boolean;
 }
 
 const GREETING = 'Je suis Edima. Je suis là pour t’aider. Que veux-tu faire ?';
@@ -93,6 +98,8 @@ function LineList({ ctx, lines }: { ctx: ViewContext; lines: TranslatedLine[] })
               line={line}
               showOriginal={ctx.expandedLines.has(raw.original)}
               showExplanation={ctx.expandedExplanations.has(raw.original)}
+              explanationOverride={ctx.explanationOverride(raw.original)}
+              explanationLoading={ctx.explanationLoading(raw.original)}
               playing={ctx.playingKey === key}
               onToggleOriginal={() => ctx.toggleOriginal(raw.original)}
               onToggleExplanation={() => ctx.toggleExplanation(raw.original)}

@@ -17,6 +17,9 @@ interface LineItemProps {
   line: TranslatedLine;
   showOriginal: boolean;
   showExplanation: boolean;
+  /** D10 AI pass (F-4): a translated gloss, or null to show the French one as-is. */
+  explanationOverride: { simple: string; example: string } | null;
+  explanationLoading: boolean;
   playing: boolean;
   onToggleOriginal: () => void;
   onToggleExplanation: () => void;
@@ -25,7 +28,17 @@ interface LineItemProps {
 
 /** One phrase read from the page. Row click reveals the French original (D9);
  * "?" opens the plain-language gloss (D10), independent of translation status. */
-export function LineItem({ line, showOriginal, showExplanation, playing, onToggleOriginal, onToggleExplanation, onListen }: LineItemProps) {
+export function LineItem({
+  line,
+  showOriginal,
+  showExplanation,
+  explanationOverride,
+  explanationLoading,
+  playing,
+  onToggleOriginal,
+  onToggleExplanation,
+  onListen,
+}: LineItemProps) {
   const hasOriginal = line.source !== 'original' && line.original !== line.text;
   return (
     <li class="line-item">
@@ -85,8 +98,15 @@ export function LineItem({ line, showOriginal, showExplanation, playing, onToggl
             <Icon name="book" size={18} />
             {line.original}, c’est quoi ?
           </p>
-          <p class="explain-simple">{line.explanation.simple}</p>
-          <p class="explain-example">{line.explanation.example}</p>
+          {explanationLoading ? (
+            <p class="explain-simple">Traduction en cours…</p>
+          ) : (
+            <>
+              <p class="explain-simple">{explanationOverride?.simple ?? line.explanation.simple}</p>
+              <p class="explain-example">{explanationOverride?.example ?? line.explanation.example}</p>
+              {explanationOverride && <Badge source="ia" />}
+            </>
+          )}
         </div>
       )}
     </li>
