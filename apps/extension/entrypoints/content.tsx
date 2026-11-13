@@ -15,7 +15,7 @@ import { findWarningLines } from '../utils/warnings';
 import { findFormFields } from '../utils/form-fields';
 import { extractRecap } from '../utils/recap';
 import { classifyStep } from '../utils/journey';
-import { checkConsistency } from '../utils/consistency';
+import { checkConsistency, checkRecapArithmetic } from '../utils/consistency';
 import { isFinancialPage } from '../utils/financial-page';
 import { speakFrenchLocally } from '../utils/speech';
 import { applyInPage, restoreAll, restoreExcept } from '../utils/in-page';
@@ -364,7 +364,13 @@ export default defineContentScript({
         return;
       }
       const enteredAmount = await requestEnteredAmount();
-      const result = checkConsistency(enteredAmount, currentRecap.montant);
+      const entered = checkConsistency(enteredAmount, currentRecap.montant);
+      // F-3: when there's nothing to compare the user's entry against (or it
+      // matches), also check the récap's own arithmetic — catches a tampered
+      // or buggy total even without a captured formulaire amount. D4's own
+      // mismatch always takes priority when both fire.
+      const arithmetic = checkRecapArithmetic(currentRecap);
+      const result = entered?.status === 'mismatch' ? entered : (arithmetic?.status === 'mismatch' ? arithmetic : (entered ?? arithmetic));
       currentConsistency = result;
       hasAlert = currentWarnings.length > 0 || result?.status === 'mismatch';
       renderOverlay();

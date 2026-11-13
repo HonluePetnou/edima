@@ -16,13 +16,14 @@ Vérifié de bout en bout sur la page du jury https://safinum.cm/hackathon-test
 | Alertes F7 (ex. « bénéficiaire jamais utilisé »), sans fausses alertes | ✅ |
 | Récapitulatif : bénéficiaire, montant, frais, total, téléphone lu par paires | ✅ |
 | D4 : montant saisi ≠ montant du récap → alerte prioritaire + point rouge sur la mascotte | ✅ (attaque simulée détectée) |
+| F-3 : contrôle arithmétique du récap (montant + frais = total), même sans saisie captée | ✅ (`utils/consistency.ts`, 4 tests dont une attaque simulée) |
 | Contenu injecté après chargement, et valeurs modifiées sur place | ✅ |
 | Protection des valeurs : montants, téléphones, comptes, références, dates, %, noms | ✅ jamais traduits ni envoyés |
 | Option « Traduire dans la page » (désactivée par défaut) | ✅ libellés traduits à l'écran, valeurs identiques, restauration exacte |
 | Voix : voix locales uniquement (rien envoyé en ligne) ; jamais de duala lu par une voix française | ✅ |
 | 34 clips audio duala (Africa TTS) joués depuis le panneau | ✅ — voix de synthèse non relue, licence non commerciale |
 | IA (M2M100 local) | ✅ désactivée par défaut, option « Traduction IA (expérimentale) » |
-| Tests | 156 tests verts (shared 97, server 7, extension 52) |
+| Tests | 160 tests verts (shared 97, server 7, extension 56) |
 
 Documents pour le jury : `docs/declaration-outils-safinum.md`.
 
@@ -83,9 +84,7 @@ Les jeux Mozilla de l'Institute of African Digital Humanities sont sous licence 
 
 ### Code
 
-- Option « Traduire dans la page » : **pas encore commitée** (le reste est dans `f4d84a8`). Rien n'est poussé sur GitHub.
 - La traduction des explications « ? » par l'IA (branche du collègue) n'a pas été reportée dans le nouveau panneau.
-- Contrôle arithmétique du récap (montant + frais = total) : pas encore fait ; utile contre une page falsifiée.
 - Mascotte déplaçable, dessin « Edima parle », mise à jour de `PLAN.md`, vidéo de 3 min, note technique.
 - Nettoyer la branche `feature/moteur-de-traduction` (journal de session de 11 000 lignes commité).
 
@@ -103,7 +102,6 @@ et revérifier sur SAFINUM avec un test Playwright + Edge chargeant `.output/chr
 |---|---|---|---|
 | F-1 | **Montants lus en duala** (F4) | `packages/shared/src/numbers.ts` : `amountToWords(n, 'dua')` à partir des nombres MPI-EVA (1–2 000) + milliers/millions confirmés par un locuteur ; brancher `speakAmount` dans `content.tsx` (`AMOUNT_SPEECH_LANGUAGE`) | Tests unitaires sur 100 montants validés |
 | F-2 | **Montants audio assemblés** | Enregistrer 0–9, dizaines, 100, 1 000, million, « francs » ; `utils/audio-clips.ts` → nouvelle fonction qui enchaîne les clips selon F-1 | Écoute + test de l'ordre des clips |
-| F-3 | **Contrôle arithmétique du récap** | `utils/consistency.ts` : vérifier montant + frais = total, alerte comme D4 | Test unitaire + attaque simulée sur SAFINUM |
 | F-4 | **Explications « ? » traduites** (D10) | Reporter le code du collègue (`edima:translate-explanation`, déjà dans `background.ts`) dans `LineItem.tsx`, seulement si l'IA est activée, avec badge « IA — non vérifiée » | Test du panneau en mode dev |
 | F-5 | **Mascotte déplaçable** | `components/FloatingMascot.tsx` : glisser-déposer, position mémorisée dans `utils/settings.ts` | Test manuel sur SAFINUM |
 | F-6 | **Illustration « Edima parle »** | Nouveau dessin dans le style `etat/`, remplacer l'astuce idle + ondes dans `components/ui/Mascot.tsx` | Visuel |
