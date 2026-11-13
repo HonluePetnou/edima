@@ -10,9 +10,12 @@ export interface EdimaSettings {
   /** F9 machine translation of unseen text. Off by default: unvalidated
    * output and page text sent to a (local) model must be an explicit choice. */
   aiEnabled: boolean;
+  /** Rewrite the page's own labels in the chosen language (in-page.ts).
+   * Off by default: Edima otherwise never writes to the bank's page. */
+  inPage: boolean;
 }
 
-export const DEFAULT_SETTINGS: EdimaSettings = { showMascot: true, theme: null, rateIndex: 0, aiEnabled: false };
+export const DEFAULT_SETTINGS: EdimaSettings = { showMascot: true, theme: null, rateIndex: 0, aiEnabled: false, inPage: false };
 const KEY = 'edimaSettings';
 
 const hasStorage = () => typeof chrome !== 'undefined' && !!chrome.storage?.local;

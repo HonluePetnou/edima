@@ -2,6 +2,8 @@
 // page. No site-specific selectors — matches on the standard form controls
 // plus whatever label the page itself provides (F11).
 
+import { elementPageText } from './in-page';
+
 const FIELD_SELECTOR = 'input:not([type=hidden]):not([type=submit]):not([type=button]), textarea, select';
 
 const KNOWN_FIELD_DESCRIPTIONS: Record<string, string> = {
@@ -29,11 +31,13 @@ function labelFor(el: HTMLElement): string {
 
   if (el.id) {
     const labelEl = document.querySelector(`label[for="${CSS.escape(el.id)}"]`);
-    if (labelEl?.textContent) return labelEl.textContent.trim();
+    const text = elementPageText(labelEl).trim();
+    if (text) return text;
   }
 
   const closestLabel = el.closest('label');
-  if (closestLabel?.textContent) return closestLabel.textContent.trim();
+  const wrapped = elementPageText(closestLabel).trim();
+  if (wrapped) return wrapped;
 
   const placeholder = el.getAttribute('placeholder');
   if (placeholder) return placeholder.trim();
@@ -54,7 +58,7 @@ function visualLabel(el: HTMLElement): string {
     let sibling = node.previousElementSibling;
     while (sibling) {
       if (!sibling.querySelector(FIELD_SELECTOR) && !sibling.matches(FIELD_SELECTOR)) {
-        const text = sibling.textContent?.replace(/\s+/g, ' ').trim() ?? '';
+        const text = elementPageText(sibling).replace(/\s+/g, ' ').trim();
         if (text.length >= 2 && text.length <= LABEL_MAX) return text;
         if (text.length > LABEL_MAX) break; // a paragraph, not a caption
       }

@@ -2,6 +2,7 @@
 // itself is a heuristic for now — a real NLU/LLM pass (F9) can replace
 // `guessAction` later without touching the hover-detection plumbing below.
 
+import { elementPageText } from './in-page';
 import { fillTemplate, findTemplate } from 'edima-shared';
 import type { LanguageCode } from './messages';
 
@@ -37,7 +38,7 @@ export function findInteractiveElements(root: ParentNode = document.body): HTMLE
 
 function labelFor(el: HTMLElement): string {
   const ariaLabel = el.getAttribute('aria-label');
-  const text = ariaLabel || el.textContent || '';
+  const text = ariaLabel || elementPageText(el) || '';
   return text.trim().replace(/\s+/g, ' ');
 }
 

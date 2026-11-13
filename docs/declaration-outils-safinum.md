@@ -17,7 +17,7 @@ Déclaration demandée par le protocole de test du Hackathon SAFINUM Innovate 20
 
 | Élément | Rôle | Où ça tourne | Licence / source |
 |---|---|---|---|
-| M2M100 418M affiné français → duala | Traduction des phrases inconnues, signalée « IA — non vérifiée » | Serveur local (`localhost`), aucun service en ligne | Modèle de base Meta (MIT), affiné sur MT560 ; publié sur Hugging Face (SupraJac/edima-m2m100-dua-ct2) |
+| M2M100 418M affiné français → duala | Traduction des phrases inconnues, signalée « IA — non vérifiée » | Serveur local (`localhost`), aucun service en ligne | Modèle de base Meta (MIT), affiné sur MT560 (CC-BY-4.0, textes religieux) avec un côté français produit par traduction automatique ; publié sur Hugging Face (SupraJac/edima-m2m100-dua-ct2) |
 
 Quand l'option est activée, seul un texte **masqué** est transmis au serveur local :
 montants, numéros de téléphone, numéros de compte, références, dates, pourcentages
@@ -27,8 +27,12 @@ sont jamais envoyés.
 
 ## Engagements vis-à-vis du protocole
 
-- **Aucune modification de la page de test** : l'interface d'Edima vit dans un Shadow DOM
-  séparé et dans le panneau latéral ; le texte de la page n'est jamais réécrit.
+- **Aucune modification du code de la page de test.** Par défaut, l'interface d'Edima vit
+  dans un Shadow DOM séparé et dans le panneau latéral. Avec l'option « Traduire dans la
+  page », seuls les **libellés** ayant une traduction sont réécrits à l'écran ; montants,
+  frais, totaux, noms, numéros, références et saisies de l'utilisateur ne sont jamais
+  touchés (vérifié valeur par valeur sur tout le parcours de test), et désactiver l'option
+  restaure la page à l'identique.
 - **Aucune collecte ni transmission** des données affichées : rien n'est stocké hors de
   la session ; pas de voix en ligne ; l'IA est désactivée par défaut et purement locale.
 - **Valeurs financières** : jamais traduites ; le montant saisi est comparé à celui du
@@ -39,5 +43,7 @@ sont jamais envoyés.
 ## Données utilisées pour préparer le projet (pas pendant la démonstration)
 
 - Mozilla Common Voice, duala (CC0-1.0) : référence d'orthographe.
+- BOUQuET (Meta, CC-BY-4.0) : jeu d'évaluation français–duala, jamais utilisé pour l'entraînement.
+- Lexique bancaire Ekwalla (2013) : consulté comme référence humaine, non recopié.
 - Nombres duala et ewondo : Numeral Systems of the World's Languages (MPI-EVA),
   données fournies par des linguistes.

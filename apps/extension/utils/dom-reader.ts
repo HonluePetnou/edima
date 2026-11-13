@@ -2,6 +2,8 @@
 // nodes only — skips <script>/<style>/<noscript> and anything hidden, so the
 // same code works on the jury's unknown page and on the sites tested in F11.
 
+import { isEdimaWrite, pageText } from './in-page';
+
 const SKIP_TAGS = new Set(['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE']);
 
 function isVisible(el: Element): boolean {
@@ -23,7 +25,7 @@ export function extractVisibleText(root: ParentNode = document.body): VisibleTex
   const results: VisibleTextNode[] = [];
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
     acceptNode(node) {
-      const text = node.textContent?.trim();
+      const text = pageText(node as Text).trim();
       if (!text) return NodeFilter.FILTER_REJECT;
 
       const parent = node.parentElement;
@@ -36,7 +38,9 @@ export function extractVisibleText(root: ParentNode = document.body): VisibleTex
 
   let current = walker.nextNode();
   while (current) {
-    results.push({ node: current as Text, text: current.textContent!.trim() });
+    // pageText: the bank's own wording, even where "traduire dans la page"
+    // has rewritten the node (see in-page.ts).
+    results.push({ node: current as Text, text: pageText(current as Text).trim() });
     current = walker.nextNode();
   }
   return results;
@@ -73,7 +77,8 @@ export function observeNewContent(callback: NewContentCallback, root: Node = doc
   const observer = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
       if (mutation.type === 'characterData') {
-        pending.add(mutation.target);
+        // Edima's own in-page rewrites are not new content.
+        if (!isEdimaWrite(mutation.target)) pending.add(mutation.target);
         continue;
       }
       for (const node of mutation.addedNodes) {

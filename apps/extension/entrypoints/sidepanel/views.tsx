@@ -289,6 +289,15 @@ export function SettingsView(ctx: ViewContext) {
         </div>
         <Divider />
         <div class="row">
+          <Icon name="file-text" size={22} />
+          <div class="row-text">
+            <p class="row-title">Traduire dans la page</p>
+            <p class="row-detail">Remplace les libellés du site par leur traduction. Les montants, noms, numéros et ce que tu tapes ne changent jamais.</p>
+          </div>
+          <Toggle checked={ctx.settings.inPage} label="Traduire dans la page" onChange={(v) => ctx.updateSettings({ inPage: v })} />
+        </div>
+        <Divider />
+        <div class="row">
           <Icon name="help" size={22} />
           <div class="row-text">
             <p class="row-title">Traduction IA (expérimentale)</p>

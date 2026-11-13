@@ -18,6 +18,7 @@ import { classifyStep } from '../utils/journey';
 import { checkConsistency } from '../utils/consistency';
 import { isFinancialPage } from '../utils/financial-page';
 import { speakFrenchLocally } from '../utils/speech';
+import { applyInPage, restoreAll, restoreExcept } from '../utils/in-page';
 import { loadSettings, onSettingsChanged } from '../utils/settings';
 import TalkingBubble, { type BubbleState } from '../components/TalkingBubble';
 import FloatingMascot from '../components/FloatingMascot';
@@ -118,6 +119,8 @@ export default defineContentScript({
     let showMascotSetting = initialSettings.showMascot;
     // F9 IA: off unless the user turned it on in the panel's settings.
     let aiEnabled = initialSettings.aiEnabled;
+    // "Traduire dans la page": off unless chosen in the panel's settings.
+    let inPageEnabled = initialSettings.inPage;
     let isFinancial = false;
     let hasAlert = false;
 
@@ -161,6 +164,12 @@ export default defineContentScript({
 
     onSettingsChanged((s) => {
       showMascotSetting = s.showMascot;
+      if (s.inPage !== inPageEnabled) {
+        inPageEnabled = s.inPage;
+        if (!inPageEnabled) restoreAll();
+        rescan();
+        reportToSidePanel();
+      }
       const aiWasEnabled = aiEnabled;
       aiEnabled = s.aiEnabled;
       if (aiWasEnabled && !aiEnabled) {
@@ -392,15 +401,37 @@ export default defineContentScript({
       // The recap is read on the page's full text in order: the displayed
       // list drops repeats ("15 000 FCFA" is both montant and total), which
       // would break the label → value pairs.
-      const pageLines: TranslatedLine[] = extractVisibleText().map(({ text }) => ({ original: text, text, source: 'original' }));
+      const visible = extractVisibleText();
+      const pageLines: TranslatedLine[] = visible.map(({ text }) => ({ original: text, text, source: 'original' }));
       currentRecap = extractRecap(pageLines);
       currentStep = classifyStep(currentLines, fields.length > 0, currentRecap !== null);
       wireMontantCapture(fields);
 
       isFinancial = isFinancialPage(currentLines, currentStep);
       hasAlert = currentWarnings.length > 0 || currentConsistency?.status === 'mismatch';
+      if (inPageEnabled) translateInPage(visible, fields);
       renderOverlay();
     };
+
+    // ---- "Traduire dans la page" (in-page.ts) ----
+    // Rewrites only labels that have a translation; values, names and what
+    // the user typed are never touched, and everything Edima reads keeps
+    // seeing the bank's French through pageText().
+    function translateInPage(visible: ReturnType<typeof extractVisibleText>, fields: ReturnType<typeof findFormFields>) {
+      const byOriginal = new Map(currentLines.filter((l) => l.source !== 'original').map((l) => [l.original, l.text]));
+      const userValues = new Set(
+        fields
+          .map(({ element }) => ('value' in element ? String((element as HTMLInputElement).value) : '').trim().toLowerCase())
+          .filter((v) => v.length > 0),
+      );
+      const candidates = visible.flatMap(({ node, text }) => {
+        const translated = byOriginal.get(text);
+        return translated ? [{ node, original: text, translated }] : [];
+      });
+      const keep = new Set(candidates.map((c) => c.node));
+      restoreExcept(keep);
+      applyInPage(candidates, userValues);
+    }
     rescan();
 
     function buildMessage(): PageTranslatedMessage {

@@ -64,6 +64,7 @@ pnpm install
 - [x] Parcours complet vérifié de bout en bout sur la page du jury https://safinum.cm/hackathon-test (Edge + extension) : solde, formulaire (libellés lus au-dessus des champs), alerte « bénéficiaire jamais utilisé », récapitulatif, contenu injecté, montant du récap falsifié → alerte D4
 - [x] Voix : uniquement des voix **locales** de l'ordinateur (rien n'est envoyé en ligne) ; jamais de texte duala lu par une voix française ; 34 clips duala (Africa TTS, non commercial, non relus) joués depuis le panneau
 - [x] Valeurs protégées étendues : noms, numéros de compte, références, dates écrites, pourcentages ; l'IA est désactivée par défaut (réglage « Traduction IA (expérimentale) »)
+- [x] Option **« Traduire dans la page »** (`utils/in-page.ts`, désactivée par défaut) : réécrit les libellés traduits directement dans le site ; valeurs, noms, références et saisies jamais touchés ; toutes les détections continuent de lire le français d'origine ; restauration exacte à la désactivation. Vérifié sur tout le parcours SAFINUM, jusqu'au reçu
 - [x] Déclaration des outils pour le jury : `docs/declaration-outils-safinum.md` ; vocabulaire de la page SAFINUM à faire traduire : `docs/safinum-vocabulaire-a-traduire-duala.txt`
 - [ ] Traductions ewondo/duala validées par le linguiste — bloquant, voir PLAN.md
 
