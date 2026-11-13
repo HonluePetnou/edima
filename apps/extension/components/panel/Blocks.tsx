@@ -82,13 +82,17 @@ export function Notice({ tone, children }: { tone: 'warning' | 'info' | 'success
 }
 
 /** F7 / D4: priority banner. Rendered above every view, read first. */
-export function AlertBanner({ message, playing, onListen }: { message: string; playing: boolean; onListen: () => void }) {
+export function AlertBanner({ message, translation, playing, onListen }: { message: string; translation?: string; playing: boolean; onListen: () => void }) {
   return (
     <section class="alert-banner" role="alert">
       <Icon name="hand" size={28} />
       <div class="alert-banner-body">
         <p class="alert-banner-title">Attention</p>
-        <p class="alert-banner-text">{message}</p>
+        {translation && <p class="alert-banner-text">{translation}</p>}
+        {/* The bank's own wording always stays visible. */}
+        <p class={translation ? 'alert-banner-original' : 'alert-banner-text'} lang="fr">
+          {message}
+        </p>
       </div>
       <ListenButton label="l’avertissement" playing={playing} onClick={onListen} />
     </section>
@@ -124,10 +128,10 @@ export function StepProgress({ step }: { step: StepInfo }) {
   return (
     <div class="step-progress">
       <div class="step-progress-top">
+        {/* No "Étape X sur 3" count: the bank's own page usually shows its
+            own numbered stepper (SAFINUM has 5 steps), and two different
+            counts would contradict each other. */}
         <p class="step-progress-label">{step.label}</p>
-        <p class="step-progress-count">
-          Étape {step.index} sur {step.total}
-        </p>
       </div>
       <div class="step-progress-bar" aria-hidden="true">
         {Array.from({ length: step.total }, (_, i) => (

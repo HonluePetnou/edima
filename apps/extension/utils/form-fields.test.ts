@@ -51,4 +51,28 @@ describe('findFormFields', () => {
     document.body.innerHTML = `<input type="text" />`;
     expect(findFormFields()).toHaveLength(0);
   });
+
+  // SAFINUM test page: captions are plain <p> elements above the field,
+  // uppercased with CSS — no <label>, id, name or placeholder.
+  it('reads the caption shown just above a field', () => {
+    document.body.innerHTML = `
+      <div>
+        <p style="text-transform: uppercase">Montant à envoyer</p>
+        <div><input type="number" /><span>FCFA</span></div>
+      </div>
+      <div>
+        <p>Nom du bénéficiaire</p>
+        <input type="text" />
+      </div>`;
+    const fields = findFormFields();
+    expect(fields.map((f) => f.label)).toEqual(['Montant à envoyer', 'Nom du bénéficiaire']);
+    expect(fields[1]?.description).toContain('recevoir');
+  });
+
+  it('ignores a long paragraph above a field', () => {
+    document.body.innerHTML = `
+      <p>Renseignez les informations du destinataire. Vérifiez toujours le numéro avant de valider le transfert.</p>
+      <input type="text" />`;
+    expect(findFormFields()).toHaveLength(0);
+  });
 });

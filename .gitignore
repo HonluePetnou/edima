@@ -6,3 +6,12 @@ dist
 .env
 .env.local
 .DS_Store
+ml/data/
+ml/models/
+ml/out/
+__pycache__/
+*.pyc
+*.safetensors
+*.zip
+.venv/
+docs/*.pdf

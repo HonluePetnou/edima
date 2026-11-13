@@ -546,10 +546,12 @@ button {
   font-weight: 600;
   line-height: 16px;
 }
+.badge--phrase_modele,
 .badge--glossaire {
   background: var(--success-soft);
   color: var(--text-brand);
 }
+.badge--a_valider,
 .badge--ia {
   background: var(--warning-soft);
   color: var(--text-warning);
@@ -788,6 +790,11 @@ button {
   text-transform: uppercase;
 }
 .alert-banner-text {
+  font-weight: 600;
+}
+.alert-banner-original {
+  margin-top: 4px;
+  font-size: 14px;
   font-weight: 600;
 }
 .alert-banner .listen-btn {

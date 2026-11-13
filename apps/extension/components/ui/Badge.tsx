@@ -5,6 +5,8 @@ import type { TranslatedLine } from '../../utils/messages';
 // status is "valide" — the only case that may claim linguist validation (D1).
 const BADGES: Record<TranslatedLine['source'], { label: string; icon: IconName }> = {
   glossaire: { label: 'Validé par un linguiste', icon: 'check-circle' },
+  phrase_modele: { label: 'Phrase modèle validée', icon: 'check-circle' },
+  a_valider: { label: 'Traduction à valider', icon: 'alert' },
   ia: { label: 'IA — non vérifiée', icon: 'help' },
   original: { label: 'Texte original (français)', icon: 'info' },
 };

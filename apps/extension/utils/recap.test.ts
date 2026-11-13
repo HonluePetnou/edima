@@ -35,20 +35,43 @@ describe('extractRecap', () => {
     expect(extractRecap([line('Mon compte courant'), line('Dernières opérations')])).toBeNull();
   });
 
-  it('returns partial info rather than discarding what it did find', () => {
-    const recap = extractRecap([line('Montant envoyé'), line('5 000 FCFA')]);
-    expect(recap).toEqual({
-      beneficiaire: null,
-      montant: '5 000 FCFA',
-      frais: null,
-      total: null,
-      beneficiairePhoneWords: null,
-    });
+  it('is not a recap without who, how much and what it costs', () => {
+    // A form page showing a running total (SAFINUM "Frais" step) is not a recap.
+    expect(extractRecap([line('Montant envoyé'), line('5 000 FCFA')])).toBeNull();
+    expect(extractRecap([line('Total à débiter'), line('25 000 FCFA'), line('Solde après opération'), line('225 000 FCFA')])).toBeNull();
   });
 
   it('leaves beneficiairePhoneWords null when the name carries no phone number', () => {
-    const recap = extractRecap([line('Bénéficiaire'), line('Paul Mballa')]);
+    const recap = extractRecap([line('Bénéficiaire'), line('Paul Mballa'), line('Montant'), line('15 000 FCFA'), line('Frais'), line('0 FCFA')]);
     expect(recap?.beneficiairePhoneWords).toBeNull();
+  });
+
+  it('ignores a sentence that merely mentions the bénéficiaire', () => {
+    // SAFINUM sidebar: a long safety tip followed by "Connexion sécurisée".
+    const lines = [line('Vérifiez toujours le nom et le numéro du bénéficiaire avant de confirmer un transfert.'), line('Connexion sécurisée')];
+    expect(extractRecap(lines)).toBeNull();
+  });
+
+  it('picks the recap bénéficiaire, not the stepper step of the same name', () => {
+    const recap = extractRecap([
+      line('Solde'), line('Frais'), line('Bénéficiaire'), line('Récapitulatif'), line('Confirmation'),
+      line('Montant'), line('15 000 FCFA'), line('Frais'), line('0 FCFA'), line('Total débité'), line('15 000 FCFA'),
+      line('Bénéficiaire'), line('Paul Mballa'), line('Téléphone'), line('699123456'),
+    ]);
+    expect(recap?.beneficiaire).toBe('Paul Mballa');
+    expect(recap?.beneficiairePhoneWords).toBeTruthy();
+  });
+
+  it('reads the SAFINUM recap even when its labels are displayed translated', () => {
+    const t = (original: string, text: string): TranslatedLine => ({ original, text, source: 'a_valider' });
+    const recap = extractRecap([
+      line('Montant'), line('15 000 FCFA'),
+      line('Frais'), line('0 FCFA'),
+      t('Total débité', 'mujsousou mou soumuabé'), line('15 000 FCFA'),
+      t('Bénéficiaire', 'mukousédi'), line('Paul Mballa'),
+      line('Téléphone'), line('699123456'),
+    ]);
+    expect(recap).toMatchObject({ beneficiaire: 'Paul Mballa', montant: '15 000 FCFA', frais: '0 FCFA', total: '15 000 FCFA' });
   });
 });
 

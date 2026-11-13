@@ -12,10 +12,14 @@ export function findWarningElements(root: ParentNode = document.body): HTMLEleme
 }
 
 const WARNING_KEYWORDS =
-  /(attention|avertissement|sécurité|erreur|arnaque|refusé|insuffisant|code secret|n'y réponds pas|jamais|warning|alert|error|security|fraud|never|suspicious)/i;
+  /(attention|avertissement|alerte|erreur|arnaque|refusé|insuffisant|code secret|n'y réponds pas|jamais|warning|alert|error|security warning|fraud|never|suspicious)/i;
+// Plain "sécurité" was dropped: it matches headings ("Sécurité") and
+// reassurances ("…en toute sécurité") that are not warnings at all.
 
 /** Short, keyword-matching lines — long paragraphs are unlikely to be a
  * genuine warning banner and would make for an unreadable spoken alert. */
 export function findWarningLines(lines: TranslatedLine[]): TranslatedLine[] {
-  return lines.filter((line) => line.text.length < 200 && WARNING_KEYWORDS.test(line.text));
+  // Match on the page's own wording: once a line is translated, its `text`
+  // no longer contains the French/English keywords.
+  return lines.filter((line) => line.original.length < 200 && WARNING_KEYWORDS.test(line.original));
 }

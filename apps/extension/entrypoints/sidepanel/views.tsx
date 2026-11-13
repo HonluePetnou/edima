@@ -32,7 +32,10 @@ export interface ViewContext {
   step: StepInfo | null;
   formFields: FieldDescription[];
   recap: RecapInfo | null;
+  /** French — what the voice reads. */
   summary: string;
+  /** What the screen shows: template sentences in the chosen language. */
+  summaryDisplay: string;
   online: boolean;
   settings: EdimaSettings;
   language: LanguageCode;
@@ -41,7 +44,8 @@ export interface ViewContext {
   expandedLines: Set<string>;
   expandedExplanations: Set<string>;
   go: (view: View) => void;
-  speak: (key: string, text: string) => void;
+  /** `text` is French; `clipFor` is the French source of a native-language clip to prefer. */
+  speak: (key: string, text: string, clipFor?: string) => void;
   toggleOriginal: (key: string) => void;
   toggleExplanation: (key: string) => void;
   updateSettings: (patch: Partial<EdimaSettings>) => void;
@@ -92,7 +96,7 @@ function LineList({ ctx, lines }: { ctx: ViewContext; lines: TranslatedLine[] })
               playing={ctx.playingKey === key}
               onToggleOriginal={() => ctx.toggleOriginal(raw.original)}
               onToggleExplanation={() => ctx.toggleExplanation(raw.original)}
-              onListen={() => ctx.speak(key, line.spokenAmount ? `${line.text}. ${line.spokenAmount}` : line.text)}
+              onListen={() => ctx.speak(key, raw.spokenAmount ? `${raw.original}. ${raw.spokenAmount}` : raw.original, raw.original)}
             />
           </div>
         );
@@ -123,7 +127,8 @@ export function ReadView(ctx: ViewContext) {
       {ctx.summary && (
         <section class="readout">
           <p class="caps">Ce que je lis à voix haute</p>
-          <p>{ctx.summary}</p>
+          <p>{ctx.showAllOriginal ? ctx.summary : ctx.summaryDisplay}</p>
+          {!ctx.showAllOriginal && ctx.summaryDisplay !== ctx.summary && <Badge source="a_valider" />}
         </section>
       )}
       {nothingTranslated && <Notice tone="info">Les mots de cette page n’ont pas encore de traduction. Je te les lis en français.</Notice>}
@@ -212,6 +217,7 @@ export function TransparencyView(ctx: ViewContext) {
   const count = (s: TranslatedLine['source']) => ctx.lines.filter((l) => l.source === s).length;
   const rows: { source: TranslatedLine['source']; text: string }[] = [
     { source: 'glossaire', text: 'Un linguiste a vérifié ce mot ou cette phrase.' },
+    { source: 'a_valider', text: 'Traduction proposée par un locuteur, pas encore relue par un linguiste.' },
     { source: 'ia', text: 'Traduit par une intelligence artificielle. Peut contenir des erreurs.' },
     { source: 'original', text: 'Pas encore de traduction : Edima montre le français de la banque.' },
   ];
@@ -231,7 +237,10 @@ export function TransparencyView(ctx: ViewContext) {
           </div>
         ))}
       </Card>
-      <Notice tone="success">Les montants, numéros et dates ne sont jamais traduits : Edima les recopie tels quels et vérifie qu’ils n’ont pas changé.</Notice>
+      <Notice tone="success">Les montants, numéros, noms et références ne sont jamais traduits : Edima les recopie tels quels et vérifie qu’ils n’ont pas changé.</Notice>
+      <Notice tone="info">
+        La voix française est celle de ton ordinateur : rien n’est envoyé sur Internet. Les mots en duala sont dits par une voix de synthèse, pas encore relue par un locuteur.
+      </Notice>
     </>
   );
 }
@@ -277,6 +286,15 @@ export function SettingsView(ctx: ViewContext) {
             <p class="row-detail">Un clic sur elle ouvre Edima.</p>
           </div>
           <Toggle checked={ctx.settings.showMascot} label="Mascotte sur les sites de banque" onChange={(v) => ctx.updateSettings({ showMascot: v })} />
+        </div>
+        <Divider />
+        <div class="row">
+          <Icon name="help" size={22} />
+          <div class="row-text">
+            <p class="row-title">Traduction IA (expérimentale)</p>
+            <p class="row-detail">Traduit les phrases inconnues avec un modèle installé sur cet ordinateur. Résultat non vérifié, toujours signalé.</p>
+          </div>
+          <Toggle checked={ctx.settings.aiEnabled} label="Traduction IA expérimentale" onChange={(v) => ctx.updateSettings({ aiEnabled: v })} />
         </div>
         <Divider />
         <div class="row">

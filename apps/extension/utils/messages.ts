@@ -11,7 +11,9 @@ export interface TranslatedLine {
   /** "ia" (F9) means: matched neither the glossary nor a template phrase,
    * and the fallback server's response survived F10's value check. Shown
    * with a "non vérifié" badge (D1) — never treated as validated. */
-  source: 'glossaire' | 'ia' | 'original';
+  /** "a_valider": a speaker's proposed translation still awaiting linguist
+   * review — shown, but always labelled as such, never as validated. */
+  source: 'glossaire' | 'phrase_modele' | 'a_valider' | 'ia' | 'original';
   /** F4: the amount in words, when this line is (or contains) an FCFA amount. */
   spokenAmount?: string;
   /** D10: a plain-language gloss for this line, when it matches a jargon
@@ -55,6 +57,14 @@ export interface RequestStateMessage {
 export interface TranslateUnknownMessage {
   type: 'edima:translate-unknown';
   masked: string;
+  language: LanguageCode;
+}
+
+/** D10: side panel → background. Explanations are static glossary content,
+ * not page data, so they are sent as-is rather than masked. */
+export interface TranslateExplanationMessage {
+  type: 'edima:translate-explanation';
+  text: string;
   language: LanguageCode;
 }
 
@@ -112,6 +122,7 @@ export type ExtensionMessage =
   | PageTranslatedMessage
   | RequestStateMessage
   | TranslateUnknownMessage
+  | TranslateExplanationMessage
   | SaveEnteredAmountMessage
   | GetEnteredAmountMessage
   | SetLanguageMessage

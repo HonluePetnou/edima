@@ -10,6 +10,11 @@ const KNOWN_FIELD_DESCRIPTIONS: Record<string, string> = {
   montant: 'Combien tu envoies.',
   'montant à envoyer': 'Combien tu envoies.',
   message: 'Un message facultatif, pour expliquer pourquoi tu envoies cet argent.',
+  'nom du bénéficiaire': 'Le nom de la personne qui va recevoir l’argent. Écris-le exactement.',
+  'numéro de téléphone': 'Le numéro de la personne qui reçoit l’argent. Vérifie-le deux fois.',
+  'motif du transfert': 'Pourquoi tu envoies cet argent, par exemple « loyer » ou « famille ».',
+  'note (optionnel)': 'Un petit mot facultatif. Tu peux laisser vide.',
+  "type d'opération": 'Où va l’argent : un compte de la même banque, Mobile Money ou une autre banque.',
 };
 
 export interface FormField {
@@ -33,6 +38,29 @@ function labelFor(el: HTMLElement): string {
   const placeholder = el.getAttribute('placeholder');
   if (placeholder) return placeholder.trim();
 
+  return visualLabel(el);
+}
+
+const LABEL_MAX = 60;
+
+/** Fallback for pages that show a caption above the field without wiring it
+ * as a <label> (the SAFINUM test page does this): the nearest short text
+ * just before the field, walking up a few container levels. textContent,
+ * not innerText, so a CSS `text-transform: uppercase` caption comes back
+ * in its real casing ("Montant à envoyer"). */
+function visualLabel(el: HTMLElement): string {
+  let node: Element | null = el;
+  for (let depth = 0; node && depth < 4; depth++, node = node.parentElement) {
+    let sibling = node.previousElementSibling;
+    while (sibling) {
+      if (!sibling.querySelector(FIELD_SELECTOR) && !sibling.matches(FIELD_SELECTOR)) {
+        const text = sibling.textContent?.replace(/\s+/g, ' ').trim() ?? '';
+        if (text.length >= 2 && text.length <= LABEL_MAX) return text;
+        if (text.length > LABEL_MAX) break; // a paragraph, not a caption
+      }
+      sibling = sibling.previousElementSibling;
+    }
+  }
   return '';
 }
 
@@ -45,7 +73,10 @@ export function findFormFields(root: ParentNode = document.body): FormField[] {
     const label = labelFor(el);
     if (!label) continue;
 
-    const description = KNOWN_FIELD_DESCRIPTIONS[label.toLowerCase()] ?? `Un champ à remplir : ${label}.`;
+    const isCheckbox = el instanceof HTMLInputElement && el.type === 'checkbox';
+    const description =
+      KNOWN_FIELD_DESCRIPTIONS[label.toLowerCase()] ??
+      (isCheckbox ? 'Coche cette case seulement si c’est vrai. Sinon, ne va pas plus loin.' : `Un champ à remplir : ${label}.`);
     fields.push({ element: el, label, description });
   }
   return fields;

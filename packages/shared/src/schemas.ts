@@ -15,7 +15,8 @@ export const GlossaryTermSchema = z.object({
   fr: z.string(),
   ewo: z.string().nullable(),
   dua: z.string().nullable(),
-  status: TranslationStatus,
+  ewo_status: TranslationStatus,
+  dua_status: TranslationStatus,
 });
 export type GlossaryTerm = z.infer<typeof GlossaryTermSchema>;
 
@@ -28,7 +29,8 @@ export const TemplatePhraseSchema = z.object({
   variables: z.array(z.string()),
   ewo: z.string().nullable(),
   dua: z.string().nullable(),
-  status: TranslationStatus,
+  ewo_status: TranslationStatus,
+  dua_status: TranslationStatus,
 });
 export type TemplatePhrase = z.infer<typeof TemplatePhraseSchema>;
 

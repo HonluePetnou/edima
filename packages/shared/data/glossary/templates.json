@@ -8,8 +8,9 @@
       "nom"
     ],
     "ewo": null,
-    "dua": null,
-    "status": "a_traduire"
+    "dua": "wa loḿa môninga {montant} na {nom}.",
+    "ewo_status": "a_traduire",
+    "dua_status": "a_valider"
   },
   {
     "id": "tpl_solde_reste",
@@ -19,8 +20,9 @@
       "montant"
     ],
     "ewo": null,
-    "dua": null,
-    "status": "a_traduire"
+    "dua": "o diané o compte a ō {montant}.",
+    "ewo_status": "a_traduire",
+    "dua_status": "a_valider"
   },
   {
     "id": "tpl_solde_disponible",
@@ -30,8 +32,9 @@
       "montant"
     ],
     "ewo": null,
-    "dua": null,
-    "status": "a_traduire"
+    "dua": "mususoumua moni o dianō muende {montant}.",
+    "ewo_status": "a_traduire",
+    "dua_status": "a_valider"
   },
   {
     "id": "tpl_frais_transfert",
@@ -41,8 +44,9 @@
       "montant"
     ],
     "ewo": null,
-    "dua": null,
-    "status": "a_traduire"
+    "dua": "mususēdi mua mūn mula loma muende {montant}.",
+    "ewo_status": "a_traduire",
+    "dua_status": "a_valider"
   },
   {
     "id": "tpl_total_sortant",
@@ -52,8 +56,9 @@
       "montant"
     ],
     "ewo": null,
-    "dua": null,
-    "status": "a_traduire"
+    "dua": "mususou mua buse o nin compte muende̍ {montant}.",
+    "ewo_status": "a_traduire",
+    "dua_status": "a_valider"
   },
   {
     "id": "tpl_envoi_complet",
@@ -65,8 +70,9 @@
       "telephone"
     ],
     "ewo": null,
-    "dua": null,
-    "status": "a_traduire"
+    "dua": "wa lomma {montant} o {nom}, nomba {telephone}.",
+    "ewo_status": "a_traduire",
+    "dua_status": "a_valider"
   },
   {
     "id": "tpl_bouton_description",
@@ -78,7 +84,8 @@
     ],
     "ewo": null,
     "dua": null,
-    "status": "a_traduire"
+    "ewo_status": "a_traduire",
+    "dua_status": "a_traduire"
   },
   {
     "id": "tpl_bouton_sert_a",
@@ -90,7 +97,8 @@
     ],
     "ewo": null,
     "dua": null,
-    "status": "a_traduire"
+    "ewo_status": "a_traduire",
+    "dua_status": "a_traduire"
   },
   {
     "id": "tpl_edima_lit_passage",
@@ -98,8 +106,9 @@
     "fr": "Edima lit ce passage.",
     "variables": [],
     "ewo": null,
-    "dua": null,
-    "status": "a_traduire"
+    "dua": "edima langa̍a wan wouma",
+    "ewo_status": "a_traduire",
+    "dua_status": "a_valider"
   },
   {
     "id": "tpl_edima_explique_champs",
@@ -107,8 +116,9 @@
     "fr": "Edima explique chaque champ à voix haute.",
     "variables": [],
     "ewo": null,
-    "dua": null,
-    "status": "a_traduire"
+    "dua": "edima lèlè biso’o bètiledi tè na doī la sam",
+    "ewo_status": "a_traduire",
+    "dua_status": "a_valider"
   },
   {
     "id": "tpl_remplis_toi_meme",
@@ -116,8 +126,9 @@
     "fr": "Remplis le formulaire toi-même sur le site, ou dis les valeurs à voix haute.",
     "variables": [],
     "ewo": null,
-    "dua": null,
-    "status": "a_traduire"
+    "dua": "londé dipapa wamené o site, tōsó langwa musousedi na doī la sam",
+    "ewo_status": "a_traduire",
+    "dua_status": "a_valider"
   },
   {
     "id": "tpl_clique_toi_meme",
@@ -127,8 +138,9 @@
       "bouton"
     ],
     "ewo": null,
-    "dua": null,
-    "status": "a_traduire"
+    "dua": "bena bèsé bē temtē, wamène banda o {bouton}",
+    "ewo_status": "a_traduire",
+    "dua_status": "a_valider"
   },
   {
     "id": "tpl_nouveau_message_lu",
@@ -136,8 +148,9 @@
     "fr": "Un message est apparu sur la page. Edima le lit maintenant.",
     "variables": [],
     "ewo": null,
-    "dua": null,
-    "status": "a_traduire"
+    "dua": "betilédi be poi᷅ o site. edima langā tatan",
+    "ewo_status": "a_traduire",
+    "dua_status": "a_valider"
   },
   {
     "id": "tpl_demande_code_sms",
@@ -145,8 +158,9 @@
     "fr": "Un message te demande ton code secret par SMS.",
     "variables": [],
     "ewo": null,
-    "dua": null,
-    "status": "a_traduire"
+    "dua": "bétilédi ba baiséwa code secret na SMS",
+    "ewo_status": "a_traduire",
+    "dua_status": "a_valider"
   },
   {
     "id": "tpl_jamais_demande",
@@ -154,8 +168,9 @@
     "fr": "Ta banque et Edima ne te le demanderont jamais.",
     "variables": [],
     "ewo": null,
-    "dua": null,
-    "status": "a_traduire"
+    "dua": "banqu'a go̍ na Edima ési mendè baisè wa",
+    "ewo_status": "a_traduire",
+    "dua_status": "a_valider"
   },
   {
     "id": "tpl_ny_reponds_pas",
@@ -163,8 +178,9 @@
     "fr": "N'y réponds pas.",
     "variables": [],
     "ewo": null,
-    "dua": null,
-    "status": "a_traduire"
+    "dua": "ô salabé",
+    "ewo_status": "a_traduire",
+    "dua_status": "a_valider"
   },
   {
     "id": "tpl_dis_jai_compris",
@@ -172,8 +188,9 @@
     "fr": "Dis « j'ai compris », ou appuie sur le bouton ci-dessous.",
     "variables": [],
     "ewo": null,
-    "dua": null,
-    "status": "a_traduire"
+    "dua": "langwa na sengi tōso mōtó o bouton wanan",
+    "ewo_status": "a_traduire",
+    "dua_status": "a_valider"
   },
   {
     "id": "tpl_dis_oui_continuer",
@@ -181,8 +198,9 @@
     "fr": "Dis « oui » pour continuer, ou « répète » pour réécouter.",
     "variables": [],
     "ewo": null,
-    "dua": null,
-    "status": "a_traduire"
+    "dua": "kwala oui o walla o bésè, tōsō répète o sengâ penîa",
+    "ewo_status": "a_traduire",
+    "dua_status": "a_valider"
   },
   {
     "id": "tpl_detecte_instant",
@@ -191,7 +209,8 @@
     "variables": [],
     "ewo": null,
     "dua": null,
-    "status": "a_traduire"
+    "ewo_status": "a_traduire",
+    "dua_status": "a_traduire"
   },
   {
     "id": "tpl_transfert_recu_de",
@@ -202,8 +221,9 @@
       "montant"
     ],
     "ewo": null,
-    "dua": null,
-    "status": "a_traduire"
+    "dua": "muloloman o dina la {nom} musousedi mua {montant}.",
+    "ewo_status": "a_traduire",
+    "dua_status": "a_valider"
   },
   {
     "id": "tpl_paiement_facture_fournisseur",
@@ -214,8 +234,9 @@
       "montant"
     ],
     "ewo": null,
-    "dua": null,
-    "status": "a_traduire"
+    "dua": "musisédi mua dipapa {fournisseur}, {montant}.",
+    "ewo_status": "a_traduire",
+    "dua_status": "a_valider"
   },
   {
     "id": "tpl_retrait_guichet_montant",
@@ -226,7 +247,8 @@
     ],
     "ewo": null,
     "dua": null,
-    "status": "a_traduire"
+    "ewo_status": "a_traduire",
+    "dua_status": "a_traduire"
   },
   {
     "id": "tpl_aujourdhui_date",
@@ -236,8 +258,9 @@
       "date"
     ],
     "ewo": null,
-    "dua": null,
-    "status": "a_traduire"
+    "dua": "wengue̍, {date}.",
+    "ewo_status": "a_traduire",
+    "dua_status": "a_valider"
   },
   {
     "id": "tpl_compte_numero",
@@ -248,6 +271,7 @@
     ],
     "ewo": null,
     "dua": null,
-    "status": "a_traduire"
+    "ewo_status": "a_traduire",
+    "dua_status": "a_traduire"
   }
 ]

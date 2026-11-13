@@ -64,4 +64,20 @@ describe('observeNewContent', () => {
 
     expect(seen).toEqual([['Ne communiquez jamais votre code secret']]);
   });
+
+  // Frameworks (Vue on the SAFINUM page) update a value by editing the
+  // existing text node, or replacing it with a bare text node.
+  it('reports a value edited in place', async () => {
+    document.body.innerHTML = '<p id="amount">15 000 FCFA</p>';
+    const seen: string[][] = [];
+    const stop = observeNewContent((added) => seen.push(added.map((n) => n.text)));
+
+    document.getElementById('amount')!.firstChild!.nodeValue = '150 000 FCFA';
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    document.getElementById('amount')!.textContent = '1 500 FCFA';
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    stop();
+
+    expect(seen).toEqual([['150 000 FCFA'], ['1 500 FCFA']]);
+  });
 });

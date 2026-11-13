@@ -32,13 +32,97 @@ export function findTemplate(id: string): TemplatePhrase | undefined {
  * app state like a chosen beneficiary name) — this function does no
  * extraction or verification of its own.
  */
-export function fillTemplate(template: TemplatePhrase, values: Record<string, string>): string {
-  // TODO (Phase 2): read from template.ewo / template.dua once a status is
-  // "valide" for the active language, falling back to `fr` until then.
+export function fillTemplate(template: TemplatePhrase, values: Record<string, string>, language: LanguageCode = 'dua'): string {
+  const statusKey = `${language}_status` as const;
+  const status = template[statusKey];
+  const translated = template[language];
+
+  const baseText = isShownTranslation(status) && translated ? translated : template.fr;
+
   return template.variables.reduce(
     (text, name) => text.replaceAll(`{${name}}`, values[name] ?? `{${name}}`),
-    template.fr,
+    baseText,
   );
+}
+
+/**
+ * A translation is shown once it is at least "a_valider" (proposed by a
+ * speaker, awaiting linguist review). Callers MUST label "a_valider" as such
+ * — never as validated (D1/D3). "a_traduire" always falls back to French.
+ */
+export function isShownTranslation(status: string | null | undefined): status is 'valide' | 'a_valider' {
+  return status === 'valide' || status === 'a_valider';
+}
+
+export interface TemplateMatch {
+  template: TemplatePhrase;
+  values: Record<string, string>;
+}
+
+function normalizeLiteral(text: string): string {
+  return text
+    .replace(/[«»"]/g, '"')
+    .replace(/[’']/g, "'")
+    .replace(/\s+/g, ' ');
+}
+
+function normalizeForMatch(text: string): string {
+  return normalizeLiteral(text).trim();
+}
+
+function escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Longer French sentences first: if two templates could match, the more
+// specific one wins (e.g. a sentence with a phone number over a short one).
+const templatesBySpecificity = [...templatePhrases].sort((a, b) => b.fr.length - a.fr.length);
+
+/**
+ * F9: matches a visible French sentence against a validated template phrase
+ * and captures its `{variables}`. This is deliberately a whole-string match:
+ * partial matches would translate only half a sentence and leave the rest in
+ * French. Only templates validated or awaiting validation ("a_valider") for
+ * `language` are considered — the caller labels the latter accordingly.
+ */
+export function matchTemplatePhrase(text: string, language: LanguageCode): TemplateMatch | null {
+  const normalizedText = normalizeForMatch(text);
+  if (!normalizedText) return null;
+
+  const statusKey = `${language}_status` as const;
+
+  for (const template of templatesBySpecificity) {
+    if (!isShownTranslation(template[statusKey]) || !template[language]) continue;
+
+    const names: string[] = [];
+    const pattern = template.fr
+      .split(/(\{[^{}]+\})/g)
+      .map((part) => {
+        const placeholder = part.match(/^\{([^{}]+)\}$/);
+        if (placeholder) {
+          const name = placeholder[1]!.trim();
+          if (template.variables.includes(name)) {
+            names.push(name);
+            return '(.+?)';
+          }
+          return escapeRegExp(part);
+        }
+        return escapeRegExp(normalizeLiteral(part)).replace(/ /g, '\\s+');
+      })
+      .join('');
+
+    const match = new RegExp(`^${pattern}$`, 'i').exec(normalizedText);
+    if (!match) continue;
+
+    const values: Record<string, string> = {};
+    names.forEach((name, index) => {
+      const value = match[index + 1]?.trim();
+      if (value) values[name] = value;
+    });
+    return { template, values };
+  }
+
+  return null;
 }
 
 function normalize(text: string): string {
@@ -52,25 +136,28 @@ export interface TranslateResult {
   text: string;
   source: 'glossaire' | 'original';
   /** The matched term's status, or null if nothing in the glossary matched this exact string. */
-  status: GlossaryTerm['status'] | null;
+  status: 'a_traduire' | 'a_valider' | 'valide' | null;
 }
 
 /**
- * F1's first and only link for now (phrases-modèles and IA come in later —
- * F9). Exact, whitespace-normalized match against the glossary.
+ * F1/F9's exact glossary lookup. Template sentences are handled separately
+ * by matchTemplatePhrase(); the IA fallback is the content script's last
+ * step for genuinely unseen text.
  *
  * F10/D9's fallback rule applies here too: an unmatched string, or a term
- * that isn't yet `status: "valide"`, is shown as the original French rather
- * than an invented or unverified translation.
+ * still "a_traduire", is shown as the original French. A term "a_valider"
+ * is returned with that status so the UI labels it "à valider".
  */
 export function translateText(text: string, language: LanguageCode): TranslateResult {
   const term = termsByNormalizedFr.get(normalize(text));
   const translated = term?.[language];
+  const statusKey = `${language}_status` as const;
+  const status = term?.[statusKey] ?? null;
 
-  if (term && term.status === 'valide' && translated) {
-    return { original: text, text: translated, source: 'glossaire', status: term.status };
+  if (term && isShownTranslation(status) && translated) {
+    return { original: text, text: translated, source: 'glossaire', status };
   }
-  return { original: text, text, source: 'original', status: term?.status ?? null };
+  return { original: text, text, source: 'original', status };
 }
 
 const explanationByTermId = new Map(explanations.map((e) => [e.termId, e]));

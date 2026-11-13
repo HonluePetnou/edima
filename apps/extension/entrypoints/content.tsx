@@ -1,7 +1,9 @@
 import { render } from 'preact';
 import {
   extractProtectedValues,
+  fillTemplate,
   findExplanationForText,
+  matchTemplatePhrase,
   reinsertProtectedValues,
   speakAmount,
   translateText,
@@ -15,6 +17,7 @@ import { extractRecap } from '../utils/recap';
 import { classifyStep } from '../utils/journey';
 import { checkConsistency } from '../utils/consistency';
 import { isFinancialPage } from '../utils/financial-page';
+import { speakFrenchLocally } from '../utils/speech';
 import { loadSettings, onSettingsChanged } from '../utils/settings';
 import TalkingBubble, { type BubbleState } from '../components/TalkingBubble';
 import FloatingMascot from '../components/FloatingMascot';
@@ -52,14 +55,35 @@ function translateVisiblePage(aiCache: Map<string, string>, language: LanguageCo
     const spokenAmount = speakAmount(text, AMOUNT_SPEECH_LANGUAGE) ?? undefined;
     const explanation = findExplanationForText(text) ?? undefined;
 
+    const result = translateText(text, language);
+    // A glossary "translation" identical to the French (e.g. "Confirmer le
+    // transfert" → "confirmer le transfert") isn't one: show it as French.
+    const sameAsFrench = result.text.trim().toLowerCase() === text.trim().toLowerCase();
+    if (result.source === 'glossaire' && !sameAsFrench) {
+      const source = result.status === 'valide' ? 'glossaire' : 'a_valider';
+      lines.push({ original: result.original, text: result.text, source, spokenAmount, explanation });
+      continue;
+    }
+
+    const templateMatch = matchTemplatePhrase(text, language);
+    if (templateMatch) {
+      lines.push({
+        original: text,
+        text: fillTemplate(templateMatch.template, templateMatch.values, language),
+        source: templateMatch.template[`${language}_status`] === 'valide' ? 'phrase_modele' : 'a_valider',
+        spokenAmount,
+        explanation,
+      });
+      continue;
+    }
+
     const cached = aiCache.get(text);
     if (cached) {
       lines.push({ original: text, text: cached, source: 'ia', spokenAmount, explanation });
       continue;
     }
 
-    const result = translateText(text, language);
-    lines.push({ original: result.original, text: result.text, source: result.source, spokenAmount, explanation });
+    lines.push({ original: result.original, text: result.text, source: 'original', spokenAmount, explanation });
   }
   return lines;
 }
@@ -67,12 +91,11 @@ function translateVisiblePage(aiCache: Map<string, string>, language: LanguageCo
 // Best-effort voice while no Ewondo/Duala synthesis exists yet (D2) — French
 // placeholder so every "lu à voix haute" requirement (F2/F3/F5/F7) already
 // holds end-to-end before real native-language audio is wired in.
+// On-device voices only (utils/speech.ts): nothing displayed on the bank
+// page is sent to an online speech service. speakFrenchLocally() cancels
+// whatever was playing, so a new F7 warning always interrupts.
 function speakFrench(text: string) {
-  if (!('speechSynthesis' in window)) return;
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = 'fr-FR';
-  speechSynthesis.cancel(); // F7: a new warning always interrupts whatever was playing
-  speechSynthesis.speak(utterance);
+  speakFrenchLocally(text);
 }
 
 export default defineContentScript({
@@ -81,7 +104,7 @@ export default defineContentScript({
 
   async main(ctx) {
     // D5: switched live via the side panel's language selector.
-    let activeLanguage: LanguageCode = 'ewo';
+    let activeLanguage: LanguageCode = 'dua';
 
     // Safety rule from the cahier des charges: by default the page's own DOM is
     // never written to. Every bit of Edima UI lives inside one Shadow DOM host,
@@ -91,7 +114,10 @@ export default defineContentScript({
     // Floating mascot: visible on financial pages, unless the user turned it
     // off or the side panel is already open.
     let panelOpen = false;
-    let showMascotSetting = (await loadSettings()).showMascot;
+    const initialSettings = await loadSettings();
+    let showMascotSetting = initialSettings.showMascot;
+    // F9 IA: off unless the user turned it on in the panel's settings.
+    let aiEnabled = initialSettings.aiEnabled;
     let isFinancial = false;
     let hasAlert = false;
 
@@ -135,6 +161,17 @@ export default defineContentScript({
 
     onSettingsChanged((s) => {
       showMascotSetting = s.showMascot;
+      const aiWasEnabled = aiEnabled;
+      aiEnabled = s.aiEnabled;
+      if (aiWasEnabled && !aiEnabled) {
+        // Turning IA off removes every provisional IA line straight away.
+        aiCache.clear();
+        aiAttempted.clear();
+        rescan();
+        reportToSidePanel();
+      } else if (!aiWasEnabled && aiEnabled) {
+        void tryAiFallback(currentLines.map((l) => l.original));
+      }
       renderOverlay();
     });
     chrome.runtime.sendMessage({ type: 'edima:get-panel-state' }, (response: PanelStateResponse | undefined) => {
@@ -146,10 +183,17 @@ export default defineContentScript({
     // button inside a freshly-injected pop-up gets wired up too) ----
     const wiredElements = new WeakSet<HTMLElement>();
 
+    // Hover descriptions are generated from a French template until the
+    // linguist validates a Duala version, so F9 translates them on demand.
+    // Cache by French source text; bump the request id on every hover/leave
+    // so a slow response never replaces a newer bubble.
+    const hoverCache = new Map<string, string>();
+    let hoverRequestId = 0;
+
     function wireInteractiveElements(): string[] {
       const labels: string[] = [];
       for (const el of findInteractiveElements()) {
-        const described = describeElement(el);
+        const described = describeElement(el, activeLanguage);
         if (!described) continue;
         labels.push(described.label);
         if (wiredElements.has(el)) continue;
@@ -157,10 +201,38 @@ export default defineContentScript({
 
         const speak = () => {
           const rect = el.getBoundingClientRect();
-          showBubble({ x: rect.left + rect.width / 2, y: rect.top - 8, text: described.description });
-          speakFrench(described.description);
+          const x = rect.left + rect.width / 2;
+          const y = rect.top - 8;
+          const frenchDescription = described.description;
+          const language = activeLanguage;
+          const requestId = ++hoverRequestId;
+          const cached = hoverCache.get(frenchDescription);
+
+          showBubble({ x, y, text: cached ?? frenchDescription });
+          speakFrench(frenchDescription);
+
+          if (!aiEnabled || language !== 'dua' || cached) return;
+
+          const { masked, values } = extractProtectedValues(frenchDescription);
+          void requestAiTranslation(masked, language).then((translated) => {
+            if (!translated || requestId !== hoverRequestId) return;
+
+            const final = reinsertProtectedValues(translated, values);
+            if (!verifyValuesIntact(final, values)) return; // F10: never show a value mismatch
+
+            hoverCache.set(frenchDescription, final);
+            const currentRect = el.getBoundingClientRect();
+            showBubble({
+              x: currentRect.left + currentRect.width / 2,
+              y: currentRect.top - 8,
+              text: final,
+            });
+          });
         };
-        const hide = () => showBubble(null);
+        const hide = () => {
+          hoverRequestId++;
+          showBubble(null);
+        };
 
         el.addEventListener('mouseenter', speak);
         el.addEventListener('focus', speak);
@@ -175,7 +247,9 @@ export default defineContentScript({
     let warningBubbleTimer: ReturnType<typeof setTimeout> | undefined;
 
     function announceNewWarnings(lines: TranslatedLine[]): string[] {
-      const warnings = findWarningLines(lines).map((l) => l.text);
+      // The bank's own French wording: spoken by a French voice, and shown in
+      // the panel with its translation (if any) above it.
+      const warnings = findWarningLines(lines).map((l) => l.original);
       const fresh = warnings.filter((text) => !spokenWarnings.has(text));
       for (const text of fresh) spokenWarnings.add(text);
 
@@ -191,29 +265,43 @@ export default defineContentScript({
     }
 
     // ---- F9: contenu inédit — chaîne glossaire → phrases-modèles → IA ----
-    // (phrases-modèles matching isn't wired yet: it needs real sentence
-    // structure matching, not just the exact-string lookup translateText()
-    // does today. Unmatched text here goes straight to the IA fallback.)
+    // Exact glossary match first, then validated template sentences, then the
+    // IA fallback for genuinely unseen text (including glossary terms still
+    // waiting for linguist review).
     const aiCache = new Map<string, string>();
+    // Texts already sent to the model (successful or not), so a failed request
+    // is not retried on every DOM mutation. Cleared on a language switch.
+    const aiAttempted = new Set<string>();
 
-    function requestAiTranslation(masked: string): Promise<string | null> {
+    function requestAiTranslation(
+      masked: string,
+      language: LanguageCode = activeLanguage,
+    ): Promise<string | null> {
       return new Promise((resolve) => {
         chrome.runtime.sendMessage(
-          { type: 'edima:translate-unknown', masked, language: activeLanguage },
+          { type: 'edima:translate-unknown', masked, language },
           (response: TranslateUnknownResponse | undefined) => resolve(response?.translated ?? null),
         );
       });
     }
 
-    async function tryAiFallback(addedTexts: string[]) {
-      for (const text of addedTexts) {
-        if (aiCache.has(text)) continue;
-        // Only genuinely unseen content is F9's job — a known glossary term
-        // (any status) was already handled by translateText() above.
-        if (translateText(text, activeLanguage).status !== null) continue;
+    async function tryAiFallback(texts: string[]) {
+      if (!aiEnabled) return;
+      let changed = false;
+      for (const text of texts) {
+        if (aiCache.has(text) || aiAttempted.has(text)) continue;
+        // A validated glossary entry or template phrase always wins;
+        // unvalidated entries (and genuinely unseen text) are allowed to get
+        // a provisional IA reading.
+        if (translateText(text, activeLanguage).source === 'glossaire') continue;
+        if (matchTemplatePhrase(text, activeLanguage)) continue;
         if (text.length < 8 || text.length > 200) continue; // not sentence-like enough to bother the LLM with
 
+        aiAttempted.add(text);
         const { masked, values } = extractProtectedValues(text);
+        // Nothing left to translate once names/numbers/amounts are masked
+        // (e.g. "Amina Ngo Bell", "CM 001 2345 6789 01"): never send it.
+        if (!/\p{L}{2,}/u.test(masked.replace(/\{\{V\d+\}\}/g, ''))) continue;
         const translated = await requestAiTranslation(masked);
         if (!translated) continue; // server unavailable — French original keeps showing, correctly
 
@@ -221,6 +309,11 @@ export default defineContentScript({
         if (!verifyValuesIntact(final, values)) continue; // F10's safety net: never show a value mismatch
 
         aiCache.set(text, final);
+        changed = true;
+      }
+
+      // One rescan/report for the whole batch instead of one per translated line.
+      if (changed) {
         rescan();
         reportToSidePanel();
       }
@@ -296,7 +389,11 @@ export default defineContentScript({
       // ---- F5: parcours guidé ----
       const fields = findFormFields();
       currentFormFields = fields.map(({ label, description }) => ({ label, description }));
-      currentRecap = extractRecap(currentLines);
+      // The recap is read on the page's full text in order: the displayed
+      // list drops repeats ("15 000 FCFA" is both montant and total), which
+      // would break the label → value pairs.
+      const pageLines: TranslatedLine[] = extractVisibleText().map(({ text }) => ({ original: text, text, source: 'original' }));
+      currentRecap = extractRecap(pageLines);
       currentStep = classifyStep(currentLines, fields.length > 0, currentRecap !== null);
       wireMontantCapture(fields);
 
@@ -328,6 +425,8 @@ export default defineContentScript({
     };
     reportToSidePanel();
     checkRecapConsistency();
+    void tryAiFallback(currentLines.map((l) => l.original));
+
 
     observeNewContent((added) => {
       rescan();
@@ -349,9 +448,11 @@ export default defineContentScript({
       if (message.type === 'edima:set-language') {
         activeLanguage = message.language;
         aiCache.clear(); // a cached translation only makes sense for the language it was produced in
+        aiAttempted.clear();
         rescan();
         reportToSidePanel();
         checkRecapConsistency();
+        void tryAiFallback(currentLines.map((l) => l.original));
         sendResponse({});
         return true;
       }

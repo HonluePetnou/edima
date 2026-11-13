@@ -16,9 +16,11 @@ describe('extractProtectedValues', () => {
 
   it('masks a Cameroonian phone number', () => {
     const { masked, values } = extractProtectedValues('Bénéficiaire : Paul Mballa, 6 99 12 34 56');
-    expect(masked).toContain('{{V0}}');
-    expect(values[0].type).toBe('telephone');
-    expect(values[0].value.replace(/\s/g, '')).toContain('699123456');
+    const phone = values.find((v) => v.type === 'telephone');
+    expect(phone?.value.replace(/\s/g, '')).toContain('699123456');
+    expect(masked).toContain(phone!.token);
+    // The beneficiary's name is protected too — names are never translated.
+    expect(values.find((v) => v.type === 'nom')?.value).toBe('Paul Mballa');
   });
 
   it('masks a date', () => {
@@ -55,5 +57,35 @@ describe('verifyValuesIntact', () => {
     const { values } = extractProtectedValues('Total 5 100 FCFA');
     const corrupted = 'Total 5 000 FCFA'; // wrong amount, as if the model changed it
     expect(verifyValuesIntact(corrupted, values)).toBe(false);
+  });
+});
+
+// Values from the SAFINUM hackathon test page — none may ever be translated.
+describe('extractProtectedValues on SAFINUM values', () => {
+  const kinds = (text: string) => extractProtectedValues(text).values.map((v) => [v.type, v.value]);
+
+  it('masks a full person name', () => {
+    expect(kinds('Bonjour, Amina Ngo Bell')).toContainEqual(['nom', 'Amina Ngo Bell']);
+  });
+
+  it('masks an account number', () => {
+    expect(kinds('Numéro de compte : CM 001 2345 6789 01')).toContainEqual(['reference', 'CM 001 2345 6789 01']);
+  });
+
+  it('masks a transfer reference', () => {
+    expect(kinds('Référence : TRX-2026-00042')).toContainEqual(['reference', 'TRX-2026-00042']);
+  });
+
+  it('masks a written date', () => {
+    expect(kinds('Paiement marchand 05 nov. 2026')).toContainEqual(['date', '05 nov. 2026']);
+  });
+
+  it('masks a fee rate', () => {
+    expect(kinds('Frais de 1,5 % (min. 100 FCFA, max. 2 500 FCFA)').map((k) => k[1])).toEqual(['1,5 %', '100 FCFA', '2 500 FCFA']);
+  });
+
+  it('leaves an ordinary sentence untouched', () => {
+    const text = 'Vérifiez les informations avant de confirmer le transfert.';
+    expect(extractProtectedValues(text)).toEqual({ masked: text, values: [] });
   });
 });

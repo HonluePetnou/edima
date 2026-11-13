@@ -1,0 +1,42 @@
+PHRASES-MODÈLES À TRADUIRE (FRANÇAIS → DUALA)
+24 phrases. Écris la traduction duala après le signe « = ».
+Ne modifie pas le texte français ni les titres de catégorie.
+Conserve les {variables} exactement tels quels (ex. {montant}, {nom}) : ils seront remplacés automatiquement.
+
+## TRANSFERT
+Tu vas envoyer {montant} à {nom}. = 
+Les frais de ce transfert sont de {montant}. = 
+Le total qui sort de ton compte est {montant}. = 
+Tu envoies {montant} à {nom}, numéro {telephone}. = 
+Aujourd'hui, {date}. = 
+
+## COMPTE
+Il te reste sur ton compte {montant}. = 
+Ton solde disponible est de {montant}. = 
+Transfert reçu de {nom}, {montant}. = 
+Paiement de facture {fournisseur}, {montant}. = 
+Retrait au guichet, {montant}. = 
+Compte numéro {numero_masque}. = 
+
+## NAVIGATION
+« {bouton} » : {description}. = 
+Le bouton « {bouton} » sert à {description}. = 
+
+## VOIX
+Edima lit ce passage. = 
+
+## PARCOURS
+Edima explique chaque champ à voix haute. = 
+Remplis le formulaire toi-même sur le site, ou dis les valeurs à voix haute. = 
+
+## CONFIRMATION
+Si tout est juste, clique toi-même sur « {bouton} ». = 
+Dis « oui » pour continuer, ou « répète » pour réécouter. = 
+
+## SÉCURITÉ
+Un message est apparu sur la page. Edima le lit maintenant. = 
+Un message te demande ton code secret par SMS. = 
+Ta banque et Edima ne te le demanderont jamais. = 
+N'y réponds pas. = 
+Dis « j'ai compris », ou appuie sur le bouton ci-dessous. = 
+Détecté à l'instant. = 

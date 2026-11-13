@@ -7,6 +7,14 @@ import { extractPhoneNumber, phoneToWords } from 'edima-shared';
 import type { TranslatedLine } from './messages';
 
 const AMOUNT_PATTERN = /\d[\d\s ]*\s?(FCFA|F\s?CFA|francs?)/i;
+// A recap label is a short caption ("Bénéficiaire", "Nom du destinataire"),
+// never a sentence that merely mentions the word.
+const BENEFICIAIRE_LABEL = /^(nom du |nom de la )?(b[ée]n[ée]ficiaire|destinataire)\s*:?$/i;
+// Step and section names: a "Bénéficiaire" caption followed by one of these
+// is a stepper or a menu, not the recap's beneficiary line.
+const NOT_A_NAME = /^(solde|frais|b[ée]n[ée]ficiaire|r[ée]capitulatif|confirmation|re[çc]u|montant|total|t[ée]l[ée]phone|r[ée]f[ée]rence|op[ée]ration|motif|note)\b/i;
+const LABEL_MAX = 40;
+const VALUE_MAX = 60;
 
 export interface RecapInfo {
   beneficiaire: string | null;
@@ -28,27 +36,45 @@ export function extractRecap(lines: TranslatedLine[]): RecapInfo | null {
     beneficiairePhoneWords: null,
   };
 
+  // Labels are matched on the bank's own wording (`original`): once a label
+  // is translated its `text` no longer says "Montant", "Frais", etc.
+  const beneficiaires: { index: number; value: string }[] = [];
+  let montantIndex = -1;
+  let phoneLine: string | null = null;
   for (let i = 0; i < lines.length; i++) {
-    const label = lines[i]?.text ?? '';
-    const value = lines[i + 1]?.text;
-    if (!value) continue;
+    const label = lines[i]?.original ?? '';
+    const value = lines[i + 1]?.original;
+    if (!value || label.length > LABEL_MAX) continue;
 
-    if (!info.beneficiaire && /b[ée]n[ée]ficiaire|destinataire/i.test(label)) {
-      info.beneficiaire = value;
-      const phone = extractPhoneNumber(value);
-      if (phone) info.beneficiairePhoneWords = phoneToWords(phone);
+    if (BENEFICIAIRE_LABEL.test(label.trim()) && value.length <= VALUE_MAX && !AMOUNT_PATTERN.test(value) && !NOT_A_NAME.test(value.trim())) {
+      beneficiaires.push({ index: i, value });
     }
+    if (!phoneLine && /^(t[ée]l[ée]phone|num[ée]ro( de t[ée]l[ée]phone)?)\s*:?$/i.test(label.trim())) phoneLine = value;
     if (!info.total && /total/i.test(label) && AMOUNT_PATTERN.test(value)) {
       info.total = value;
     } else if (!info.frais && /^frais/i.test(label) && AMOUNT_PATTERN.test(value)) {
       info.frais = value;
     } else if (!info.montant && /montant|tu envoies/i.test(label) && AMOUNT_PATTERN.test(value)) {
       info.montant = value;
+      montantIndex = i;
     }
   }
 
-  const found = info.beneficiaire || info.montant || info.frais || info.total;
-  return found ? info : null;
+  // "Bénéficiaire" can also be a step name in the page's stepper; the one
+  // that belongs to the recap sits closest to the amount.
+  const closest = [...beneficiaires].sort((a, b) => Math.abs(a.index - montantIndex) - Math.abs(b.index - montantIndex))[0];
+  if (closest) {
+    info.beneficiaire = closest.value;
+    // D12: the phone sits inside the name line on some pages, on its own
+    // "Téléphone" line on others (SAFINUM).
+    const phone = extractPhoneNumber(closest.value) ?? (phoneLine ? extractPhoneNumber(phoneLine) : null);
+    if (phone) info.beneficiairePhoneWords = phoneToWords(phone);
+  }
+
+  // A confirmation screen shows who gets the money, how much, and what it
+  // costs. A balance or form page that only shows a running total doesn't.
+  const isRecap = !!info.beneficiaire && !!info.montant && !!(info.frais || info.total);
+  return isRecap ? info : null;
 }
 
 export function formatRecapSummary(info: RecapInfo): string {

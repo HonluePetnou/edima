@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import { summarizePage } from '../../utils/summarize';
 import { formatRecapSummary } from '../../utils/recap';
 import { loadSettings, saveSettings, DEFAULT_SETTINGS, type EdimaSettings } from '../../utils/settings';
+import { speakFrenchLocally } from '../../utils/speech';
+import { fillTemplate, matchTemplatePhrase } from 'edima-shared';
+import { clipUrl, loadClipManifest, type ClipManifest } from '../../utils/audio-clips';
 import { Header, SPEECH_RATES } from '../../components/panel/Header';
 import { AlertBanner } from '../../components/panel/Blocks';
 import { HomeView, ReadView, LinesView, GuideView, SafetyView, TransparencyView, SettingsView, PanelFooter, type View, type ViewContext } from './views';
@@ -20,7 +23,7 @@ const hasExtensionContext = typeof chrome !== 'undefined' && !!chrome.runtime?.i
 
 export default function App() {
   const [lines, setLines] = useState<TranslatedLine[] | null>(null);
-  const [language, setLanguageState] = useState<LanguageCode>('ewo');
+  const [language, setLanguageState] = useState<LanguageCode>('dua');
   const [buttonLabels, setButtonLabels] = useState<string[]>([]);
   const [warnings, setWarnings] = useState<string[]>([]);
   const [step, setStep] = useState<StepInfo | null>(null);
@@ -43,31 +46,60 @@ export default function App() {
   const rateRef = useRef(0);
   rateRef.current = settings.rateIndex;
 
-  const speak = (key: string, text: string) => {
-    if (!text || !('speechSynthesis' in window)) return;
+  // Native-language clips for the current language (see utils/audio-clips.ts).
+  const [clips, setClips] = useState<ClipManifest | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  useEffect(() => {
+    loadClipManifest(language).then(setClips);
+  }, [language]);
+
+  /** `text` must be French (it's read by a French voice). `clipFor` is the
+   * French source whose native-language clip, if any, plays instead. */
+  const speak = (key: string, text: string, clipFor?: string) => {
+    if (!text) return;
+    const audio = audioRef.current;
     if (playingKey === key && !isPaused) {
-      speechSynthesis.pause();
+      if (audio && !audio.paused) audio.pause();
+      else if ('speechSynthesis' in window) speechSynthesis.pause();
       setIsPaused(true);
       return;
     }
     if (playingKey === key && isPaused) {
-      speechSynthesis.resume();
+      if (audio && audio.src && audio.paused && audio.currentTime > 0) void audio.play();
+      else if ('speechSynthesis' in window) speechSynthesis.resume();
       setIsPaused(false);
       return;
     }
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'fr-FR';
-    utterance.rate = SPEECH_RATES[rateRef.current] ?? 1;
-    utterance.onstart = () => {
-      setPlayingKey(key);
-      setIsPaused(false);
-    };
-    utterance.onend = () => {
+
+    if ('speechSynthesis' in window) speechSynthesis.cancel();
+    audio?.pause();
+    const done = () => {
       setPlayingKey((current) => (current === key ? null : current));
       setIsPaused(false);
     };
-    speechSynthesis.cancel();
-    speechSynthesis.speak(utterance);
+
+    const url = clipFor ? clipUrl(clips, language, clipFor) : null;
+    if (url) {
+      const el = new Audio(url);
+      el.playbackRate = SPEECH_RATES[rateRef.current] ?? 1;
+      el.onended = done;
+      el.onerror = done;
+      audioRef.current = el;
+      setPlayingKey(key);
+      setIsPaused(false);
+      void el.play().catch(done);
+      return;
+    }
+
+    audioRef.current = null;
+    speakFrenchLocally(text, {
+      rate: SPEECH_RATES[rateRef.current] ?? 1,
+      onStart: () => {
+        setPlayingKey(key);
+        setIsPaused(false);
+      },
+      onEnd: done,
+    });
   };
 
   useEffect(() => {
@@ -177,6 +209,10 @@ export default function App() {
   // D4 mismatch first, then the latest F7 warning — both stay visible.
   const alerts = [mismatch, warnings.length > 0 ? warnings[warnings.length - 1]! : null].filter((a): a is string => !!a);
   const priorityAlert = alerts[0] ?? null;
+  // Alerts arrive as the page's French text; show the translation above it
+  // when there is one, but never drop the original (SAFINUM: a translated
+  // warning must not become weaker or ambiguous).
+  const alertTranslation = (french: string) => lines?.find((l) => l.original === french && l.source !== 'original' && l.text !== french)?.text;
 
   // F6/D4: when a récap (or a mismatch) appears, jump to it once — the user
   // can still go back to the welcome screen afterwards.
@@ -186,9 +222,20 @@ export default function App() {
   }, [needsGuide]);
   const effectiveView = view;
 
-  const summary = lines ? summarizePage(lines, buttonLabels) : '';
+  // Spoken by a French voice, so built from the French originals — never
+  // from Duala/Ewondo text (see utils/speech.ts).
+  const summary = lines ? summarizePage(lines.map((l) => ({ ...l, text: l.original })), buttonLabels) : '';
+  // Shown on screen: each summary sentence that matches a (validated or
+  // proposed) template phrase is displayed in the chosen language.
+  const summaryDisplay = summary
+    .split(/(?<=[.:])\s+/)
+    .map((sentence) => {
+      const match = matchTemplatePhrase(sentence, language);
+      return match ? fillTemplate(match.template, match.values, language) : sentence;
+    })
+    .join(' ');
   const recapSummary = recap ? `${formatRecapSummary(recap)}${consistency ? ` ${consistency.message}` : ''}` : '';
-  const formSpeech = step ? `Étape ${step.index} sur ${step.total} : ${step.label}. ${formFields.map((f) => `${f.label} : ${f.description}`).join(' ')}` : '';
+  const formSpeech = step ? `${step.label}. ${formFields.map((f) => `${f.label} : ${f.description}`).join(' ')}` : '';
 
   // What the header's play button reads for the current screen.
   const primary: { key: string; text: string } | null =
@@ -227,6 +274,7 @@ export default function App() {
     formFields,
     recap,
     summary,
+    summaryDisplay,
     online,
     settings,
     language,
@@ -263,7 +311,13 @@ export default function App() {
         {!loading &&
           !unsupported &&
           alerts.map((message, i) => (
-            <AlertBanner key={message} message={message} playing={ctx.playingKey === `alert-${i}`} onListen={() => speak(`alert-${i}`, message)} />
+            <AlertBanner
+              key={message}
+              message={message}
+              translation={alertTranslation(message)}
+              playing={ctx.playingKey === `alert-${i}`}
+              onListen={() => speak(`alert-${i}`, message, message)}
+            />
           ))}
 
         {effectiveView === 'settings' ? (

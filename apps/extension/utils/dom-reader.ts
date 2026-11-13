@@ -61,14 +61,21 @@ export function observeNewContent(callback: NewContentCallback, root: Node = doc
 
     const found: VisibleTextNode[] = [];
     for (const node of addedNodes) {
-      if (!(node instanceof Element) && !(node instanceof Document)) continue;
-      found.push(...extractVisibleText(node as ParentNode));
+      // A bare text node (added, or edited in place by a framework like Vue
+      // when a total is recomputed) is read through its parent element.
+      const target = node instanceof Text ? node.parentElement : node;
+      if (!(target instanceof Element) && !(target instanceof Document)) continue;
+      found.push(...extractVisibleText(target as ParentNode));
     }
     if (found.length > 0) callback(found);
   };
 
   const observer = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
+      if (mutation.type === 'characterData') {
+        pending.add(mutation.target);
+        continue;
+      }
       for (const node of mutation.addedNodes) {
         pending.add(node);
       }
@@ -78,6 +85,8 @@ export function observeNewContent(callback: NewContentCallback, root: Node = doc
     timer = setTimeout(flush, 150);
   });
 
-  observer.observe(root, { childList: true, subtree: true });
+  // characterData: values that change in place (a recomputed fee or total,
+  // an amount altered after load) must be re-read, not only new elements.
+  observer.observe(root, { childList: true, subtree: true, characterData: true });
   return () => observer.disconnect();
 }

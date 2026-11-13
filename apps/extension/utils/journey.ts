@@ -24,7 +24,7 @@ const STEPS: Record<StepId, StepInfo> = {
 const AMOUNT_PATTERN = /\d[\d\s ]*\s?(FCFA|F\s?CFA|francs?)/i;
 
 function hasSoldeMention(lines: TranslatedLine[]): boolean {
-  return lines.some((line, i) => /solde/i.test(line.text) && AMOUNT_PATTERN.test(lines[i + 1]?.text ?? line.text));
+  return lines.some((line, i) => /solde/i.test(line.original) && AMOUNT_PATTERN.test(lines[i + 1]?.original ?? line.original));
 }
 
 /**

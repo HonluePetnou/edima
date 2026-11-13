@@ -20,7 +20,7 @@ export const DEV_SCENARIOS: Record<string, Scenario> = {
         source: 'ia',
         spokenAmount: 'cinq mille francs',
       },
-      { original: 'Le solde du compte est suffisant.', text: 'Ndoŋ ye mony ye ô kôló', source: 'glossaire' },
+      { original: 'Le solde du compte est suffisant.', text: 'Ndoŋ ye mony ye ô kôló', source: 'a_valider' },
     ],
     buttonLabels: ['Confirmer le transfert'],
     warnings: ['Ne communique jamais ton code secret, même à un conseiller de la banque.'],
@@ -43,8 +43,8 @@ export const DEV_SCENARIOS: Record<string, Scenario> = {
 
   'recapitulatif-ok': {
     lines: [
-      { original: 'Montant', text: 'Montant', source: 'glossaire' },
-      { original: 'Bénéficiaire', text: 'Bénéficiaire', source: 'glossaire' },
+      { original: 'Montant', text: 'Montant', source: 'a_valider' },
+      { original: 'Bénéficiaire', text: 'Bénéficiaire', source: 'a_valider' },
     ],
     buttonLabels: ['Confirmer le transfert'],
     warnings: [],
@@ -76,8 +76,8 @@ export const DEV_SCENARIOS: Record<string, Scenario> = {
 
   solde: {
     lines: [
-      { original: 'Solde disponible', text: 'Solde disponible', source: 'glossaire' },
-      { original: '245 500 FCFA', text: '245 500 FCFA', source: 'glossaire', spokenAmount: 'deux cent quarante-cinq mille cinq cents francs' },
+      { original: 'Solde disponible', text: 'Solde disponible', source: 'a_valider' },
+      { original: '245 500 FCFA', text: '245 500 FCFA', source: 'a_valider', spokenAmount: 'deux cent quarante-cinq mille cinq cents francs' },
       { original: 'Dernière mise à jour : aujourd’hui à 10h30.', text: 'Dernière mise à jour : aujourd’hui à 10h30.', source: 'original' },
     ],
     buttonLabels: ['Envoyer de l’argent', 'Recharger', 'Payer une facture', 'Historique'],

@@ -7,9 +7,12 @@ export interface EdimaSettings {
   /** null = follow the system's light/dark preference. */
   theme: 'light' | 'dark' | null;
   rateIndex: number;
+  /** F9 machine translation of unseen text. Off by default: unvalidated
+   * output and page text sent to a (local) model must be an explicit choice. */
+  aiEnabled: boolean;
 }
 
-export const DEFAULT_SETTINGS: EdimaSettings = { showMascot: true, theme: null, rateIndex: 0 };
+export const DEFAULT_SETTINGS: EdimaSettings = { showMascot: true, theme: null, rateIndex: 0, aiEnabled: false };
 const KEY = 'edimaSettings';
 
 const hasStorage = () => typeof chrome !== 'undefined' && !!chrome.storage?.local;
