@@ -88,7 +88,7 @@ Les jeux Mozilla de l'Institute of African Digital Humanities sont sous licence 
 
 ### Code
 
-- Mascotte déplaçable, dessin « Edima parle », mise à jour de `PLAN.md`, vidéo de 3 min, note technique.
+- Dessin « Edima parle » (F-6), mise à jour de `PLAN.md`, vidéo de 3 min, note technique.
 - Nettoyer la branche `feature/moteur-de-traduction` (journal de session de 11 000 lignes commité).
 
 ## 4. Features futures (feuille de route, prête à confier à Claude)
