@@ -13,9 +13,12 @@ export interface EdimaSettings {
   /** Rewrite the page's own labels in the chosen language (in-page.ts).
    * Off by default: Edima otherwise never writes to the bank's page. */
   inPage: boolean;
+  /** F-5: where the floating mascot sits on the page, dragged there by the
+   * user (FloatingMascot.tsx). null = the default bottom-right corner. */
+  mascotPosition: { right: number; bottom: number } | null;
 }
 
-export const DEFAULT_SETTINGS: EdimaSettings = { showMascot: true, theme: null, rateIndex: 0, aiEnabled: false, inPage: false };
+export const DEFAULT_SETTINGS: EdimaSettings = { showMascot: true, theme: null, rateIndex: 0, aiEnabled: false, inPage: false, mascotPosition: null };
 const KEY = 'edimaSettings';
 
 const hasStorage = () => typeof chrome !== 'undefined' && !!chrome.storage?.local;

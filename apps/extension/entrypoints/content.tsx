@@ -19,7 +19,7 @@ import { checkConsistency, checkRecapArithmetic } from '../utils/consistency';
 import { isFinancialPage } from '../utils/financial-page';
 import { speakFrenchLocally } from '../utils/speech';
 import { applyInPage, restoreAll, restoreExcept } from '../utils/in-page';
-import { loadSettings, onSettingsChanged } from '../utils/settings';
+import { loadSettings, onSettingsChanged, saveSettings } from '../utils/settings';
 import TalkingBubble, { type BubbleState } from '../components/TalkingBubble';
 import FloatingMascot from '../components/FloatingMascot';
 import mascotIdleSrc from '../assets/mascot/edima-idle.webp?inline';
@@ -117,6 +117,8 @@ export default defineContentScript({
     let panelOpen = false;
     const initialSettings = await loadSettings();
     let showMascotSetting = initialSettings.showMascot;
+    // F-5: dragged there by the user — null until they move it once.
+    let mascotPosition = initialSettings.mascotPosition;
     // F9 IA: off unless the user turned it on in the panel's settings.
     let aiEnabled = initialSettings.aiEnabled;
     // "Traduire dans la page": off unless chosen in the panel's settings.
@@ -125,6 +127,14 @@ export default defineContentScript({
     let hasAlert = false;
 
     const openPanel = () => chrome.runtime.sendMessage({ type: 'edima:open-panel' }).catch(() => {});
+    const moveMascot = (next: { right: number; bottom: number }) => {
+      mascotPosition = next;
+      saveSettings({ mascotPosition: next }).catch(() => {});
+      // No renderOverlay() here: FloatingMascot already shows the dragged
+      // position itself (its own `live` state) for the duration of the
+      // drag — re-rendering from a fresh `position` prop would just match
+      // what's already on screen.
+    };
     // Inlined as data: URLs (see imports) rather than chrome-extension:// URLs,
     // which a bank's CSP can block and which break after an extension reload.
     const idleSrc = mascotIdleSrc;
@@ -136,7 +146,9 @@ export default defineContentScript({
       render(
         <>
           <TalkingBubble state={bubbleState} />
-          {mascotVisible && <FloatingMascot idleSrc={idleSrc} alertSrc={alertSrc} alert={hasAlert} onOpen={openPanel} />}
+          {mascotVisible && (
+            <FloatingMascot idleSrc={idleSrc} alertSrc={alertSrc} alert={hasAlert} position={mascotPosition} onOpen={openPanel} onMove={moveMascot} />
+          )}
         </>,
         mountContainer,
       );
@@ -164,6 +176,7 @@ export default defineContentScript({
 
     onSettingsChanged((s) => {
       showMascotSetting = s.showMascot;
+      mascotPosition = s.mascotPosition;
       if (s.inPage !== inPageEnabled) {
         inPageEnabled = s.inPage;
         if (!inPageEnabled) restoreAll();

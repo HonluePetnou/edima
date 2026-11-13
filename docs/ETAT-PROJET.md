@@ -24,6 +24,7 @@ Vérifié de bout en bout sur la page du jury https://safinum.cm/hackathon-test
 | 34 clips audio duala (Africa TTS) joués depuis le panneau | ✅ — voix de synthèse non relue, licence non commerciale |
 | IA (M2M100 local) | ✅ désactivée par défaut, option « Traduction IA (expérimentale) » |
 | F-4 : explications « ? » traduites par l'IA si l'option est activée, badge « IA — non vérifiée » | ✅ (`LineItem.tsx`), repli silencieux en français sinon |
+| F-5 : mascotte flottante déplaçable (glisser-déposer), position mémorisée | ✅ (`FloatingMascot.tsx` + `utils/settings.ts`) — vérifié sur une page de test (clic vs glissé, blocage aux bords) ; **à revérifier à la main sur SAFINUM** |
 | Tests | 160 tests verts (shared 97, server 7, extension 56) |
 
 Documents pour le jury : `docs/declaration-outils-safinum.md`.
@@ -35,6 +36,7 @@ Documents pour le jury : `docs/declaration-outils-safinum.md`.
 3. **Écouter les clips duala** avant de les montrer (`apps/extension/public/audio/dua/`).
 4. Vérifier qu'une **voix française locale** est installée sur le PC (Windows : Paramètres → Heure et langue → Voix). Sans elle, Edima reste silencieux.
 5. Laisser l'**IA désactivée** pendant la démo, ou la déclarer clairement si on l'active.
+6. **Tester le glisser-déposer de la mascotte** à la main sur SAFINUM (clic = ouvre le panneau, glisser = déplace) — vérifié sur une page de test, pas encore dans le navigateur réel.
 
 ### Lancer l'IA (optionnel, désactivée par défaut)
 
@@ -102,7 +104,6 @@ et revérifier sur SAFINUM avec un test Playwright + Edge chargeant `.output/chr
 |---|---|---|---|
 | F-1 | **Montants lus en duala** (F4) | `packages/shared/src/numbers.ts` : `amountToWords(n, 'dua')` à partir des nombres MPI-EVA (1–2 000) + milliers/millions confirmés par un locuteur ; brancher `speakAmount` dans `content.tsx` (`AMOUNT_SPEECH_LANGUAGE`) | Tests unitaires sur 100 montants validés |
 | F-2 | **Montants audio assemblés** | Enregistrer 0–9, dizaines, 100, 1 000, million, « francs » ; `utils/audio-clips.ts` → nouvelle fonction qui enchaîne les clips selon F-1 | Écoute + test de l'ordre des clips |
-| F-5 | **Mascotte déplaçable** | `components/FloatingMascot.tsx` : glisser-déposer, position mémorisée dans `utils/settings.ts` | Test manuel sur SAFINUM |
 | F-6 | **Illustration « Edima parle »** | Nouveau dessin dans le style `etat/`, remplacer l'astuce idle + ondes dans `components/ui/Mascot.tsx` | Visuel |
 | F-7 | **Ewondo** | Dès l'accès Mozilla : corpus Ewondo-French (3 631 phrases) → glossaire `ewo`, phrases-modèles, statut `a_valider` | Couverture sur SAFINUM avec la langue EWO |
 | F-7b | **Évaluer le modèle duala** | Le pipeline est dans `ml/` (récupéré de la branche du collègue) : `ml/scripts/06_evaluate.py` sur **BOUQuET** (fr→dua, jamais pour l'entraînement) + nos phrases-modèles ; noter chrF et précision terminologique dans `ml/README.md` (aucun score n'existe aujourd'hui) | Scores écrits |
