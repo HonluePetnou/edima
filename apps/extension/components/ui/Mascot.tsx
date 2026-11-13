@@ -1,11 +1,9 @@
 export type MascotState = 'idle' | 'greeting' | 'speaking' | 'thinking' | 'alert' | 'question' | 'paused' | 'offline' | 'thanks';
 
-/** "speaking" reuses the idle art plus animated sound waves until a dedicated
- * speaking illustration exists (see the Figma cover notes). */
 const ART: Record<MascotState, string> = {
   idle: 'idle',
   greeting: 'greeting',
-  speaking: 'idle',
+  speaking: 'speaking',
   thinking: 'thinking',
   alert: 'alert',
   question: 'question',

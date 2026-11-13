@@ -18,6 +18,7 @@ Vérifié de bout en bout sur la page du jury https://safinum.cm/hackathon-test
 | D4 : montant saisi ≠ montant du récap → alerte prioritaire + point rouge sur la mascotte | ✅ (attaque simulée détectée) |
 | F-3 : contrôle arithmétique du récap (montant + frais = total), même sans saisie captée | ✅ (`utils/consistency.ts`, 4 tests dont une attaque simulée) |
 | F-9 : vocabulaire du glossaire masqué comme les valeurs avant l'IA, réinséré traduit (pas la devinette du modèle) | ✅ (`packages/shared/src/term-mask.ts`, 9 tests) |
+| F-6 : illustration « Edima parle » (bouche ouverte, même style que les autres états) | ✅ générée + détourée (gpt-image-2.5-sunburst + birefnet-v2-bg-removal), remplace l'astuce idle + ondes dans `Mascot.tsx` |
 | Contenu injecté après chargement, et valeurs modifiées sur place | ✅ |
 | Protection des valeurs : montants, téléphones, comptes, références, dates, %, noms | ✅ jamais traduits ni envoyés |
 | Option « Traduire dans la page » (désactivée par défaut) | ✅ libellés traduits à l'écran, valeurs identiques, restauration exacte |
@@ -90,7 +91,7 @@ Les jeux Mozilla de l'Institute of African Digital Humanities sont sous licence 
 
 ### Code
 
-- Dessin « Edima parle » (F-6), mise à jour de `PLAN.md`, vidéo de 3 min, note technique.
+- Mise à jour de `PLAN.md`, vidéo de 3 min, note technique.
 - Nettoyer la branche `feature/moteur-de-traduction` (journal de session de 11 000 lignes commité).
 
 ## 4. Features futures (feuille de route, prête à confier à Claude)
@@ -107,7 +108,6 @@ et revérifier sur SAFINUM avec un test Playwright + Edge chargeant `.output/chr
 |---|---|---|---|
 | F-1 | **Montants lus en duala** (F4) | `packages/shared/src/numbers.ts` : `amountToWords(n, 'dua')` à partir des nombres MPI-EVA (1–2 000) + milliers/millions confirmés par un locuteur ; brancher `speakAmount` dans `content.tsx` (`AMOUNT_SPEECH_LANGUAGE`) | Tests unitaires sur 100 montants validés |
 | F-2 | **Montants audio assemblés** | Enregistrer 0–9, dizaines, 100, 1 000, million, « francs » ; `utils/audio-clips.ts` → nouvelle fonction qui enchaîne les clips selon F-1 | Écoute + test de l'ordre des clips |
-| F-6 | **Illustration « Edima parle »** | Nouveau dessin dans le style `etat/`, remplacer l'astuce idle + ondes dans `components/ui/Mascot.tsx` | Visuel |
 | F-7 | **Ewondo** | Dès l'accès Mozilla : corpus Ewondo-French (3 631 phrases) → glossaire `ewo`, phrases-modèles, statut `a_valider` | Couverture sur SAFINUM avec la langue EWO |
 | F-7b | **Évaluer le modèle duala** | Le pipeline est dans `ml/` (récupéré de la branche du collègue) : `ml/scripts/06_evaluate.py` sur **BOUQuET** (fr→dua, jamais pour l'entraînement) + nos phrases-modèles ; noter chrF et précision terminologique dans `ml/README.md` (aucun score n'existe aujourd'hui) | Scores écrits |
 | F-7c | **Adaptation bancaire (LoRA)** | Prévu par le collègue : `ml/scripts/08_train_lora.py` sur 200–500 paires bancaires validées (fiche SAFINUM + glossaire), puis réévaluer | Précision terminologique avant/après |
