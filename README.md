@@ -31,6 +31,11 @@ pnpm install
   ```bash
   pnpm test
   ```
+- **Test de bout en bout** (extension réelle chargée dans Edge, contre la page de test du jury) :
+  ```bash
+  pnpm build:extension   # d'abord — le test charge .output/chrome-mv3
+  pnpm test:e2e
+  ```
 - **Vérification des types** :
   ```bash
   pnpm compile

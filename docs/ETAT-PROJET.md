@@ -25,7 +25,8 @@ Vérifié de bout en bout sur la page du jury https://safinum.cm/hackathon-test
 | IA (M2M100 local) | ✅ désactivée par défaut, option « Traduction IA (expérimentale) » |
 | F-4 : explications « ? » traduites par l'IA si l'option est activée, badge « IA — non vérifiée » | ✅ (`LineItem.tsx`), repli silencieux en français sinon |
 | F-5 : mascotte flottante déplaçable (glisser-déposer), position mémorisée | ✅ (`FloatingMascot.tsx` + `utils/settings.ts`) — vérifié sur une page de test (clic vs glissé, blocage aux bords) ; **à revérifier à la main sur SAFINUM** |
-| Tests | 160 tests verts (shared 97, server 7, extension 56) |
+| F-10 : test Playwright dans le dépôt (`pnpm test:e2e`), extension réelle chargée dans Edge sur la vraie page SAFINUM | ✅ relancé et vert à l'instant : solde → frais → bénéficiaire (alerte F7) → récapitulatif (D4/F-3 sans fausse alerte) → confirmation |
+| Tests | 160 tests unitaires verts (shared 97, server 7, extension 56) + 1 test Playwright bout-en-bout |
 
 Documents pour le jury : `docs/declaration-outils-safinum.md`.
 
@@ -110,7 +111,6 @@ et revérifier sur SAFINUM avec un test Playwright + Edge chargeant `.output/chr
 | F-7c | **Adaptation bancaire (LoRA)** | Prévu par le collègue : `ml/scripts/08_train_lora.py` sur 200–500 paires bancaires validées (fiche SAFINUM + glossaire), puis réévaluer | Précision terminologique avant/après |
 | F-8 | **Modèle IA qui sait se taire** | `ml/inference/server.py` : seuil de confiance + aller-retour (rétro-traduction) ; sinon renvoyer `null` → français | Jeu de 200 phrases bancaires |
 | F-9 | **Vocabulaire imposé à l'IA** | Masquer les termes du glossaire comme les valeurs avant envoi au modèle, puis réinsérer la traduction validée | Test unitaire sur `protect-values` |
-| F-10 | **Test Playwright dans le dépôt** | Copier le script du test SAFINUM (scratchpad) dans `apps/extension/e2e/`, lançable via `pnpm test:e2e` | CI locale |
 
 ### Moyen terme
 

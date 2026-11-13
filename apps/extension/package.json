@@ -13,9 +13,11 @@
     "zip:firefox": "wxt zip -b firefox",
     "compile": "tsc --noEmit",
     "test": "vitest run",
+    "test:e2e": "playwright test",
     "postinstall": "wxt prepare"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.0",
     "@preact/preset-vite": "^2.10.6",
     "@types/chrome": "^0.3.7",
     "jsdom": "^31.0.0",

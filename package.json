@@ -7,6 +7,7 @@
     "dev:extension": "pnpm --filter edima-extension dev",
     "build:extension": "pnpm --filter edima-extension build",
     "dev:server": "pnpm --filter edima-server dev",
+    "test:e2e": "pnpm --filter edima-extension test:e2e",
     "test": "pnpm -r --if-present run test",
     "compile": "pnpm -r --if-present run compile"
   },
