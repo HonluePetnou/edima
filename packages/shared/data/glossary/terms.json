@@ -76,54 +76,54 @@
     "category": "transfert",
     "fr": "Bénéficiaire",
     "ewo": null,
-    "dua": null,
+    "dua": "mukousédi",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "montant_envoye",
     "category": "transfert",
     "fr": "Montant envoyé",
     "ewo": null,
-    "dua": null,
+    "dua": "mūsasédi moulomabé",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "montant_a_envoyer",
     "category": "transfert",
     "fr": "Montant à envoyer",
     "ewo": null,
-    "dua": null,
+    "dua": "mūsasédi o lomā",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "frais",
     "category": "transfert",
     "fr": "Frais",
     "ewo": null,
-    "dua": null,
+    "dua": "frais",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "total_debite",
     "category": "transfert",
     "fr": "Total débité",
     "ewo": null,
-    "dua": null,
+    "dua": "mujsousou mou soumuabé",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "date",
     "category": "transfert",
     "fr": "Date",
     "ewo": null,
-    "dua": null,
+    "dua": "date",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "message_optionnel",
@@ -139,36 +139,36 @@
     "category": "transfert",
     "fr": "Tu envoies",
     "ewo": null,
-    "dua": null,
+    "dua": "wa loma",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "a_destinataire",
     "category": "transfert",
     "fr": "À",
     "ewo": null,
-    "dua": null,
+    "dua": "O",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "franc_cfa",
     "category": "transfert",
     "fr": "FCFA",
     "ewo": null,
-    "dua": null,
+    "dua": "FCFA",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "numero_telephone",
     "category": "transfert",
     "fr": "Numéro de téléphone",
     "ewo": null,
-    "dua": null,
+    "dua": "nɔmba telephone",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "transfert_refuse",
@@ -184,117 +184,117 @@
     "category": "navigation",
     "fr": "Envoyer de l'argent",
     "ewo": null,
-    "dua": null,
+    "dua": "loma moni",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "retirer",
     "category": "navigation",
     "fr": "Retirer",
     "ewo": null,
-    "dua": null,
+    "dua": "soumōa",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "payer_facture",
     "category": "navigation",
     "fr": "Payer une facture",
     "ewo": null,
-    "dua": null,
+    "dua": "sawa facture",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "accueil",
     "category": "navigation",
     "fr": "Accueil",
     "ewo": null,
-    "dua": null,
+    "dua": "Acceuil",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "comptes",
     "category": "navigation",
     "fr": "Comptes",
     "ewo": null,
-    "dua": null,
+    "dua": "comptes",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "virements",
     "category": "navigation",
     "fr": "Virements",
     "ewo": null,
-    "dua": null,
+    "dua": "virement",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "aide",
     "category": "navigation",
     "fr": "Aide",
     "ewo": null,
-    "dua": null,
+    "dua": "jongwané",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "bonjour",
     "category": "navigation",
     "fr": "Bonjour",
     "ewo": null,
-    "dua": null,
+    "dua": "moné",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "confirmer",
     "category": "confirmation",
     "fr": "Confirmer",
     "ewo": null,
-    "dua": null,
+    "dua": "confirmer",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "confirmer_transfert",
     "category": "confirmation",
     "fr": "Confirmer le transfert",
     "ewo": null,
-    "dua": null,
+    "dua": "confirmer le transfert",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "annuler",
     "category": "confirmation",
     "fr": "Annuler",
     "ewo": null,
-    "dua": null,
+    "dua": "annuler",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "etape",
     "category": "confirmation",
     "fr": "Étape",
     "ewo": null,
-    "dua": null,
+    "dua": "etape",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "sur",
     "category": "confirmation",
     "fr": "sur",
     "ewo": null,
-    "dua": null,
+    "dua": "mōnia",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "recapitulatif",
@@ -337,117 +337,117 @@
     "category": "securite",
     "fr": "Ne partage jamais ton code secret, même par téléphone",
     "ewo": null,
-    "dua": null,
+    "dua": "o si langwea tomoto code secrét niango tō ō telephone",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "ne_jamais_communiquer_code_agence",
     "category": "securite",
     "fr": "Ne communiquez jamais votre code secret, même à un conseiller de la banque",
     "ewo": null,
-    "dua": null,
+    "dua": "o si langwea tōbūnīa  to o conseiller ningo'o nia banque",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "alerte_securite",
     "category": "securite",
     "fr": "Alerte sécurité",
     "ewo": null,
-    "dua": null,
+    "dua": "alerte sécurité",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "arnaque_possible",
     "category": "securite",
     "fr": "Arnaque possible",
     "ewo": null,
-    "dua": null,
+    "dua": "arnaque possible",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "ce_nest_pas_ta_banque",
     "category": "securite",
     "fr": "Ce n'est pas ta banque",
     "ewo": null,
-    "dua": null,
+    "dua": "etiti banque niango'o",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "message_detecte",
     "category": "securite",
     "fr": "Message détecté sur la page",
     "ewo": null,
-    "dua": null,
+    "dua": "message détecté sur la page",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "action_requise",
     "category": "securite",
     "fr": "Action requise",
     "ewo": null,
-    "dua": null,
+    "dua": "action requise",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "detecte_a_linstant",
     "category": "securite",
     "fr": "Détecté à l'instant",
     "ewo": null,
-    "dua": null,
+    "dua": "détecté à l'instant",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "erreur",
     "category": "securite",
     "fr": "Erreur",
     "ewo": null,
-    "dua": null,
+    "dua": "diwousé",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "avertissement",
     "category": "securite",
     "fr": "Avertissement",
     "ewo": null,
-    "dua": null,
+    "dua": "avertissement",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "lis_moi_cette_page",
     "category": "voix",
     "fr": "Lis-moi cette page",
     "ewo": null,
-    "dua": null,
+    "dua": "langa̍  mba nin kalati",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "ecouter",
     "category": "voix",
     "fr": "Écouter",
     "ewo": null,
-    "dua": null,
+    "dua": "senga'a",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "repeter",
     "category": "voix",
     "fr": "Répéter",
     "ewo": null,
-    "dua": null,
+    "dua": "repeter",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "pause",
@@ -463,36 +463,36 @@
     "category": "voix",
     "fr": "Plus lent",
     "ewo": null,
-    "dua": null,
+    "dua": "na yō",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "reecouter",
     "category": "voix",
     "fr": "Réécouter",
     "ewo": null,
-    "dua": null,
+    "dua": "senga̍ pèté",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "jai_compris",
     "category": "voix",
     "fr": "J'ai compris",
     "ewo": null,
-    "dua": null,
+    "dua": "na sengui",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "ce_que_dit_la_page",
     "category": "voix",
     "fr": "Ce que dit la page",
     "ewo": null,
-    "dua": null,
+    "dua": "njē kalati la kwalanō",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "valide",
@@ -535,9 +535,9 @@
     "category": "transparence",
     "fr": "Voir le français",
     "ewo": null,
-    "dua": null,
+    "dua": "onbwa  frìncí",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "texte_original",
@@ -553,18 +553,18 @@
     "category": "parcours",
     "fr": "La page, dans l'ordre",
     "ewo": null,
-    "dua": null,
+    "dua": "betiledi̍ o oda",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "ce_quedima_texplique",
     "category": "parcours",
     "fr": "Ce qu'Edima t'explique",
     "ewo": null,
-    "dua": null,
+    "dua": "njé Edima éno télèwa",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "etape_1_sur_3_consulter_solde",
@@ -580,9 +580,9 @@
     "category": "parcours",
     "fr": "Étape 2 sur 3 : remplir",
     "ewo": null,
-    "dua": null,
+    "dua": "Etape 2 sur 3: londé",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "etape_3_sur_3_verifier",
@@ -598,27 +598,27 @@
     "category": "coherence",
     "fr": "Les montants sont les mêmes que ceux que tu as saisis",
     "ewo": null,
-    "dua": null,
+    "dua": "misongui mendè mè o tidi nō",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "montant_verifie_saisie",
     "category": "coherence",
     "fr": "Montant vérifié — correspond à ta saisie",
     "ewo": null,
-    "dua": null,
+    "dua": "misongui beten na nje o tidinō",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "edima",
     "category": "divers",
     "fr": "Edima",
     "ewo": null,
-    "dua": null,
+    "dua": "Edima",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "slogan",
@@ -634,9 +634,9 @@
     "category": "divers",
     "fr": "En attente d'une page à expliquer",
     "ewo": null,
-    "dua": null,
+    "dua": "o djedeelle telè kalati",
     "ewo_status": "a_traduire",
-    "dua_status": "a_traduire"
+    "dua_status": "valide"
   },
   {
     "id": "nouveau_message_detecte",
