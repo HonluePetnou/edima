@@ -17,6 +17,7 @@ Vérifié de bout en bout sur la page du jury https://safinum.cm/hackathon-test
 | Récapitulatif : bénéficiaire, montant, frais, total, téléphone lu par paires | ✅ |
 | D4 : montant saisi ≠ montant du récap → alerte prioritaire + point rouge sur la mascotte | ✅ (attaque simulée détectée) |
 | F-3 : contrôle arithmétique du récap (montant + frais = total), même sans saisie captée | ✅ (`utils/consistency.ts`, 4 tests dont une attaque simulée) |
+| F-9 : vocabulaire du glossaire masqué comme les valeurs avant l'IA, réinséré traduit (pas la devinette du modèle) | ✅ (`packages/shared/src/term-mask.ts`, 9 tests) |
 | Contenu injecté après chargement, et valeurs modifiées sur place | ✅ |
 | Protection des valeurs : montants, téléphones, comptes, références, dates, %, noms | ✅ jamais traduits ni envoyés |
 | Option « Traduire dans la page » (désactivée par défaut) | ✅ libellés traduits à l'écran, valeurs identiques, restauration exacte |
@@ -26,7 +27,7 @@ Vérifié de bout en bout sur la page du jury https://safinum.cm/hackathon-test
 | F-4 : explications « ? » traduites par l'IA si l'option est activée, badge « IA — non vérifiée » | ✅ (`LineItem.tsx`), repli silencieux en français sinon |
 | F-5 : mascotte flottante déplaçable (glisser-déposer), position mémorisée | ✅ (`FloatingMascot.tsx` + `utils/settings.ts`) — vérifié sur une page de test (clic vs glissé, blocage aux bords) ; **à revérifier à la main sur SAFINUM** |
 | F-10 : test Playwright dans le dépôt (`pnpm test:e2e`), extension réelle chargée dans Edge sur la vraie page SAFINUM | ✅ relancé et vert à l'instant : solde → frais → bénéficiaire (alerte F7) → récapitulatif (D4/F-3 sans fausse alerte) → confirmation |
-| Tests | 160 tests unitaires verts (shared 97, server 7, extension 56) + 1 test Playwright bout-en-bout |
+| Tests | 169 tests unitaires verts (shared 106, server 7, extension 56) + 1 test Playwright bout-en-bout (relancé après F-9, toujours vert) |
 
 Documents pour le jury : `docs/declaration-outils-safinum.md`.
 
@@ -66,7 +67,7 @@ jeton `{{Vn}}`, il renvoie `null` et l'extension garde le français.
 - **Vocabulaire de la page SAFINUM** : seuls 9 de ses textes sont dans le glossaire. Fiche à faire remplir : `docs/safinum-vocabulaire-a-traduire-duala.txt` (≈50 textes). C'est ce qui fera monter la couverture de traduction.
 - **Ewondo** : rien de traduit pour l'instant.
 - **Pipeline d'entraînement** (`ml/scripts`, `ml/configs`, notebook Kaggle) récupéré de `feature/moteur-de-traduction` dans `main` ; aucun score d'évaluation n'a jamais été noté (voir F-7b).
-- **Montants lus en duala** : nombres de 1 à 2 000 connus (MPI-EVA, linguiste de Yaoundé I) ; il manque 10 000, 100 000, le million et « francs », à confirmer par un locuteur, puis à coder dans `packages/shared/src/numbers.ts`.
+- **Montants lus en duala — toujours bloqué, précisé le 13/11** : source primaire retrouvée (https://lingweb.eva.mpg.de/channumerals/Duala.htm, Dr. Francine Ebegne Ndedi, Univ. Yaoundé I, 2012 — confirme la citation du doc). Mais elle ne donne que **36 formes exactes** : 1-29 (composées avec *na*), les dizaines 30-90, 100, 200, 1000, 2000 — **aucune règle de composition pour 300-900 ou 1100-1999**, et l'accord de classe nominale bantou change la forme (« 2000 » = *lokólí lóɓǎ*, pas *ikólí* + *ɓébǎ*, les formes standalone de 1000 et 2). Généraliser une règle décimale à la française inventerait des formes non confirmées. Le mot duala pour « francs » n'apparaît dans aucune source en main. **Code possible mais quasi inutile en l'état** : seules des valeurs exactes parmi les 36 seraient dites, et jamais avec une unité monétaire. Reste à soumettre les cas manquants (300-900, 1100-1999, « francs », 10 000+) à un locuteur avant de coder quoi que ce soit dans `packages/shared/src/numbers.ts`.
 
 ### Voix
 
@@ -111,7 +112,6 @@ et revérifier sur SAFINUM avec un test Playwright + Edge chargeant `.output/chr
 | F-7b | **Évaluer le modèle duala** | Le pipeline est dans `ml/` (récupéré de la branche du collègue) : `ml/scripts/06_evaluate.py` sur **BOUQuET** (fr→dua, jamais pour l'entraînement) + nos phrases-modèles ; noter chrF et précision terminologique dans `ml/README.md` (aucun score n'existe aujourd'hui) | Scores écrits |
 | F-7c | **Adaptation bancaire (LoRA)** | Prévu par le collègue : `ml/scripts/08_train_lora.py` sur 200–500 paires bancaires validées (fiche SAFINUM + glossaire), puis réévaluer | Précision terminologique avant/après |
 | F-8 | **Modèle IA qui sait se taire** | `ml/inference/server.py` : seuil de confiance + aller-retour (rétro-traduction) ; sinon renvoyer `null` → français | Jeu de 200 phrases bancaires |
-| F-9 | **Vocabulaire imposé à l'IA** | Masquer les termes du glossaire comme les valeurs avant envoi au modèle, puis réinsérer la traduction validée | Test unitaire sur `protect-values` |
 
 ### Moyen terme
 

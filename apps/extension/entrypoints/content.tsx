@@ -1,12 +1,15 @@
 import { render } from 'preact';
 import {
+  extractGlossaryTerms,
   extractProtectedValues,
   fillTemplate,
   findExplanationForText,
   matchTemplatePhrase,
+  reinsertGlossaryTerms,
   reinsertProtectedValues,
   speakAmount,
   translateText,
+  verifyTermsIntact,
   verifyValuesIntact,
 } from 'edima-shared';
 import { extractVisibleText, observeNewContent } from '../utils/dom-reader';
@@ -235,12 +238,8 @@ export default defineContentScript({
 
           if (!aiEnabled || language !== 'dua' || cached) return;
 
-          const { masked, values } = extractProtectedValues(frenchDescription);
-          void requestAiTranslation(masked, language).then((translated) => {
-            if (!translated || requestId !== hoverRequestId) return;
-
-            const final = reinsertProtectedValues(translated, values);
-            if (!verifyValuesIntact(final, values)) return; // F10: never show a value mismatch
+          void translateWithGuardedVocabulary(frenchDescription, language).then((final) => {
+            if (!final || requestId !== hoverRequestId) return;
 
             hoverCache.set(frenchDescription, final);
             const currentRect = el.getBoundingClientRect();
@@ -307,6 +306,32 @@ export default defineContentScript({
       });
     }
 
+    // F-9: masks protected values (F10) *and* known glossary vocabulary
+    // before the model ever sees the text — it's never asked to retranslate
+    // a term we already trust, and never gets the chance to get it wrong.
+    // Reinsertion puts back our own glossary translation for those terms,
+    // not whatever the model would have produced; both reinsertions are
+    // verified intact, same as F10's own value check. Null on any failure —
+    // the caller always keeps showing the French original.
+    const MASK_TOKEN_RE = /\{\{(?:V\d+|T:[^}]+)\}\}/g;
+    async function translateWithGuardedVocabulary(text: string, language: LanguageCode): Promise<string | null> {
+      const { masked: maskedValues, values } = extractProtectedValues(text);
+      const { masked, terms } = extractGlossaryTerms(maskedValues, language);
+
+      // Nothing left to translate once values/terms are masked (e.g. a line
+      // that's just a name or an amount): never bother the model with it.
+      if (!/\p{L}{2,}/u.test(masked.replace(MASK_TOKEN_RE, ''))) return null;
+
+      const translated = await requestAiTranslation(masked, language);
+      if (!translated || !verifyTermsIntact(translated, terms)) return null;
+
+      const withTerms = reinsertGlossaryTerms(translated, terms);
+      const final = reinsertProtectedValues(withTerms, values);
+      if (!verifyValuesIntact(final, values)) return null; // F10's safety net: never show a value mismatch
+
+      return final;
+    }
+
     async function tryAiFallback(texts: string[]) {
       if (!aiEnabled) return;
       let changed = false;
@@ -320,15 +345,8 @@ export default defineContentScript({
         if (text.length < 8 || text.length > 200) continue; // not sentence-like enough to bother the LLM with
 
         aiAttempted.add(text);
-        const { masked, values } = extractProtectedValues(text);
-        // Nothing left to translate once names/numbers/amounts are masked
-        // (e.g. "Amina Ngo Bell", "CM 001 2345 6789 01"): never send it.
-        if (!/\p{L}{2,}/u.test(masked.replace(/\{\{V\d+\}\}/g, ''))) continue;
-        const translated = await requestAiTranslation(masked);
-        if (!translated) continue; // server unavailable — French original keeps showing, correctly
-
-        const final = reinsertProtectedValues(translated, values);
-        if (!verifyValuesIntact(final, values)) continue; // F10's safety net: never show a value mismatch
+        const final = await translateWithGuardedVocabulary(text, activeLanguage);
+        if (!final) continue; // server unavailable, nothing left to translate, or a safety check failed
 
         aiCache.set(text, final);
         changed = true;
