@@ -70,14 +70,15 @@ jeton `{{Vn}}`, il renvoie `null` et l'extension garde le français.
 
 ### Voix
 
-- Pas de voix duala/ewondo pour un texte quelconque : seuls des clips préparés. Pour aller plus loin : enregistrer un locuteur (meilleur), ou entraîner une voix sur Common Voice / Duala-TTS-Dataset (Mozilla, accès demandé).
-- Africa TTS est non commerciale : à remplacer avant tout usage commercial.
+- Pas de voix duala/pidgin pour un texte quelconque : seuls des clips préparés. **Le corpus brut pour les deux est maintenant téléchargé** (`ml/data/common-voice/dua/`, `ml/data/common-voice/wes/`, CC0, non commité — voir ci-dessous) ; reste à entraîner une vraie voix dessus (F-11, toujours à faire).
+- Africa TTS est non commerciale : à remplacer avant tout usage commercial — ce corpus CC0 est le remplaçant naturel.
+- **Pépite trouvée dans `wes`** : plusieurs phrases déjà enregistrées (8-9 locuteurs chacune) tombent pile sur le vocabulaire financier, ex. *« Balance for dat moni na weti? »* (`sentence_id f7441f25...`) et *« Some person be tell yi for send moni for some number. »* (`sentence_id 1fea5d65...`) — de l'audio natif prêt à l'emploi pour « solde » / « envoyer de l'argent », sans TTS à entraîner.
 
 ### Données disponibles
 
 | | Duala | Ewondo | Pidgin camerounais |
 |---|---|---|---|
-| Voix (audio) | ✅ Common Voice 14 h + Duala-TTS (accès demandé) | ✅ Common Voice 14 h + Ewondo-TTS 4 h | ✅ Common Voice 10 h |
+| Voix (audio) | ✅ **téléchargé** — Common Voice 27.0, 14,4 h, 8 095 clips → `ml/data/common-voice/dua/` ; + Duala-TTS-Dataset (accès demandé, en plus) | ⚠️ Common Voice 14 h + Ewondo-TTS 4 h — accès demandé, pas encore en main | ✅ **téléchargé** — Common Voice 27.0, 10,8 h, 9 417 clips → `ml/data/common-voice/wes/` |
 | Texte traduit du français | ⚠️ **BOUQuET** (Meta) : ~1 300 phrases `dua_Latn`/`fra_Latn`, CC-BY-4.0, accès sur demande — **réservé à l'évaluation** du modèle | ✅ 3 631 phrases (Mozilla, accès demandé) | ⚠️ non, mais proche de l'anglais |
 | Texte anglais ↔ duala | ✅ MT560 : 15 351 paires (religieux, CC-BY-4.0, provenance à vérifier avant usage commercial) — déjà utilisé pour entraîner M2M100 | | |
 | Référence bancaire humaine | ✅ **Lexique bancaire Ekwalla (2013)**, ~40 termes — © : à consulter pour valider le glossaire, ne pas recopier | | |
@@ -116,8 +117,8 @@ et revérifier sur SAFINUM avec un test Playwright + Edge chargeant `.output/chr
 
 | # | Feature | Où / comment |
 |---|---|---|
-| F-11 | **Voix duala/ewondo libre de droits** | Entraîner une voix (Piper, MIT) sur Common Voice + Duala-TTS / Ewondo-TTS (Mozilla) ; générer les clips hors ligne, puis voix en direct via ONNX/WebAssembly dans l'extension |
-| F-12 | **Pidgin camerounais** (3e langue) | `LanguageCode` += `wes` ; glossaire pidgin (vocabulaire d'argent déjà dans Common Voice : *moni*, *send*, *balance*, *price*) ; traduction facilitée par la proximité avec l'anglais |
+| F-11 | **Voix duala/ewondo libre de droits** | Corpus duala déjà en main (`ml/data/common-voice/dua/`) ; entraîner une voix (Piper, MIT) dessus + Duala-TTS/Ewondo-TTS (Mozilla, accès demandé) ; générer les clips hors ligne, puis voix en direct via ONNX/WebAssembly dans l'extension |
+| F-12 | **Pidgin camerounais** (3e langue) | Corpus déjà en main (`ml/data/common-voice/wes/`, 9 417 clips, 999 phrases) ; `LanguageCode` += `wes` ; glossaire pidgin (vocabulaire d'argent déjà repéré dans le corpus : *moni*, *send*, *balance* — voir section Voix ci-dessus) ; traduction facilitée par la proximité avec l'anglais |
 | F-13 | **Glossaire en orthographe officielle** | Réécrire avec un locuteur (ɛ, ɔ, ɓ, ɗ, ŋ, tons) ; script de contrôle qui signale les entrées sans ces caractères |
 | F-14 | **Tests sur 10 sites bancaires** (Phase 3 du PLAN) | Banques et mobile money réels, en lecture seule ; mesurer étapes/récap/alertes détectés |
 | F-15 | **Mode hors ligne complet** | Glossaire + clips + voix locale embarqués ; IA facultative ; indicateur dans le panneau |

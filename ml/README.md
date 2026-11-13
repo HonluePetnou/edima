@@ -88,7 +88,8 @@ Le notebook `notebooks/kaggle_train.ipynb` enchaîne ces étapes.
 | --- | --- | --- | --- |
 | MT560 EN–DUA (15 351 paires) | entraînement | CC-BY-4.0 | contenu religieux (Watch Tower), provenance à vérifier avant commercial |
 | BOUQuET `dua_Latn` / `fra_Latn` | évaluation uniquement | CC-BY-4.0 (gated) | ~1,3 k phrases, ne pas entraîner dessus |
-| Common Voice Duala 27.0 | non utilisé ici | CC0 | 1 003 phrases audio, pas de re-hosting |
+| Common Voice Duala 27.0 (`data/common-voice/dua/`) | non utilisé ici — réservé à la voix (F-11/F-18) | CC0 | 8 095 clips, 14,4 h, 1 004 phrases ; pas de re-hosting |
+| Common Voice Pidgin camerounais 27.0 (`data/common-voice/wes/`) | non utilisé ici — réservé à F-12 (3ᵉ langue) | CC0 | 9 417 clips, 10,8 h, 999 phrases ; pas de re-hosting |
 | Lexique bancaire Ekwalla (2013) | référence humaine | © | ne pas recopier, ~40 termes |
 
 Aucun corpus public **français–duala financier** n'existe : le domaine
