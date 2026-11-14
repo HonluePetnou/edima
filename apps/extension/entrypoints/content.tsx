@@ -286,9 +286,10 @@ export default defineContentScript({
     }
 
     // ---- F9: contenu inédit — chaîne glossaire → phrases-modèles → IA ----
-    // Exact glossary match first, then validated template sentences, then the
-    // IA fallback for genuinely unseen text (including glossary terms still
-    // waiting for linguist review).
+    // Exact glossary match first, then template sentences with a shown
+    // translation ("valide" or "a_valider"), then the IA fallback for text
+    // with no glossary/template coverage. Proposed translations are never
+    // sent to IA for correction.
     const aiCache = new Map<string, string>();
     // Texts already sent to the model (successful or not), so a failed request
     // is not retried on every DOM mutation. Cleared on a language switch.
@@ -337,9 +338,9 @@ export default defineContentScript({
       let changed = false;
       for (const text of texts) {
         if (aiCache.has(text) || aiAttempted.has(text)) continue;
-        // A validated glossary entry or template phrase always wins;
-        // unvalidated entries (and genuinely unseen text) are allowed to get
-        // a provisional IA reading.
+        // Any shown glossary entry or template phrase ("valide" or
+        // "a_valider") wins and is never sent to IA for correction; only
+        // "a_traduire" terms and genuinely unseen text reach the fallback.
         if (translateText(text, activeLanguage).source === 'glossaire') continue;
         if (matchTemplatePhrase(text, activeLanguage)) continue;
         if (text.length < 8 || text.length > 200) continue; // not sentence-like enough to bother the LLM with
