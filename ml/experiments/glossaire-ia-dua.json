@@ -1,0 +1,372 @@
+[
+  {
+    "fr": "Solde",
+    "dua_ia": "Sonja",
+    "ok": true
+  },
+  {
+    "fr": "Montant",
+    "dua_ia": "Mō̱",
+    "ok": true
+  },
+  {
+    "fr": "Opération",
+    "dua_ia": "Bebolo",
+    "ok": true
+  },
+  {
+    "fr": "Référence",
+    "dua_ia": "Referangwedi",
+    "ok": true
+  },
+  {
+    "fr": "Téléphone",
+    "dua_ia": "Tele̱",
+    "ok": true
+  },
+  {
+    "fr": "Confirmation",
+    "dua_ia": "Bekaki",
+    "ok": true
+  },
+  {
+    "fr": "Votre compte",
+    "dua_ia": "Myango mo̱ ngo̱",
+    "ok": true
+  },
+  {
+    "fr": "Numéro de compte",
+    "dua_ia": "No̱ ngo̱ la myango",
+    "ok": true
+  },
+  {
+    "fr": "Type d'opération",
+    "dua_ia": "Tipe̱ pe̱ la bebolo",
+    "ok": true
+  },
+  {
+    "fr": "Frais de transfert",
+    "dua_ia": "Tire̱ le̱",
+    "ok": true
+  },
+  {
+    "fr": "Motif du transfert",
+    "dua_ia": "Njo̱ m a betukwedi",
+    "ok": true
+  },
+  {
+    "fr": "Nom du bénéficiaire",
+    "dua_ia": "Dina la muńe̱ nge̱",
+    "ok": true
+  },
+  {
+    "fr": "Total à débiter",
+    "dua_ia": "Nika ńe̱ se̱ ńangame̱ n",
+    "ok": true
+  },
+  {
+    "fr": "Solde après opération",
+    "dua_ia": "Sonja ombusa ebolo",
+    "ok": true
+  },
+  {
+    "fr": "Transactions récentes",
+    "dua_ia": "Bedomsedi be tombi",
+    "ok": true
+  },
+  {
+    "fr": "Récapitulatif et confirmation",
+    "dua_ia": "Jombwea na jome̱ le̱",
+    "ok": true
+  },
+  {
+    "fr": "Reçu de transfert",
+    "dua_ia": "Jabea la jemea",
+    "ok": true
+  },
+  {
+    "fr": "Effectuer un transfert",
+    "dua_ia": "Bolane̱ diwengisan",
+    "ok": true
+  },
+  {
+    "fr": "Consulter les frais",
+    "dua_ia": "So̱ ṅtane̱ mo̱ ni",
+    "ok": true
+  },
+  {
+    "fr": "Continuer",
+    "dua_ia": "Benga",
+    "ok": true
+  },
+  {
+    "fr": "Retour",
+    "dua_ia": "Timba",
+    "ok": true
+  },
+  {
+    "fr": "Modifier",
+    "dua_ia": "Wengisane̱",
+    "ok": true
+  },
+  {
+    "fr": "Salaire reçu",
+    "dua_ia": "Mun'a muńe̱ nge̱",
+    "ok": true
+  },
+  {
+    "fr": "Facture électricité",
+    "dua_ia": "Ekotedi ewo̱",
+    "ok": true
+  },
+  {
+    "fr": "Gratuit",
+    "dua_ia": "Esibe̱",
+    "ok": true
+  },
+  {
+    "fr": "Transfert instantané et gratuit",
+    "dua_ia": "Jabea la dibokime̱ ne̱ na la wonja",
+    "ok": true
+  },
+  {
+    "fr": "Transfert effectué",
+    "dua_ia": "Diwengisan di bolabe̱",
+    "ok": true
+  },
+  {
+    "fr": "Votre transfert a été envoyé avec succès.",
+    "dua_ia": "Diko̱ ti lo̱ ngo̱ di lomabe̱ na bwam.",
+    "ok": true
+  },
+  {
+    "fr": "Consultez votre solde et lancez un transfert en toute sécurité.",
+    "dua_ia": "Ombwea so̱ ṅtane̱ ońol'ango̱, o we̱ le̱ pe̱ mo̱ me̱ ne̱ na mbaki.",
+    "ok": true
+  },
+  {
+    "fr": "Choisissez le type de transfert et le montant. Les frais sont calculés automatiquement.",
+    "dua_ia": "Po̱ so̱ pat'a betukwedi na ńo̱ ṅo̱ n.",
+    "ok": true
+  },
+  {
+    "fr": "Renseignez les informations du destinataire. Vérifiez toujours le numéro avant de valider.",
+    "dua_ia": "Tele̱ ye̱ mot'a muwaso. Ombwea ponda ye̱ se̱ edinge̱ mo̱ denge̱ o we̱ le̱ mo̱.",
+    "ok": true
+  },
+  {
+    "fr": "Vérifiez les informations avant de confirmer le transfert.",
+    "dua_ia": "Ombwea mo̱ me̱ ne̱ oboso ná o po̱ ngulane̱ mo̱.",
+    "ok": true
+  },
+  {
+    "fr": "J'ai vérifié le nom et le numéro du bénéficiaire.",
+    "dua_ia": "Na mba na keka dina la mot'a musawedi name̱ ne̱ pe̱ na numbe̱.",
+    "ok": true
+  },
+  {
+    "fr": "Je confirme que les informations ci-dessus sont correctes.",
+    "dua_ia": "Na mabamse̱ ná nje di kwaledino̱ ye mbale̱.",
+    "ok": true
+  },
+  {
+    "fr": "Vérifiez toujours le nom et le numéro du bénéficiaire avant de confirmer un transfert.",
+    "dua_ia": "O ponda ye̱ se̱, jombweye dina la mot'a musawedi name̱ ne̱ pe̱ na numbe̱ la mo̱ ni oboso ná o kuse jabea la mo̱ ni.",
+    "ok": true
+  },
+  {
+    "fr": "Alerte de sécurité",
+    "dua_ia": "Maye̱ le̱ ma mbaki",
+    "ok": true
+  },
+  {
+    "fr": "Erreur réseau",
+    "dua_ia": "Meto̱ ngedi",
+    "ok": true
+  },
+  {
+    "fr": "Ce bénéficiaire n'a jamais été utilisé sur ce compte. Vérifiez le numéro avant de continuer.",
+    "dua_ia": "Nu muwase̱ musawedi a si bolane̱ no̱ to̱ buńa.",
+    "ok": true
+  },
+  {
+    "fr": "Alerte de sécurité : ce bénéficiaire n'a jamais été utilisé sur ce compte.",
+    "dua_ia": "Mbe̱ le̱ ma mbaki: Muńe̱ nge̱ mu si ta mu bolane̱ o din jokwa.",
+    "ok": true
+  },
+  {
+    "fr": "Alerte de sécurité : vérifiez le numéro du bénéficiaire avant de continuer.",
+    "dua_ia": "Mbe̱ le̱ ma mbaki: Ombwa so̱ ṅtane̱ muńe̱ nge̱ muńe̱ nge̱.",
+    "ok": true
+  },
+  {
+    "fr": "Solde insuffisant pour effectuer ce transfert.",
+    "dua_ia": "M'bwaṅ mu si dongame̱ n o bola nika.",
+    "ok": true
+  },
+  {
+    "fr": "Le montant doit être supérieur à zéro.",
+    "dua_ia": "Mō̱ ńangame̱ n buka n'eso̱ ti.",
+    "ok": true
+  },
+  {
+    "fr": "Veuillez renseigner le nom et le numéro du bénéficiaire.",
+    "dua_ia": "Ońola nika, teleye̱ dina na numbise̱ le̱ la mot'a musawedi.",
+    "ok": true
+  },
+  {
+    "fr": "Vous devez confirmer les informations avant de valider le transfert.",
+    "dua_ia": "O s'angame̱ n so̱ ṅtane̱ mo̱ oboso ná o kuse betukwedi.",
+    "ok": true
+  },
+  {
+    "fr": "Erreur réseau : le service est temporairement indisponible. Réessayez.",
+    "dua_ia": "Diwuse̱ la ńolo: Ebol'a dikalo e titi ná e bolabe̱ ońola son a ponda.",
+    "ok": true
+  },
+  {
+    "fr": "Solde disponible",
+    "dua_ia": "Sonja ni ta ni be̱ be̱",
+    "ok": true
+  },
+  {
+    "fr": "Compte n°",
+    "dua_ia": "Myango mō̱",
+    "ok": true
+  },
+  {
+    "fr": "Compte courant",
+    "dua_ia": "Kalat'a Bonayuda",
+    "ok": true
+  },
+  {
+    "fr": "Dernières opérations",
+    "dua_ia": "Bebolo be sukan",
+    "ok": true
+  },
+  {
+    "fr": "Transfert reçu",
+    "dua_ia": "Dipapa di kusino̱",
+    "ok": true
+  },
+  {
+    "fr": "Paiement facture",
+    "dua_ia": "Beteledi ba mo̱ ni",
+    "ok": true
+  },
+  {
+    "fr": "Retrait au guichet",
+    "dua_ia": "Jingea o wum'a boso",
+    "ok": true
+  },
+  {
+    "fr": "Solde insuffisant",
+    "dua_ia": "Bato ba si dongame̱ n",
+    "ok": true
+  },
+  {
+    "fr": "Message (optionnel)",
+    "dua_ia": "Mwe̱ ndi ( e mapulano̱ )",
+    "ok": true
+  },
+  {
+    "fr": "Transfert refusé",
+    "dua_ia": "Jabea di bangabe̱",
+    "ok": true
+  },
+  {
+    "fr": "Récapitulatif",
+    "dua_ia": "Jombwea",
+    "ok": true
+  },
+  {
+    "fr": "Récapitulatif du transfert",
+    "dua_ia": "Jombwea betukwedi",
+    "ok": true
+  },
+  {
+    "fr": "Cette opération est irréversible",
+    "dua_ia": "Y'ebolo e titi pe̱ te̱ nge̱ n",
+    "ok": true
+  },
+  {
+    "fr": "Code secret",
+    "dua_ia": "Kode̱ le̱ diwuta",
+    "ok": true
+  },
+  {
+    "fr": "Pause",
+    "dua_ia": "Pańa",
+    "ok": true
+  },
+  {
+    "fr": "Validé",
+    "dua_ia": "JALEA",
+    "ok": true
+  },
+  {
+    "fr": "Validé par le linguiste",
+    "dua_ia": "Jombwea na mutombise̱ eyem'a bwambo",
+    "ok": true
+  },
+  {
+    "fr": "Non vérifié",
+    "dua_ia": "Esibe̱ jombwa",
+    "ok": true
+  },
+  {
+    "fr": "IA — non vérifié",
+    "dua_ia": "KA - Esibe̱ jombwea",
+    "ok": true
+  },
+  {
+    "fr": "Texte original",
+    "dua_ia": "Tongwea na Bibe̱ l",
+    "ok": true
+  },
+  {
+    "fr": "Étape 1 sur 3 — Consulter le solde",
+    "dua_ia": "Etapa 1 ońola 3 - Ombwa edinge̱ le̱",
+    "ok": true
+  },
+  {
+    "fr": "Étape 3 sur 3 : vérifier",
+    "dua_ia": "Etapa 3 na 3: Ombwa",
+    "ok": true
+  },
+  {
+    "fr": "Ta banque parle ta langue",
+    "dua_ia": "Bank lo̱ ngo̱ e to̱ po̱ eyem'ango̱",
+    "ok": true
+  },
+  {
+    "fr": "Nouveau message détecté",
+    "dua_ia": "Mwe̱ ndi ma peńa mu so̱ i",
+    "ok": true
+  },
+  {
+    "fr": "« {bouton} » : {description}.",
+    "dua_ia": "E? ( Efe.",
+    "ok": true
+  },
+  {
+    "fr": "Le bouton « {bouton} » sert à {description}.",
+    "dua_ia": "But'a \" [ [ [ ] ] \" e mabolane̱ nde ońola [ langwa ].",
+    "ok": true
+  },
+  {
+    "fr": "Détecté à l'instant.",
+    "dua_ia": "Di so̱ ṅtane̱ o nin we̱ nge̱.",
+    "ok": true
+  },
+  {
+    "fr": "Retrait au guichet, {montant}.",
+    "dua_ia": "Diba omo̱ ń a bo̱ ngo̱.",
+    "ok": true
+  },
+  {
+    "fr": "Compte numéro {numero_masque}.",
+    "dua_ia": "No̱ ngo̱ numba la mo̱ ni.",
+    "ok": true
+  }
+]
