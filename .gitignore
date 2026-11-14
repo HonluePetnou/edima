@@ -9,6 +9,7 @@ dist
 ml/data/
 ml/models/
 ml/out/
+ml/experiments/tts-dataset/
 __pycache__/
 *.pyc
 *.safetensors

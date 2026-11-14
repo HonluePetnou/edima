@@ -52,6 +52,27 @@ une sortie de modèle, pas une traduction. Utile pour donner à un locuteur
 une base à corriger plutôt qu'une page blanche — pas pour remplir le
 glossaire tout seul.
 
+## 3. Données prêtes pour un entraînement multi-locuteurs (`prepare-tts-dataset.py`)
+
+Convertit le corpus Common Voice brut (`ml/data/common-voice/<lang>/`) en
+wav 22050 Hz mono + `metadata.csv` (`id|speaker|texte`), format compatible
+aussi bien Piper que Coqui TTS. Lancé pour `dua` et `wes` : 7018 et 9018
+clips convertis, 0 échec. Sortie dans `tts-dataset/<lang>/` (gitignored —
+audio régénérable, pas du code).
+
+Meilleur locuteur unique par langue (utile pour une voix mono-locuteur
+plus propre) : ~1,2 à 1,5 h / ~900-1000 clips — voir `speakers.csv` dans
+chaque dossier de sortie pour le classement complet.
+
+**Blocage découvert en préparant l'entraînement, pas juste le compute** :
+Piper a besoin d'espeak-ng pour phonétiser le texte avant l'entraînement,
+et espeak-ng ne connaît ni le duala ni le pidgin camerounais. D'autres
+projets dans la même situation (féroïen, tigrigna) ont dû soit fabriquer
+une voix espeak-ng pour leur langue à la main, soit utiliser un autre
+outil (Coqui TTS) qui accepte un entraînement directement sur les
+caractères, sans phonétisation. Ce choix d'outil n'est pas tranché ici —
+les données préparées marchent pour les deux options.
+
 ## Pourquoi tout ça reste hors de `packages/shared/`
 
 Parce que `packages/shared/src/glossary.ts` et `numbers.ts` sont importés
