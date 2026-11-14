@@ -78,7 +78,7 @@
     "ewo": null,
     "dua": "mukousédi",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "montant_envoye",
@@ -87,7 +87,7 @@
     "ewo": null,
     "dua": "mūsasédi moulomabé",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "montant_a_envoyer",
@@ -96,7 +96,7 @@
     "ewo": null,
     "dua": "mūsasédi o lomā",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "frais",
@@ -105,7 +105,7 @@
     "ewo": null,
     "dua": "frais",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "total_debite",
@@ -114,7 +114,7 @@
     "ewo": null,
     "dua": "mujsousou mou soumuabé",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "date",
@@ -123,7 +123,7 @@
     "ewo": null,
     "dua": "date",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "message_optionnel",
@@ -141,7 +141,7 @@
     "ewo": null,
     "dua": "wa loma",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "a_destinataire",
@@ -150,7 +150,7 @@
     "ewo": null,
     "dua": "O",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "franc_cfa",
@@ -159,7 +159,7 @@
     "ewo": null,
     "dua": "FCFA",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "numero_telephone",
@@ -168,7 +168,7 @@
     "ewo": null,
     "dua": "nɔmba telephone",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "transfert_refuse",
@@ -186,7 +186,7 @@
     "ewo": null,
     "dua": "loma moni",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "retirer",
@@ -195,7 +195,7 @@
     "ewo": null,
     "dua": "soumōa",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "payer_facture",
@@ -204,7 +204,7 @@
     "ewo": null,
     "dua": "sawa facture",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "accueil",
@@ -213,7 +213,7 @@
     "ewo": null,
     "dua": "Acceuil",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "comptes",
@@ -222,7 +222,7 @@
     "ewo": null,
     "dua": "comptes",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "virements",
@@ -231,7 +231,7 @@
     "ewo": null,
     "dua": "virement",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "aide",
@@ -240,7 +240,7 @@
     "ewo": null,
     "dua": "jongwané",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "bonjour",
@@ -249,7 +249,7 @@
     "ewo": null,
     "dua": "moné",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "confirmer",
@@ -258,7 +258,7 @@
     "ewo": null,
     "dua": "confirmer",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "confirmer_transfert",
@@ -267,7 +267,7 @@
     "ewo": null,
     "dua": "confirmer le transfert",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "annuler",
@@ -276,7 +276,7 @@
     "ewo": null,
     "dua": "annuler",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "etape",
@@ -285,7 +285,7 @@
     "ewo": null,
     "dua": "etape",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "sur",
@@ -294,7 +294,7 @@
     "ewo": null,
     "dua": "mōnia",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "recapitulatif",
@@ -339,7 +339,7 @@
     "ewo": null,
     "dua": "o si langwea tomoto code secrét niango tō ō telephone",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "ne_jamais_communiquer_code_agence",
@@ -348,7 +348,7 @@
     "ewo": null,
     "dua": "o si langwea tōbūnīa  to o conseiller ningo'o nia banque",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "alerte_securite",
@@ -357,7 +357,7 @@
     "ewo": null,
     "dua": "alerte sécurité",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "arnaque_possible",
@@ -366,7 +366,7 @@
     "ewo": null,
     "dua": "arnaque possible",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "ce_nest_pas_ta_banque",
@@ -375,7 +375,7 @@
     "ewo": null,
     "dua": "etiti banque niango'o",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "message_detecte",
@@ -384,7 +384,7 @@
     "ewo": null,
     "dua": "message détecté sur la page",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "action_requise",
@@ -393,7 +393,7 @@
     "ewo": null,
     "dua": "action requise",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "detecte_a_linstant",
@@ -402,7 +402,7 @@
     "ewo": null,
     "dua": "détecté à l'instant",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "erreur",
@@ -411,7 +411,7 @@
     "ewo": null,
     "dua": "diwousé",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "avertissement",
@@ -420,7 +420,7 @@
     "ewo": null,
     "dua": "avertissement",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "lis_moi_cette_page",
@@ -429,7 +429,7 @@
     "ewo": null,
     "dua": "langa̍  mba nin kalati",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "ecouter",
@@ -438,7 +438,7 @@
     "ewo": null,
     "dua": "senga'a",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "repeter",
@@ -447,7 +447,7 @@
     "ewo": null,
     "dua": "repeter",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "pause",
@@ -465,7 +465,7 @@
     "ewo": null,
     "dua": "na yō",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "reecouter",
@@ -474,7 +474,7 @@
     "ewo": null,
     "dua": "senga̍ pèté",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "jai_compris",
@@ -483,7 +483,7 @@
     "ewo": null,
     "dua": "na sengui",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "ce_que_dit_la_page",
@@ -492,7 +492,7 @@
     "ewo": null,
     "dua": "njē kalati la kwalanō",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "valide",
@@ -537,7 +537,7 @@
     "ewo": null,
     "dua": "onbwa  frìncí",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "texte_original",
@@ -555,7 +555,7 @@
     "ewo": null,
     "dua": "betiledi̍ o oda",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "ce_quedima_texplique",
@@ -564,7 +564,7 @@
     "ewo": null,
     "dua": "njé Edima éno télèwa",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "etape_1_sur_3_consulter_solde",
@@ -582,7 +582,7 @@
     "ewo": null,
     "dua": "Etape 2 sur 3: londé",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "etape_3_sur_3_verifier",
@@ -600,7 +600,7 @@
     "ewo": null,
     "dua": "misongui mendè mè o tidi nō",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "montant_verifie_saisie",
@@ -609,7 +609,7 @@
     "ewo": null,
     "dua": "misongui beten na nje o tidinō",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "edima",
@@ -618,7 +618,7 @@
     "ewo": null,
     "dua": "Edima",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "slogan",
@@ -636,7 +636,7 @@
     "ewo": null,
     "dua": "o djedeelle telè kalati",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "nouveau_message_detecte",

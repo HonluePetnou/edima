@@ -10,7 +10,7 @@
     "ewo": null,
     "dua": "wa loḿa môninga {montant} na {nom}.",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "tpl_solde_reste",
@@ -22,7 +22,7 @@
     "ewo": null,
     "dua": "o diané o compte a ō {montant}.",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "tpl_solde_disponible",
@@ -34,7 +34,7 @@
     "ewo": null,
     "dua": "mususoumua moni o dianō muende {montant}.",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "tpl_frais_transfert",
@@ -46,7 +46,7 @@
     "ewo": null,
     "dua": "mususēdi mua mūn mula loma muende {montant}.",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "tpl_total_sortant",
@@ -58,7 +58,7 @@
     "ewo": null,
     "dua": "mususou mua buse o nin compte muende̍ {montant}.",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "tpl_envoi_complet",
@@ -72,7 +72,7 @@
     "ewo": null,
     "dua": "wa lomma {montant} o {nom}, nomba {telephone}.",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "tpl_bouton_description",
@@ -108,7 +108,7 @@
     "ewo": null,
     "dua": "edima langa̍a wan wouma",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "tpl_edima_explique_champs",
@@ -118,7 +118,7 @@
     "ewo": null,
     "dua": "edima lèlè biso’o bètiledi tè na doī la sam",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "tpl_remplis_toi_meme",
@@ -128,7 +128,7 @@
     "ewo": null,
     "dua": "londé dipapa wamené o site, tōsó langwa musousedi na doī la sam",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "tpl_clique_toi_meme",
@@ -140,7 +140,7 @@
     "ewo": null,
     "dua": "bena bèsé bē temtē, wamène banda o {bouton}",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "tpl_nouveau_message_lu",
@@ -150,7 +150,7 @@
     "ewo": null,
     "dua": "betilédi be poi᷅ o site. edima langā tatan",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "tpl_demande_code_sms",
@@ -160,7 +160,7 @@
     "ewo": null,
     "dua": "bétilédi ba baiséwa code secret na SMS",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "tpl_jamais_demande",
@@ -170,7 +170,7 @@
     "ewo": null,
     "dua": "banqu'a go̍ na Edima ési mendè baisè wa",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "tpl_ny_reponds_pas",
@@ -180,7 +180,7 @@
     "ewo": null,
     "dua": "ô salabé",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "tpl_dis_jai_compris",
@@ -190,7 +190,7 @@
     "ewo": null,
     "dua": "langwa na sengi tōso mōtó o bouton wanan",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "tpl_dis_oui_continuer",
@@ -200,7 +200,7 @@
     "ewo": null,
     "dua": "kwala oui o walla o bésè, tōsō répète o sengâ penîa",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "tpl_detecte_instant",
@@ -223,7 +223,7 @@
     "ewo": null,
     "dua": "muloloman o dina la {nom} musousedi mua {montant}.",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "tpl_paiement_facture_fournisseur",
@@ -236,7 +236,7 @@
     "ewo": null,
     "dua": "musisédi mua dipapa {fournisseur}, {montant}.",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "tpl_retrait_guichet_montant",
@@ -260,7 +260,7 @@
     "ewo": null,
     "dua": "wengue̍, {date}.",
     "ewo_status": "a_traduire",
-    "dua_status": "a_valider"
+    "dua_status": "valide"
   },
   {
     "id": "tpl_compte_numero",

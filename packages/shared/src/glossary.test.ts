@@ -87,9 +87,9 @@ describe('fillTemplate', () => {
     expect(result).toBe('Tu vas envoyer 5 000 FCFA à {nom}.');
   });
 
-  it('fills the proposed (a_valider) duala template while preserving protected values', () => {
+  it('fills the validated duala template while preserving protected values', () => {
     const template = findTemplate('tpl_envoi_montant_nom')!;
-    expect(template.dua_status).toBe('a_valider');
+    expect(template.dua_status).toBe('valide');
     const result = fillTemplate(template, { montant: '5 000 FCFA', nom: 'Paul Mballa' });
     expect(result).toContain('5 000 FCFA');
     expect(result).toContain('Paul Mballa');
@@ -97,12 +97,12 @@ describe('fillTemplate', () => {
     expect(result).not.toBe(template.fr);
   });
 
-  it('uses the duala column once that template is valide, independent of ewondo', () => {
+  it('fills a merely proposed (a_valider) duala template the same way, independent of ewondo', () => {
     const template = findTemplate('tpl_envoi_montant_nom')!;
     const originalStatus = template.dua_status;
     const originalDua = template.dua;
     try {
-      template.dua_status = 'valide';
+      template.dua_status = 'a_valider';
       template.dua = 'U la tila {montant} i {nom}.';
       const values = { montant: '5 000 FCFA', nom: 'Paul Mballa' };
       expect(fillTemplate(template, values, 'dua')).toBe('U la tila 5 000 FCFA i Paul Mballa.');

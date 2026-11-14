@@ -89,8 +89,15 @@ Le notebook `notebooks/kaggle_train.ipynb` enchaîne ces étapes.
 | MT560 EN–DUA (15 351 paires) | entraînement | CC-BY-4.0 | contenu religieux (Watch Tower), provenance à vérifier avant commercial |
 | BOUQuET `dua_Latn` / `fra_Latn` | évaluation uniquement | CC-BY-4.0 (gated) | ~1,3 k phrases, ne pas entraîner dessus |
 | Common Voice Duala 27.0 (`data/common-voice/dua/`) | non utilisé ici — réservé à la voix (F-11/F-18) | CC0 | 8 095 clips, 14,4 h, 1 004 phrases ; pas de re-hosting |
-| Common Voice Pidgin camerounais 27.0 (`data/common-voice/wes/`) | non utilisé ici — réservé à F-12 (3ᵉ langue) | CC0 | 9 417 clips, 10,8 h, 999 phrases ; pas de re-hosting |
+| Common Voice Pidgin camerounais 27.0 (`data/common-voice/wes/`) | réservé à F-12 (3ᵉ langue) | CC0 | 9 417 clips, 10,8 h, 999 phrases ; pas de re-hosting |
 | Lexique bancaire Ekwalla (2013) | référence humaine | © | ne pas recopier, ~40 termes |
+
+Deux phrases du corpus pidgin tombent directement sur le vocabulaire financier
+(« *Balance for dat moni na weti?* », « *Some person be tell yi for send moni for
+some number.* »), chacune enregistrée par 8-9 locuteurs — extraites et documentées
+dans `ml/samples/wes-financier/` (CC0, hors de `data/` donc commitées). Elles ne sont
+pas encore branchées dans l'extension : ce sont des phrases complètes, pas des
+traductions des libellés courts de l'interface — voir le README de ce dossier.
 
 Aucun corpus public **français–duala financier** n'existe : le domaine
 bancaire viendra du glossaire validé puis, à l'étape 2, d'une adaptation

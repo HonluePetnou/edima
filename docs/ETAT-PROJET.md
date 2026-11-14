@@ -18,6 +18,7 @@ Vérifié de bout en bout sur la page du jury https://safinum.cm/hackathon-test
 | D4 : montant saisi ≠ montant du récap → alerte prioritaire + point rouge sur la mascotte | ✅ (attaque simulée détectée) |
 | F-3 : contrôle arithmétique du récap (montant + frais = total), même sans saisie captée | ✅ (`utils/consistency.ts`, 4 tests dont une attaque simulée) |
 | F-9 : vocabulaire du glossaire masqué comme les valeurs avant l'IA, réinséré traduit (pas la devinette du modèle) | ✅ (`packages/shared/src/term-mask.ts`, 9 tests) |
+| Glossaire duala (48 termes + 19 phrases traduits) relu et validé par un locuteur — le 14/11 | ✅ `dua_status` passé à `"valide"` dans `packages/shared/data/glossary/` ; le badge « Traduction à valider » disparaît, remplacé par le badge glossaire/phrase-modèle normal (D1) |
 | F-6 : illustration « Edima parle » (bouche ouverte, même style que les autres états) | ✅ générée + détourée (gpt-image-2.5-sunburst + birefnet-v2-bg-removal), remplace l'astuce idle + ondes dans `Mascot.tsx` |
 | Contenu injecté après chargement, et valeurs modifiées sur place | ✅ |
 | Protection des valeurs : montants, téléphones, comptes, références, dates, %, noms | ✅ jamais traduits ni envoyés |
@@ -62,9 +63,9 @@ jeton `{{Vn}}`, il renvoie `null` et l'extension garde le français.
 
 ### Langue (bloquant pour la note « fidélité des traductions »)
 
-- **Aucune traduction duala n'est validée par un linguiste.** Les 48 termes et 19 phrases du glossaire sont affichés « Traduction à valider ». Si un locuteur les a relus, remettre `dua_status` à `"valide"` dans `packages/shared/data/glossary/`.
+- **Glossaire duala validé par un locuteur le 14/11** (48 termes + 19 phrases, `dua_status: "valide"`). Reste à confirmer que ce locuteur est bien qualifié pour une relecture linguistique au sens strict (le jury peut demander qui a validé) — voir aussi le point orthographe ci-dessous.
 - Le glossaire duala est écrit « à la française » (`mukousédi`), alors que l'orthographe officielle utilise ɛ, ɔ, ɓ, ɗ, ŋ et les tons (voir Common Voice). À réécrire avec un locuteur, sinon les voix prononcent mal.
-- Certaines « traductions » sont identiques au français (`Confirmer le transfert`) : elles sont ignorées à l'affichage, mais à remplacer.
+- Certaines « traductions » validées sont encore identiques au français (`Confirmer le transfert`, `Virements`, `Comptes`, `Avertissement`...) : à remplacer par de vrais mots duala quand ils existent — sinon elles restent des emprunts tels quels.
 - **Vocabulaire de la page SAFINUM** : seuls 9 de ses textes sont dans le glossaire. Fiche à faire remplir : `docs/safinum-vocabulaire-a-traduire-duala.txt` (≈50 textes). C'est ce qui fera monter la couverture de traduction.
 - **Ewondo** : rien de traduit pour l'instant.
 - **Pipeline d'entraînement** (`ml/scripts`, `ml/configs`, notebook Kaggle) récupéré de `feature/moteur-de-traduction` dans `main` ; aucun score d'évaluation n'a jamais été noté (voir F-7b).
@@ -74,7 +75,7 @@ jeton `{{Vn}}`, il renvoie `null` et l'extension garde le français.
 
 - Pas de voix duala/pidgin pour un texte quelconque : seuls des clips préparés. **Le corpus brut pour les deux est maintenant téléchargé** (`ml/data/common-voice/dua/`, `ml/data/common-voice/wes/`, CC0, non commité — voir ci-dessous) ; reste à entraîner une vraie voix dessus (F-11, toujours à faire).
 - Africa TTS est non commerciale : à remplacer avant tout usage commercial — ce corpus CC0 est le remplaçant naturel.
-- **Pépite trouvée dans `wes`** : plusieurs phrases déjà enregistrées (8-9 locuteurs chacune) tombent pile sur le vocabulaire financier, ex. *« Balance for dat moni na weti? »* (`sentence_id f7441f25...`) et *« Some person be tell yi for send moni for some number. »* (`sentence_id 1fea5d65...`) — de l'audio natif prêt à l'emploi pour « solde » / « envoyer de l'argent », sans TTS à entraîner.
+- **Pépite dans `wes`, extraite le 14/11** : deux phrases enregistrées par 8-9 locuteurs chacune tombent sur le vocabulaire financier — *« Balance for dat moni na weti? »* et *« Some person be tell yi for send moni for some number. »*. Copiées (CC0) dans `ml/samples/wes-financier/` avec leur transcription exacte. **Pas branchées dans l'extension** : ce sont des phrases complètes, pas des traductions des libellés courts de l'UI (« Solde disponible », « Envoyer de l'argent ») — les faire jouer à la place d'un libellé serait le même genre d'erreur que deviner un montant (F10), appliqué à la langue. Utile comme matière première une fois qu'un vrai libellé pidgin existera (F-12).
 
 ### Données disponibles
 

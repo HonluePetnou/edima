@@ -8,13 +8,13 @@
 
 > *« Le principal risque n'est pas le code mais la qualité de la langue »* — cahier des charges.
 
-La langue MVP est tranchée : **duala**, pas ewondo (aucun corpus ewondo en main à ce jour). Le glossaire (72 termes + 24 phrases-modèles), la grammaire des nombres dans `packages/shared/src/numbers.ts`, 34 clips audio (Africa TTS) et le corpus Common Voice duala (14,4 h, `ml/data/common-voice/dua/`) sont tous en main. Ce qui manque encore :
+La langue MVP est tranchée : **duala**, pas ewondo (aucun corpus ewondo en main à ce jour). Le glossaire (48 termes + 19 phrases traduits sur 72/24) est **relu et validé par un locuteur depuis le 14/11** (`dua_status: "valide"`) ; la grammaire des nombres dans `packages/shared/src/numbers.ts`, 34 clips audio (Africa TTS) et le corpus Common Voice duala (14,4 h, `ml/data/common-voice/dua/`) sont en main. Ce qui manque encore :
 
-- **Validation par un linguiste.** Tout le duala est au statut `a_valider` (proposé par un locuteur, jamais relu par un linguiste) — c'est ce qui bloque la note « fidélité des traductions » du jury, pas l'absence de contenu.
-- L'orthographe duala du glossaire est écrite « à la française » plutôt qu'avec ɛ ɔ ɓ ɗ ŋ — à corriger avec un locuteur.
+- L'orthographe duala du glossaire est écrite « à la française » plutôt qu'avec ɛ ɔ ɓ ɗ ŋ — à corriger avec un locuteur, sinon les voix prononcent mal.
+- Certaines traductions validées sont encore des emprunts identiques au français (`Virements`, `Comptes`, `Confirmer le transfert`...) — à remplacer par de vrais mots duala quand ils existent.
 - Les montants au-delà de 2 000 et le mot duala pour « francs » : aucune source trouvée (voir `docs/ETAT-PROJET.md` § Langue pour le détail — y compris pourquoi une règle de composition générique serait risquée, l'accord de classe nominale bantoue changeant la forme des nombres).
 
-**Action immédiate, toujours valable :** mobiliser un locuteur/linguiste duala (Resulam, linguistique Yaoundé I/Douala, NTeALan) pour relire le glossaire et combler les nombres manquants — c'est le seul gain qui débloquerait plusieurs lignes de la feuille de route (F-1, F-2, F-7b/7c) d'un coup.
+**Action immédiate, toujours valable :** mobiliser un locuteur/linguiste duala (Resulam, linguistique Yaoundé I/Douala, NTeALan) pour corriger l'orthographe, traduire les emprunts restants et combler les nombres manquants — ça débloquerait F-1, F-2, F-7b/7c d'un coup.
 
 ## Répartition des rôles (2 personnes, historique)
 
@@ -38,7 +38,7 @@ Dans les faits, l'essentiel du code depuis a été écrit avec une assistance IA
 - [x] Direction visuelle : panneau redessiné (éditorial sobre, encre + terracotta) puis aligné sur le fichier Figma « Edima — Extension UI » (mascotte à 9 états, palette clair/sombre, navigation par écrans)
 - [x] Glossaire + phrases-modèles duala livrés par des locuteurs (statut `a_valider`) — relecture linguiste en attente
 
-## Phase 2 — Fonctions du MVP ✅ terminée (hors validation linguistique)
+## Phase 2 — Fonctions du MVP ✅ terminée
 
 Détail et preuves dans le README (§ État actuel) et `docs/ETAT-PROJET.md` (§ Ce qui marche) — vérifié de bout en bout sur https://safinum.cm/hackathon-test.
 
@@ -51,7 +51,7 @@ Détail et preuves dans le README (§ État actuel) et `docs/ETAT-PROJET.md` (§
 - [x] Vocabulaire du glossaire masqué comme les valeurs avant l'IA (`packages/shared/src/term-mask.ts`) — le modèle ne retraduit jamais un terme déjà validé
 - [x] Mascotte flottante sur les pages financières, déplaçable par glisser-déposer, position mémorisée
 - [ ] Protection des montants testée sur 200 phrases / jeu de 100 montants validés — pas formalisé comme jeu de test dédié (la couverture actuelle vient des suites unitaires, 169 tests)
-- [ ] Relecture par 2 locuteurs, rétro-traduction — toujours en attente du linguiste
+- [x] Glossaire duala relu par un locuteur (14/11) — [ ] une 2ᵉ relecture / rétro-traduction reste souhaitable pour la rigueur linguistique complète
 
 ## Phase 3 — Durcissement et dépôt — en cours
 
